@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1d4ed8">
+<title>ثبت عملیات — مرحله ۳.۱</title>
+<style>
+*{box-sizing:border-box}
+:root{--p:#1d4ed8;--bg:#f5f7fb;--line:#e2e8f0;--muted:#64748b;--ok:#16a34a;--warn:#d97706;--danger:#dc2626}
+body{margin:0;background:var(--bg);font-family:Tahoma,system-ui;color:#0f172a;padding-bottom:40px}
+.app{max-width:720px;margin:auto;padding:0 12px}
+.head{margin:0 -12px 14px;padding:18px;background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;border-radius:0 0 24px 24px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.head h1{font-size:18px;margin:0}
+.head small{opacity:.85;font-size:11px;font-weight:400}
+.card{background:#fff;border:1px solid #e7ebf2;border-radius:18px;padding:15px;margin-bottom:12px;box-shadow:0 10px 28px -22px #0f172a}
+.note{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:14px;padding:10px 12px;font-size:12px;line-height:1.9;margin-bottom:12px}
+.field{display:block;margin:12px 0}
+.field span.lb{display:block;color:var(--muted);font-size:12px;font-weight:700;margin-bottom:5px}
+.req{color:var(--danger)}
+.field input,.field textarea,.field select{width:100%;padding:12px;border:1.5px solid var(--line);border-radius:12px;background:#fbfdff;font:inherit;color:inherit}
+.field textarea{min-height:92px;resize:vertical}
+.field input:focus,.field textarea:focus,.field select:focus{outline:0;border-color:#93c5fd;background:#fff}
+select.empty{color:#94a3b8;border-color:#fcd34d;background:#fffdf5}
+.btn{border:0;border-radius:12px;padding:12px 14px;font:700 14px inherit;background:#e2e8f0;color:#0f172a;transition:transform .08s,filter .08s}
+.btn:active{transform:scale(.97);filter:brightness(.92)}
+.btn.block{width:100%;margin-top:8px}
+.btn.primary{background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:#fff}
+.btn.ok{background:#16a34a;color:#fff}
+.btn.ghost{background:#fff;border:1.5px solid var(--line)}
+.btn.danger{background:#fee2e2;color:#991b1b}
+.btn[disabled]{opacity:.5}
+.hidden{display:none!important}
+.row{display:flex;gap:8px}
+.row>*{flex:1}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{text-align:center;background:#f8fafc;border-radius:13px;padding:10px 3px}
+.stat b{display:block;font-size:22px;color:var(--p)}
+.stat span{font-size:11px;color:var(--muted)}
+.muted{color:var(--muted);font-size:12px;line-height:1.9}
+.msg{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 18px;border-radius:25px;display:none;z-index:30;font-size:13px}
+.msg.show{display:block}
+.wiz-top{margin-bottom:10px}
+.wiz-bar{height:6px;background:#e2e8f0;border-radius:6px;overflow:hidden}
+.wiz-bar i{display:block;height:100%;background:linear-gradient(90deg,#1d4ed8,#60a5fa);transition:width .25s}
+.wiz-meta{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.wiz-meta b{font-size:15px}
+.wiz-meta span{font-size:11px;color:var(--muted);background:#eef2ff;padding:4px 9px;border-radius:12px}
+.typegrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.type{border:1.5px solid var(--line);background:#fbfdff;border-radius:14px;padding:11px 9px;text-align:right;font:inherit;transition:transform .08s}
+.type:active{transform:scale(.97)}
+.type b{display:block;font-size:13px}
+.type small{color:var(--muted);font-size:10px}
+.type.sel{border-color:#1d4ed8;background:#eff6ff;box-shadow:0 0 0 3px #dbeafe}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:20px;padding:7px 12px;font:700 12px inherit;color:#334155;transition:transform .08s}
+.chip:active{transform:scale(.96)}
+.chip.sel{border-color:#1d4ed8;background:#eff6ff;color:#1d4ed8}
+.err{display:none;margin:10px 0 0;background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:12px;padding:9px 11px;font-size:12px;font-weight:700;line-height:1.9}
+.err.show{display:block}
+.pend{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:12px;padding:9px 11px;font-size:12px;font-weight:700;margin-top:10px}
+.gpsbox{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:13px;padding:11px;font-size:12px;line-height:2}
+.gpsbox b{color:var(--p);direction:ltr;display:inline-block}
+.unit{background:#eef2ff;color:#1e40af;border-radius:10px;padding:0 10px;display:flex;align-items:center;font-weight:700;font-size:13px;flex:0 0 auto}
+.qrow{display:flex;gap:8px}
+.qrow input{flex:1}
+.sum{border-right:4px solid #bfdbfe;padding-right:12px;margin:4px 0 0}
+.sum div{display:flex;gap:8px;padding:7px 0;border-bottom:1px dashed #e2e8f0;font-size:13px}
+.sum div:last-child{border:0}
+.sum i{font-style:normal;color:var(--muted);min-width:92px;font-size:12px}
+.sum b{font-weight:700;flex:1}
+.photos{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+.ph{position:relative}
+.ph img{width:84px;height:84px;border-radius:12px;object-fit:cover;border:1px solid var(--line)}
+.ph button{position:absolute;top:-7px;left:-7px;width:24px;height:24px;border-radius:50%;border:2px solid #fff;background:#dc2626;color:#fff;font:700 13px Tahoma;line-height:1;padding:0}
+.op{background:#fff;border:1px solid var(--line);border-radius:16px;padding:13px;margin-bottom:9px}
+.op-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.code{direction:ltr;color:var(--p);font-weight:800;font-size:13px}
+.tag{font-size:10px;padding:4px 9px;border-radius:14px;background:#eff6ff;color:#1d4ed8;font-weight:700;white-space:nowrap}
+.op p{margin:8px 0 0;font-size:13px;line-height:1.9}
+.op .meta{color:var(--muted);font-size:11px;margin-top:6px}
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:26px 10px}
+details.tools summary{cursor:pointer;font-weight:700;padding:10px;background:#f8fafc;border-radius:12px;font-size:13px;color:var(--muted)}
+.okbox{text-align:center;padding:14px 6px}
+.okbox .big{font-size:44px}
+.okbox h2{margin:6px 0 4px;font-size:18px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="head">
+    <div>
+      <h1>🏗️ ثبت عملیات</h1>
+      <small>نسخه آزمایشی • v3.1.1-OPS-WIZARD</small>
+    </div>
+    <button class="btn ghost" id="homeBtn">خانه</button>
+  </header>
+
+  <div class="note">
+    <b>فایل آزمایشی مرحله ۳.۱</b><br>
+    این صفحه فقط برای آزمایش «ویزارد ۷ گامی ثبت عملیات» است. داده‌ها فقط در حافظه همین مرورگر ذخیره می‌شود و هیچ ارتباطی با سامانه اصلی، سرور و داده‌های واقعی ندارد.
+  </div>
+
+  <section id="home">
+    <div class="card stats">
+      <div class="stat"><b id="nAll">۰</b><span>کل عملیات</span></div>
+      <div class="stat"><b id="nToday">۰</b><span>امروز</span></div>
+      <div class="stat"><b id="nTypes">۰</b><span>نوع فعال</span></div>
+    </div>
+    <button class="btn primary block" id="newOp">➕ ثبت عملیات جدید</button>
+    <div id="list"></div>
+    <details class="tools">
+      <summary>⚙️ ابزار آزمایش</summary>
+      <div class="card" style="margin-top:10px">
+        <p class="muted">برای شروع دوباره آزمایش می‌توانی همه داده‌های محلی این صفحه را پاک کنی. روی سامانه اصلی هیچ اثری ندارد.</p>
+        <button class="btn danger block" id="wipe">🗑 پاک‌کردن داده‌های آزمایشی</button>
+      </div>
+    </details>
+  </section>
+
+  <section id="wizard" class="hidden">
+    <div class="card">
+      <div class="wiz-top">
+        <div class="wiz-bar"><i id="wizBar" style="width:13%"></i></div>
+        <div class="wiz-meta"><b id="wizTitle">نوع عملیات</b><span id="wizStep">گام ۱ از ۷</span></div>
+      </div>
+
+      <!-- گام ۱ -->
+      <div class="step" data-step="1">
+        <span class="lb">نوع عملیات را انتخاب کن <span class="req">*</span></span>
+        <div class="typegrid" id="typeGrid"></div>
+        <div class="pend" id="p1">هنوز انتخابی انجام نشده است.</div>
+      </div>
+
+      <!-- گام ۲ -->
+      <div class="step hidden" data-step="2">
+        <label class="field">
+          <span class="lb">تاریخ عملیات (شمسی) <span class="req">*</span></span>
+          <div class="row">
+            <select id="dY"></select>
+            <select id="dM"></select>
+            <select id="dD"></select>
+          </div>
+        </label>
+        <div class="chips">
+          <button type="button" class="chip" data-day="-1">دیروز</button>
+          <button type="button" class="chip" data-day="0">امروز</button>
+          <button type="button" class="chip" data-day="1">فردا</button>
+        </div>
+        <div class="pend" id="p2">هیچ تاریخی از پیش انتخاب نشده است. تاریخ را خودت انتخاب کن.</div>
+      </div>
+
+      <!-- گام ۳ -->
+      <div class="step hidden" data-step="3">
+        <label class="field">
+          <span class="lb">منطقه <span class="req">*</span></span>
+          <select id="region"></select>
+        </label>
+        <label class="field hidden" id="regionOtherWrap">
+          <span class="lb">نام منطقه <span class="req">*</span></span>
+          <input id="regionOther" placeholder="مثلاً شهرک صنعتی">
+        </label>
+        <button class="btn ghost block" id="gpsBtn">📍 ثبت موقعیت فعلی (اختیاری)</button>
+        <div class="gpsbox" id="gpsBox" style="margin-top:10px">موقعیتی ثبت نشده است.</div>
+        <div class="pend" id="p3">منطقه هنوز انتخاب نشده است.</div>
+      </div>
+
+      <!-- گام ۴ -->
+      <div class="step hidden" data-step="4">
+        <label class="field">
+          <span class="lb">آدرس دقیق <span class="req">*</span></span>
+          <textarea id="address" placeholder="خیابان، کوچه، پلاک یا نشانه شاخص"></textarea>
+        </label>
+        <p class="muted">هرچه دقیق‌تر باشد، پیگیری و تحویل کار ساده‌تر می‌شود.</p>
+      </div>
+
+      <!-- گام ۵ -->
+      <div class="step hidden" data-step="5">
+        <label class="field">
+          <span class="lb">شرح عملیات <span class="req">*</span></span>
+          <textarea id="descr" placeholder="چه کاری باید انجام شود؟"></textarea>
+        </label>
+      </div>
+
+      <!-- گام ۶ -->
+      <div class="step hidden" data-step="6">
+        <label class="field">
+          <span class="lb" id="q1Label">مقدار <span class="req">*</span></span>
+          <div class="qrow"><input id="q1" type="number" inputmode="decimal" min="0" step="any" placeholder="مثلاً ۱۲٫۵"><span class="unit" id="q1Unit">—</span></div>
+        </label>
+        <label class="field hidden" id="q2Wrap">
+          <span class="lb" id="q2Label">مقدار دوم (اختیاری)</span>
+          <div class="qrow"><input id="q2" type="number" inputmode="decimal" min="0" step="any" placeholder="اختیاری"><span class="unit" id="q2Unit">—</span></div>
+        </label>
+        <p class="muted" id="qHint"></p>
+      </div>
+
+      <!-- گام ۷ -->
+      <div class="step hidden" data-step="7">
+        <span class="lb">نحوه اجرا را مشخص کن <span class="req">*</span></span>
+        <div class="typegrid" id="execMode">
+          <button type="button" class="type" data-mode="contractor"><b>🏢 با پیمانکار</b><small>نام پیمانکار لازم است</small></button>
+          <button type="button" class="type" data-mode="amani"><b>👷 اجرای امانی</b><small>با نیروی داخلی، بدون پیمانکار</small></button>
+        </div>
+        <label class="field hidden" id="cWrap">
+          <span class="lb">نام پیمانکار <span class="req">*</span></span>
+          <input id="contractor" placeholder="نام پیمانکار یا شرکت">
+        </label>
+        <div class="pend" id="p7">نحوه اجرا هنوز مشخص نشده است.</div>
+      </div>
+
+      <!-- بازبینی -->
+      <div class="step hidden" data-step="8">
+        <div class="sum" id="review"></div>
+        <div class="field" style="margin-top:14px">
+          <span class="lb">عکس وضعیت موجود (اختیاری، حداکثر ۳)</span>
+          <input id="photoInput" type="file" accept="image/*" multiple>
+          <div class="photos" id="photoBox"></div>
+          <p class="muted">این عکس‌ها فقط «وضعیت فعلی محل» را هنگام ثبت دستور ثبت می‌کنند و جایگزین شواهد اجرا نیستند. عکس‌های قبل از اجرا، حین اجرا و پایان کار با قفل ترتیبی، حداقل تعداد و ثبت GPS در مرحله ۳.۳ گرفته می‌شوند.</p>
+        </div>
+      </div>
+
+      <p class="err" id="err"></p>
+
+      <div class="row" style="margin-top:14px">
+        <button class="btn ghost" id="prev">◀ قبلی</button>
+        <button class="btn primary" id="next">بعدی ▶</button>
+      </div>
+      <button class="btn block ghost" id="cancel" style="margin-top:8px">انصراف</button>
+    </div>
+  </section>
+
+  <section id="done" class="hidden">
+    <div class="card okbox">
+      <div class="big">✅</div>
+      <h2>عملیات ثبت شد</h2>
+      <p class="muted">کد رهگیری این عملیات:</p>
+      <p class="code" id="doneCode" style="font-size:20px"></p>
+      <button class="btn primary block" id="doneHome">بازگشت به فهرست</button>
+    </div>
+  </section>
+
+</div>
+<div class="msg" id="msg"></div>
+
+<script>
+const APP_VERSION = 'v3.1.1-OPS-WIZARD';
+const KEY = 'ops31_local_v1';
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const pad2 = n => String(n).padStart(2, '0');
+const fd = s => String(s).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+const TYPES = [
+  {id:'asphalt',   name:'آسفالت‌ریزی',            u1:'تن',      u2:'متر مربع'},
+  {id:'patch',     name:'لکه‌گیری آسفالت',        u1:'تن',      u2:'متر مربع'},
+  {id:'trench',    name:'ترمیم ترانشه',           u1:'متر طول', u2:'متر مربع'},
+  {id:'curb',      name:'جدول‌گذاری',             u1:'متر طول', u2:''},
+  {id:'sidewalk',  name:'پیاده‌روسازی',           u1:'متر مربع',u2:''},
+  {id:'drain',     name:'دفع آبگرفتگی / لایروبی', u1:'متر طول', u2:''},
+  {id:'clean',     name:'نظافت و جمع‌آوری نخاله', u1:'تن',      u2:'سرویس'},
+  {id:'green',     name:'فضای سبز و هرس',         u1:'اصله',    u2:'متر مربع'},
+  {id:'light',     name:'روشنایی معابر',          u1:'عدد',     u2:''},
+  {id:'furniture', name:'تعمیر مبلمان شهری',      u1:'عدد',     u2:''},
+  {id:'safety',    name:'رفع خطر و ایمن‌سازی',    u1:'مورد',    u2:''}
+];
+const MONTHS = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+const REGIONS = ['منطقه ۱','منطقه ۲','منطقه ۳','منطقه ۴','منطقه ۵','منطقه ۶','منطقه ۷','منطقه ۸','سایر'];
+
+/* ---------- تاریخ شمسی ---------- */
+function jParts(d){
+  const a = new Intl.DateTimeFormat('fa-IR-u-ca-persian-nu-latn',{year:'numeric',month:'numeric',day:'numeric'}).formatToParts(d);
+  const o = {}; a.forEach(x => o[x.type] = +x.value);
+  return {y:o.year, m:o.month, d:o.day};
+}
+function jToday(){ return jParts(new Date()); }
+function jDoy(m,d){ return (m <= 6 ? (m-1)*31 : 186 + (m-7)*30) + d; }
+function jToDate(jy,jm,jd){
+  let g = new Date(Date.UTC(jy + 621, 2, 21, 12, 0, 0));
+  for (let i = 0; i < 8; i++){
+    const p = jParts(g);
+    if (p.y === jy && p.m === jm && p.d === jd) return g;
+    const delta = (jy - p.y) * 365 + (jDoy(jm,jd) - jDoy(p.m,p.d));
+    if (delta === 0) break;
+    g = new Date(g.getTime() + delta * 86400000);
+  }
+  for (let k = -4; k <= 4; k++){
+    const t = new Date(g.getTime() + k * 86400000), p = jParts(t);
+    if (p.y === jy && p.m === jm && p.d === jd) return t;
+  }
+  return null;
+}
+function jMonthLen(jy,jm){
+  if (jm <= 6) return 31;
+  if (jm <= 11) return 30;
+  return jToDate(jy,12,30) ? 30 : 29;
+}
+function jFmt(jy,jm,jd){ return fd(jy + '/' + pad2(jm) + '/' + pad2(jd)); }
+function nowFa(){
+  return new Intl.DateTimeFormat('fa-IR-u-ca-persian',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).format(new Date());
+}
+
+/* ---------- ذخیره محلی ---------- */
+function load(){ try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch(e){ return []; } }
+function save(a){
+  try { localStorage.setItem(KEY, JSON.stringify(a)); return true; }
+  catch(e){ alert('حافظه مرورگر پر شده است. چند عکس کمتر بگذار یا داده‌های آزمایشی را پاک کن.'); return false; }
+}
+function toast(t){ const m = $('#msg'); m.textContent = t; m.classList.add('show'); clearTimeout(window._t); window._t = setTimeout(() => m.classList.remove('show'), 2300); }
+function makeCode(jy,jm,jd){
+  const base = jy + '-' + pad2(jm) + '-' + pad2(jd);
+  return base + '-' + (load().filter(o => (o.code || '').startsWith(base)).length + 1);
+}
+
+/* ---------- وضعیت ویزارد ---------- */
+let step = 1, draft = {}, photos = [];
+const LAST = 8;
+const TITLES = {1:'نوع عملیات',2:'تاریخ عملیات',3:'منطقه و موقعیت',4:'آدرس دقیق',5:'شرح عملیات',6:'مقدار کار',7:'نحوه اجرا',8:'بازبینی و ثبت'};
+
+function show(sec){
+  ['home','wizard','done'].forEach(x => $('#'+x).classList.toggle('hidden', x !== sec));
+  window.scrollTo(0,0);
+}
+function err(t){
+  const e = $('#err');
+  if (!t){ e.classList.remove('show'); return; }
+  e.textContent = '⛔ ' + t;
+  e.classList.add('show');
+  e.scrollIntoView({block:'center', behavior:'smooth'});
+}
+function paintStep(){
+  $$('.step').forEach(s => s.classList.toggle('hidden', +s.dataset.step !== step));
+  $('#wizBar').style.width = Math.round(step / LAST * 100) + '%';
+  $('#wizTitle').textContent = TITLES[step];
+  $('#wizStep').textContent = step === LAST ? 'بازبینی نهایی' : 'گام ' + fd(step) + ' از ۷';
+  $('#prev').disabled = step === 1;
+  $('#next').textContent = step === LAST ? '✅ ثبت نهایی' : 'بعدی ▶';
+  $('#next').classList.toggle('ok', step === LAST);
+  err('');
+  if (step === 6) paintQty();
+  if (step === LAST){ paintReview(); paintPhotos(); }
+  pending();
+  window.scrollTo(0,0);
+}
+/* نشانگر «هنوز انتخاب نشده» */
+function pending(){
+  const set = (id, bad) => { const el = $(id); if (el) el.classList.toggle('hidden', !bad); };
+  set('#p1', !draft.typeId);
+  set('#p2', !($('#dY').value && $('#dM').value && $('#dD').value));
+  set('#p3', !$('#region').value);
+  set('#p7', !draft.mode);
+  $('#dY').classList.toggle('empty', !$('#dY').value);
+  $('#dM').classList.toggle('empty', !$('#dM').value);
+  $('#dD').classList.toggle('empty', !$('#dD').value);
+  $('#region').classList.toggle('empty', !$('#region').value);
+}
+
+/* ---------- گام ۱ ---------- */
+function paintTypes(){
+  $('#typeGrid').innerHTML = TYPES.map(t =>
+    `<button type="button" class="type${draft.typeId===t.id?' sel':''}" data-id="${t.id}"><b>${esc(t.name)}</b><small>واحد: ${esc(t.u1)}${t.u2?' + '+esc(t.u2):''}</small></button>`
+  ).join('');
+}
+$('#typeGrid').addEventListener('click', e => {
+  const b = e.target.closest('.type'); if (!b) return;
+  draft.typeId = b.dataset.id; paintTypes(); err(''); pending();
+});
+
+/* ---------- گام ۲ (بدون هیچ پیش‌فرض) ---------- */
+function buildDateSelects(){
+  const t = jToday(), ys = $('#dY'), ms = $('#dM'), ds = $('#dD');
+  ys.innerHTML = ''; ms.innerHTML = ''; ds.innerHTML = '';
+  ys.add(new Option('سال…', ''));
+  for (let y = t.y - 1; y <= t.y + 1; y++) ys.add(new Option(fd(y), y));
+  ms.add(new Option('ماه…', ''));
+  MONTHS.forEach((n,i) => ms.add(new Option(n, i+1)));
+  ds.add(new Option('روز…', ''));
+  ys.value = ''; ms.value = ''; ds.value = '';
+}
+function buildDays(keep){
+  const ds = $('#dD'), jy = +$('#dY').value, jm = +$('#dM').value;
+  const cur = keep != null ? keep : (+ds.value || 0);
+  ds.innerHTML = ''; ds.add(new Option('روز…', ''));
+  if (jy && jm){
+    const len = jMonthLen(jy, jm);
+    for (let d = 1; d <= len; d++) ds.add(new Option(fd(d), d));
+    ds.value = (cur >= 1 && cur <= len) ? cur : '';
+  } else {
+    ds.value = '';
+  }
+  pending();
+}
+function setDate(jy,jm,jd){
+  $('#dY').value = jy; $('#dM').value = jm; buildDays(jd); $('#dD').value = jd; pending(); err('');
+}
+$('#dY').addEventListener('change', () => { buildDays(); err(''); });
+$('#dM').addEventListener('change', () => { buildDays(); err(''); });
+$('#dD').addEventListener('change', () => { pending(); err(''); });
+$$('.chip[data-day]').forEach(c => c.addEventListener('click', () => {
+  const p = jParts(new Date(Date.now() + (+c.dataset.day) * 86400000));
+  setDate(p.y, p.m, p.d); toast('تاریخ ' + jFmt(p.y,p.m,p.d) + ' انتخاب شد');
+}));
+
+/* ---------- گام ۳ (بدون پیش‌فرض) ---------- */
+function buildRegions(){
+  const r = $('#region'); r.innerHTML = '';
+  r.add(new Option('— منطقه را انتخاب کن —', ''));
+  REGIONS.forEach(x => r.add(new Option(x, x)));
+  r.value = '';
+}
+$('#region').addEventListener('change', () => {
+  $('#regionOtherWrap').classList.toggle('hidden', $('#region').value !== 'سایر');
+  pending(); err('');
+});
+$('#gpsBtn').addEventListener('click', () => {
+  if (!navigator.geolocation) return toast('مرورگر از موقعیت‌یابی پشتیبانی نمی‌کند');
+  const b = $('#gpsBtn'); b.disabled = true; b.textContent = '⏳ در حال دریافت موقعیت…';
+  navigator.geolocation.getCurrentPosition(p => {
+    draft.gps = {lat:p.coords.latitude, lng:p.coords.longitude, acc:Math.round(p.coords.accuracy||0), at:new Date().toISOString()};
+    paintGps(); b.disabled = false; b.textContent = '🔄 دریافت دوباره موقعیت'; toast('موقعیت ثبت شد');
+  }, e => {
+    b.disabled = false; b.textContent = '📍 ثبت موقعیت فعلی (اختیاری)';
+    toast(e.code === 1 ? 'اجازه دسترسی به موقعیت داده نشد' : 'دریافت موقعیت ناموفق بود');
+  }, {enableHighAccuracy:true, timeout:15000, maximumAge:0});
+});
+function paintGps(){
+  const g = draft.gps;
+  $('#gpsBox').innerHTML = g
+    ? `طول و عرض جغرافیایی: <b>${g.lat.toFixed(6)}, ${g.lng.toFixed(6)}</b><br>دقت تقریبی: ${fd(g.acc)} متر<br><a href="https://www.google.com/maps?q=${g.lat},${g.lng}" target="_blank" rel="noopener">نمایش روی نقشه</a>`
+    : 'موقعیتی ثبت نشده است.';
+}
+
+/* ---------- گام ۶ ---------- */
+function curType(){ return TYPES.find(t => t.id === draft.typeId) || null; }
+function paintQty(){
+  const t = curType(); if (!t) return;
+  $('#q1Label').innerHTML = 'مقدار بر حسب ' + esc(t.u1) + ' <span class="req">*</span>';
+  $('#q1Unit').textContent = t.u1;
+  $('#q2Wrap').classList.toggle('hidden', !t.u2);
+  if (t.u2){ $('#q2Label').textContent = 'مقدار بر حسب ' + t.u2 + ' (اختیاری)'; $('#q2Unit').textContent = t.u2; }
+  $('#qHint').textContent = t.u2
+    ? 'واحد اصلی ' + t.u1 + ' است. اگر ' + t.u2 + ' را هم وارد کنی، گزارش‌ها و کنترل کیفیت دقیق‌تر می‌شوند.'
+    : 'واحد این نوع عملیات ' + t.u1 + ' است.';
+}
+
+/* ---------- گام ۷ (انتخاب صریح) ---------- */
+$('#execMode').addEventListener('click', e => {
+  const b = e.target.closest('.type'); if (!b) return;
+  draft.mode = b.dataset.mode;
+  $$('#execMode .type').forEach(x => x.classList.toggle('sel', x.dataset.mode === draft.mode));
+  $('#cWrap').classList.toggle('hidden', draft.mode !== 'contractor');
+  if (draft.mode === 'amani') $('#contractor').value = '';
+  pending(); err('');
+});
+
+/* ---------- عکس اختیاری وضعیت موجود ---------- */
+$('#photoInput').addEventListener('change', async e => {
+  const files = Array.from(e.target.files || []);
+  e.target.value = '';
+  for (const f of files){
+    if (photos.length >= 3){ toast('حداکثر ۳ عکس'); break; }
+    try { photos.push(await shrink(f)); } catch(x){ toast('خواندن عکس ناموفق بود'); }
+  }
+  paintPhotos();
+});
+function shrink(file){
+  return new Promise((res, rej) => {
+    const fr = new FileReader();
+    fr.onerror = rej;
+    fr.onload = () => {
+      const img = new Image();
+      img.onerror = rej;
+      img.onload = () => {
+        const max = 1000, s = Math.min(1, max / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        res(c.toDataURL('image/jpeg', 0.6));
+      };
+      img.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+function paintPhotos(){
+  $('#photoBox').innerHTML = photos.map((p,i) =>
+    `<div class="ph"><img src="${p}" alt="عکس ${i+1}"><button type="button" data-i="${i}">×</button></div>`).join('');
+}
+$('#photoBox').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  photos.splice(+b.dataset.i, 1); paintPhotos();
+});
+
+/* ---------- بازبینی ---------- */
+function collect(){
+  const t = curType();
+  const region = $('#region').value === 'سایر' ? $('#regionOther').value.trim() : $('#region').value;
+  return {
+    typeId: draft.typeId, typeName: t ? t.name : '',
+    jy: +$('#dY').value, jm: +$('#dM').value, jd: +$('#dD').value,
+    region, address: $('#address').value.trim(), descr: $('#descr').value.trim(),
+    q1: $('#q1').value.trim(), u1: t ? t.u1 : '', q2: $('#q2').value.trim(), u2: t ? t.u2 : '',
+    mode: draft.mode, contractor: draft.mode === 'contractor' ? $('#contractor').value.trim() : '',
+    gps: draft.gps || null, photos: photos.slice()
+  };
+}
+function paintReview(){
+  const o = collect();
+  const rows = [
+    ['نوع عملیات', o.typeName],
+    ['تاریخ عملیات', jFmt(o.jy,o.jm,o.jd)],
+    ['منطقه', o.region],
+    ['آدرس دقیق', o.address],
+    ['شرح', o.descr],
+    ['مقدار', fd(o.q1) + ' ' + o.u1 + (o.q2 ? ' — ' + fd(o.q2) + ' ' + o.u2 : '')],
+    ['نحوه اجرا', o.mode === 'amani' ? 'اجرای امانی' : 'پیمانکار: ' + o.contractor],
+    ['موقعیت', o.gps ? o.gps.lat.toFixed(5) + ', ' + o.gps.lng.toFixed(5) + ' (±' + fd(o.gps.acc) + ' متر)' : 'ثبت نشده']
+  ];
+  $('#review').innerHTML = rows.map(r => `<div><i>${esc(r[0])}</i><b>${esc(r[1])}</b></div>`).join('');
+}
+
+/* ---------- اعتبارسنجی ---------- */
+function validate(){
+  if (step === 1 && !draft.typeId) return 'نوع عملیات اجباری است. یکی از کارت‌ها را انتخاب کن.';
+  if (step === 2){
+    if (!$('#dY').value) return 'سال عملیات انتخاب نشده است.';
+    if (!$('#dM').value) return 'ماه عملیات انتخاب نشده است.';
+    if (!$('#dD').value) return 'روز عملیات انتخاب نشده است.';
+  }
+  if (step === 3){
+    if (!$('#region').value) return 'منطقه اجباری است و هیچ پیش‌فرضی ندارد.';
+    if ($('#region').value === 'سایر' && !$('#regionOther').value.trim()) return 'نام منطقه را بنویس.';
+  }
+  if (step === 4 && $('#address').value.trim().length < 3) return 'آدرس دقیق اجباری است.';
+  if (step === 5 && $('#descr').value.trim().length < 3) return 'شرح عملیات اجباری است.';
+  if (step === 6){
+    const v = $('#q1').value.trim();
+    if (!v) return 'مقدار اجباری است.';
+    if (!(parseFloat(v) > 0)) return 'مقدار باید عددی بزرگ‌تر از صفر باشد.';
+  }
+  if (step === 7){
+    if (!draft.mode) return 'نحوه اجرا را انتخاب کن: با پیمانکار یا اجرای امانی.';
+    if (draft.mode === 'contractor' && !$('#contractor').value.trim()) return 'نام پیمانکار را بنویس یا گزینه اجرای امانی را انتخاب کن.';
+  }
+  return '';
+}
+
+/* ---------- ناوبری ---------- */
+$('#next').addEventListener('click', () => {
+  const e = validate(); if (e){ pending(); return err(e); }
+  if (step === LAST) return submit();
+  step++; paintStep();
+});
+$('#prev').addEventListener('click', () => { if (step > 1){ step--; paintStep(); } });
+$('#cancel').addEventListener('click', () => { if (confirm('ثبت این عملیات لغو شود؟')){ render(); show('home'); } });
+$('#homeBtn').addEventListener('click', () => {
+  if (!$('#wizard').classList.contains('hidden') && !confirm('ثبت این عملیات لغو شود؟')) return;
+  render(); show('home');
+});
+$('#doneHome').addEventListener('click', () => { render(); show('home'); });
+
+function submit(){
+  const o = collect();
+  o.code = makeCode(o.jy, o.jm, o.jd);
+  o.createdAt = new Date().toISOString();
+  o.createdFa = nowFa();
+  o.status = 'registered';
+  const all = load(); all.unshift(o);
+  if (!save(all)) return;
+  $('#doneCode').textContent = fd(o.code);
+  show('done');
+}
+
+/* ---------- شروع ---------- */
+$('#newOp').addEventListener('click', () => {
+  draft = {}; photos = []; step = 1;
+  paintTypes(); buildDateSelects(); buildRegions();
+  $('#regionOtherWrap').classList.add('hidden'); $('#regionOther').value = '';
+  $('#address').value = ''; $('#descr').value = ''; $('#q1').value = ''; $('#q2').value = '';
+  $('#contractor').value = ''; $('#cWrap').classList.add('hidden');
+  $$('#execMode .type').forEach(x => x.classList.remove('sel'));
+  $('#gpsBtn').disabled = false; $('#gpsBtn').textContent = '📍 ثبت موقعیت فعلی (اختیاری)';
+  paintGps(); paintPhotos(); paintStep(); show('wizard');
+});
+$('#wipe').addEventListener('click', () => {
+  if (!confirm('همه داده‌های آزمایشی این صفحه پاک شود؟')) return;
+  localStorage.removeItem(KEY); render(); toast('پاک شد');
+});
+
+function render(){
+  const all = load(), t = jToday();
+  $('#nAll').textContent = fd(all.length);
+  $('#nToday').textContent = fd(all.filter(o => o.jy === t.y && o.jm === t.m && o.jd === t.d).length);
+  $('#nTypes').textContent = fd(new Set(all.map(o => o.typeId)).size);
+  $('#list').innerHTML = all.length ? all.map(o => `
+    <div class="op">
+      <div class="op-top">
+        <div><span class="code">${esc(fd(o.code))}</span><p style="margin:4px 0 0"><b>${esc(o.typeName)}</b></p></div>
+        <span class="tag">${esc(jFmt(o.jy,o.jm,o.jd))}</span>
+      </div>
+      <p>📍 ${esc(o.region)} — ${esc(o.address)}</p>
+      <p>📝 ${esc(o.descr)}</p>
+      <p>📦 ${esc(fd(o.q1))} ${esc(o.u1)}${o.q2 ? ' — ' + esc(fd(o.q2)) + ' ' + esc(o.u2) : ''}</p>
+      ${(o.photos && o.photos.length) ? `<div class="photos">${o.photos.map(p => `<div class="ph"><img src="${p}" alt="عکس"></div>`).join('')}</div>` : ''}
+      <div class="meta">${o.mode === 'amani' ? '👷 اجرای امانی' : '🏢 ' + esc(o.contractor || '—')} • ثبت: ${esc(o.createdFa || '')}${o.gps ? ' • 📍 موقعیت دارد' : ''}</div>
+    </div>`).join('') : '<div class="card empty">هنوز عملیاتی ثبت نشده است.<br>با دکمه بالا اولین عملیات را ثبت کن.</div>';
+}
+
+buildDateSelects(); buildRegions(); render();
+console.log('Bazdid Ops ' + APP_VERSION);
+</script>
+</body>
+</html>
