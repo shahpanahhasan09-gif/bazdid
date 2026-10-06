@@ -89,6 +89,31 @@ details.tools summary{cursor:pointer;font-weight:700;padding:10px;background:#f8
 .acc-ok{color:#16a34a;font-weight:700}
 .acc-bad{color:#b45309;font-weight:700}
 
+/* ---------- نقش‌ها و گردش کار ---------- */
+.rolecards{display:grid;gap:10px}
+.role{display:flex;gap:12px;align-items:center;background:#fbfdff;border:1.5px solid var(--line);border-radius:16px;padding:14px;text-align:right;font:inherit;transition:transform .08s}
+.role:active{transform:scale(.98)}
+.role.on{border-color:#1d4ed8;background:#eff6ff;box-shadow:0 0 0 3px #dbeafe}
+.role .ic{font-size:27px;flex:0 0 auto}
+.role .tx{flex:1}
+.role b{display:block;font-size:15px;color:var(--p);margin-bottom:2px}
+.role i{font-style:normal;display:block;font-size:11.5px;color:var(--muted);line-height:1.8}
+.rolechip{margin-top:6px;background:#ffffff26;border:1px solid #ffffff59;color:#fff;border-radius:999px;padding:4px 11px;font:700 11px Tahoma;transition:transform .08s}
+.rolechip:active{transform:scale(.95)}
+.st{display:inline-block;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:700;white-space:nowrap}
+.st-ord{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
+.st-pln{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+.st-run{background:#ecfdf5;color:#047857;border:1px solid #a7f3d0}
+.flow{display:flex;align-items:center;gap:4px;margin:9px 0 0}
+.flow i{font-style:normal;flex:1;text-align:center;font-size:9.5px;color:#94a3b8;background:#f1f5f9;border-radius:8px;padding:4px 2px}
+.flow i.on{background:#dbeafe;color:#1d4ed8;font-weight:700}
+.flow i.done{background:#dcfce7;color:#15803d;font-weight:700}
+details.log{margin-top:9px}
+details.log summary{cursor:pointer;font-size:11.5px;color:var(--p);font-weight:700}
+details.log ul{margin:7px 0 0;padding-right:17px;font-size:11.5px;color:var(--muted);line-height:2}
+.assignbox{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:12px;padding:9px 11px;font-size:12px;line-height:2;margin-top:8px}
+.assignbox b{color:var(--p)}
+
 /* ---------- تقویم شمسی ---------- */
 .datebtn{width:100%;text-align:right;padding:15px;border:1.5px solid var(--line);border-radius:14px;background:#fbfdff;font:inherit;display:flex;justify-content:space-between;align-items:center;gap:8px;transition:transform .08s}
 .datebtn:active{transform:scale(.99)}
@@ -135,23 +160,32 @@ details.tools summary{cursor:pointer;font-weight:700;padding:10px;background:#f8
   <header class="head">
     <div>
       <h1>🏗️ ثبت عملیات</h1>
-      <small>نسخه آزمایشی • v3.1.3-OPS-CALENDAR</small>
+      <small>نسخه آزمایشی • v3.2.0-ROLES</small>
+      <button type="button" id="roleChip" class="rolechip hidden"></button>
     </div>
     <button class="btn ghost" id="homeBtn">خانه</button>
   </header>
 
   <div class="note">
-    <b>فایل آزمایشی مرحله ۳.۱</b><br>
-    این صفحه فقط برای آزمایش «ویزارد ۷ گامی ثبت عملیات» است. داده‌ها فقط در حافظه همین مرورگر ذخیره می‌شود و هیچ ارتباطی با سامانه اصلی، سرور و داده‌های واقعی ندارد.
+    <b>فایل آزمایشی مرحله ۳.۲</b><br>
+    آزمایش «گردش نقش‌ها»: مدیر اصلی دستور می‌دهد، مدیر اجرایی برنامه‌ریزی و ارجاع می‌کند، ناظر/مجری اجرا را شروع می‌کند. داده‌ها فقط در حافظه همین مرورگر ذخیره می‌شود و هیچ ارتباطی با سامانه اصلی، سرور و داده‌های واقعی ندارد.
   </div>
 
-  <section id="home">
-    <div class="card stats">
-      <div class="stat"><b id="nAll">۰</b><span>کل عملیات</span></div>
-      <div class="stat"><b id="nToday">۰</b><span>امروز</span></div>
-      <div class="stat"><b id="nTypes">۰</b><span>نوع فعال</span></div>
+  <section id="roleGate" class="hidden">
+    <div class="card">
+      <h3 style="margin:0 0 4px;font-size:16px">نقش خود را انتخاب کن</h3>
+      <p class="muted" style="margin:0 0 12px">هر نقش فقط گزینه‌های مربوط به خودش را می‌بیند. برای آزمایش هر وقت خواستی می‌توانی نقش را عوض کنی.</p>
+      <div class="rolecards" id="roleCards"></div>
     </div>
-    <button class="btn primary block" id="newOp">➕ ثبت عملیات جدید</button>
+    <div class="note">
+      گردش کار: <b>مدیر اصلی</b> دستور عملیات صادر می‌کند ← <b>مدیر اجرایی</b> آن را برنامه‌ریزی و به مجری ارجاع می‌دهد ← <b>ناظر/مجری</b> اجرا را شروع می‌کند.
+    </div>
+  </section>
+
+  <section id="home">
+    <div class="card stats" id="statWrap"></div>
+    <button class="btn primary block hidden" id="newOp">➕ صدور دستور عملیات جدید</button>
+    <p class="muted hidden" id="roleHint" style="margin:10px 2px 0"></p>
     <div id="list"></div>
     <details class="tools">
       <summary>⚙️ ابزار آزمایش</summary>
@@ -278,12 +312,40 @@ details.tools summary{cursor:pointer;font-weight:700;padding:10px;background:#f8
     </div>
   </section>
 
+  <section id="plan" class="hidden">
+    <div class="card">
+      <h3 style="margin:0 0 10px;font-size:16px">🗂 برنامه‌ریزی و ارجاع</h3>
+      <div class="sum" id="planSum"></div>
+    </div>
+    <div class="card">
+      <label class="field">
+        <span class="lb">مجری / ناظر مسئول <span class="req">*</span></span>
+        <input id="pAssignee" placeholder="نام فرد یا اکیپ مسئول اجرا">
+      </label>
+      <span class="lb" style="display:block;color:var(--muted);font-size:12px;font-weight:700;margin:12px 0 5px">تاریخ شروع برنامه‌ریزی‌شده <span class="req">*</span></span>
+      <button type="button" class="datebtn empty" id="pDateBtn">
+        <span><b id="pDateTxt">تاریخی انتخاب نشده</b><small id="pDateSub">برای باز شدن تقویم شمسی بزن</small></span>
+        <span class="ico">📅</span>
+      </button>
+      <label class="field">
+        <span class="lb">یادداشت برای مجری (اختیاری)</span>
+        <textarea id="pNote" placeholder="مثلاً هماهنگی با ترافیک، ساعت شروع، تجهیزات لازم"></textarea>
+      </label>
+      <p class="err" id="pErr"></p>
+      <div class="row" style="margin-top:12px">
+        <button class="btn ghost" id="pCancel">انصراف</button>
+        <button class="btn primary" id="pSave">✅ ثبت ارجاع</button>
+      </div>
+    </div>
+  </section>
+
   <section id="done" class="hidden">
     <div class="card okbox">
       <div class="big">✅</div>
-      <h2>عملیات ثبت شد</h2>
-      <p class="muted">کد رهگیری این عملیات:</p>
+      <h2>دستور عملیات صادر شد</h2>
+      <p class="muted">وضعیت: <span class="st st-ord">ابلاغ‌شده</span><br>کد رهگیری این عملیات:</p>
       <p class="code" id="doneCode" style="font-size:20px"></p>
+      <p class="muted" style="margin-top:10px">گام بعدی: مدیر اجرایی این دستور را برنامه‌ریزی و به مجری ارجاع می‌دهد.</p>
       <button class="btn primary block" id="doneHome">بازگشت به فهرست</button>
     </div>
   </section>
@@ -312,7 +374,7 @@ details.tools summary{cursor:pointer;font-weight:700;padding:10px;background:#f8
 <div class="msg" id="msg"></div>
 
 <script>
-const APP_VERSION = 'v3.1.3-OPS-CALENDAR';
+const APP_VERSION = 'v3.2.0-ROLES';
 const KEY = 'ops31_local_v1';
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
@@ -336,6 +398,20 @@ const TYPES = [
 const WEEK = ['شنبه','یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنجشنبه','جمعه'];
 const MONTHS = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
 const REGIONS = ['منطقه ۱','منطقه ۲','منطقه ۳','منطقه ۴','منطقه ۵','منطقه ۶','منطقه ۷','منطقه ۸','سایر'];
+
+/* ---------- نقش‌ها و وضعیت‌ها (مرحله ۳.۲) ---------- */
+const ROLES = {
+  manager: {ic:'👔', t:'مدیر اصلی',   d:'صدور دستور عملیات و دیدن کل چرخه کار'},
+  exec:    {ic:'🧭', t:'مدیر اجرایی', d:'برنامه‌ریزی دستورها، تعیین مجری و تاریخ شروع'},
+  sup:     {ic:'🦺', t:'ناظر / مجری', d:'دیدن کارهای ارجاع‌شده و ثبت شروع اجرا'}
+};
+const ST = {
+  ordered:    {t:'ابلاغ‌شده',        c:'st-ord'},
+  planned:    {t:'برنامه‌ریزی‌شده',  c:'st-pln'},
+  inprogress: {t:'در حال اجرا',      c:'st-run'}
+};
+const FLOW = ['ordered','planned','inprogress'];
+const ROLE_KEY = 'ops32_role';
 
 /* ---------- تاریخ شمسی ---------- */
 function jParts(d){
@@ -388,7 +464,7 @@ const LAST = 8;
 const TITLES = {1:'نوع عملیات',2:'تاریخ عملیات',3:'منطقه و موقعیت',4:'آدرس دقیق',5:'شرح عملیات',6:'مقدار کار',7:'نحوه اجرا',8:'بازبینی و ثبت'};
 
 function show(sec){
-  ['home','wizard','done'].forEach(x => $('#'+x).classList.toggle('hidden', x !== sec));
+  ['roleGate','home','wizard','plan','done'].forEach(x => $('#'+x).classList.toggle('hidden', x !== sec));
   window.scrollTo(0,0);
 }
 function err(t){
@@ -437,29 +513,32 @@ $('#typeGrid').addEventListener('click', e => {
 /* ---------- گام ۲ (بدون هیچ پیش‌فرض) ---------- */
 /* ---------- گام ۲: تقویم شمسی ---------- */
 let calY = 0, calM = 0;
-function paintDateBtn(){
-  const d = draft.date;
-  const b = $('#dateBtn');
-  b.classList.toggle('empty', !d);
+let calCtx = 'wizard';
+const calDate = () => calCtx === 'plan' ? planDraft.date : draft.date;
+function fillDate(b, t, u, d){
+  $(b).classList.toggle('empty', !d);
   if (d){
     const g = jToDate(d.y, d.m, d.d);
-    $('#dateTxt').textContent = fd(d.d) + ' ' + MONTHS[d.m-1] + ' ' + fd(d.y);
-    $('#dateSub').textContent = WEEK[(g.getUTCDay() + 1) % 7] + ' • معادل میلادی ' +
+    $(t).textContent = fd(d.d) + ' ' + MONTHS[d.m-1] + ' ' + fd(d.y);
+    $(u).textContent = WEEK[(g.getUTCDay() + 1) % 7] + ' • معادل میلادی ' +
       new Intl.DateTimeFormat('en-GB',{day:'2-digit',month:'short',year:'numeric',timeZone:'UTC'}).format(g);
   } else {
-    $('#dateTxt').textContent = 'تاریخی انتخاب نشده';
-    $('#dateSub').textContent = 'برای باز شدن تقویم شمسی بزن';
+    $(t).textContent = 'تاریخی انتخاب نشده';
+    $(u).textContent = 'برای باز شدن تقویم شمسی بزن';
   }
 }
-function openCal(){
-  const t = jToday(), d = draft.date;
+function paintDateBtn(){ fillDate('#dateBtn','#dateTxt','#dateSub', draft.date); }
+function paintPlanDate(){ fillDate('#pDateBtn','#pDateTxt','#pDateSub', planDraft.date); }
+function openCal(ctx){
+  calCtx = ctx === 'plan' ? 'plan' : 'wizard';
+  const t = jToday(), d = calDate();
   calY = d ? d.y : t.y; calM = d ? d.m : t.m;
   $('#calPick').classList.add('hidden');
   paintCal(); $('#calOvl').classList.remove('hidden');
 }
 function closeCal(){ $('#calOvl').classList.add('hidden'); }
 function paintCal(){
-  const t = jToday(), d = draft.date, len = jMonthLen(calY, calM);
+  const t = jToday(), d = calDate(), len = jMonthLen(calY, calM);
   const first = jToDate(calY, calM, 1), off = (first.getUTCDay() + 1) % 7;
   $('#calTitle').textContent = MONTHS[calM-1] + ' ' + fd(calY) + '  ▾';
   let h = '';
@@ -474,11 +553,17 @@ function paintCal(){
   $('#calGrid').innerHTML = h;
 }
 function pickDate(y,m,d){
-  draft.date = {y,m,d};
-  paintDateBtn(); pending(); err(''); closeCal();
+  if (calCtx === 'plan'){
+    planDraft.date = {y,m,d};
+    paintPlanDate(); perr(''); closeCal();
+  } else {
+    draft.date = {y,m,d};
+    paintDateBtn(); pending(); err(''); closeCal();
+  }
   toast('تاریخ ' + jFmt(y,m,d) + ' انتخاب شد');
 }
-$('#dateBtn').addEventListener('click', openCal);
+$('#dateBtn').addEventListener('click', () => openCal('wizard'));
+$('#pDateBtn').addEventListener('click', () => openCal('plan'));
 $('#calClose').addEventListener('click', closeCal);
 $('#calOvl').addEventListener('click', e => { if (e.target.id === 'calOvl') closeCal(); });
 $('#calPrev').addEventListener('click', () => { calM--; if (calM < 1){ calM = 12; calY--; } paintCal(); });
@@ -696,7 +781,7 @@ $('#prev').addEventListener('click', () => { if (step > 1){ step--; paintStep();
 $('#cancel').addEventListener('click', () => { if (confirm('ثبت این عملیات لغو شود؟')){ render(); show('home'); } });
 $('#homeBtn').addEventListener('click', () => {
   if (!$('#wizard').classList.contains('hidden') && !confirm('ثبت این عملیات لغو شود؟')) return;
-  render(); show('home');
+  render(); show(role ? 'home' : 'roleGate');
 });
 $('#doneHome').addEventListener('click', () => { render(); show('home'); });
 
@@ -705,7 +790,9 @@ function submit(){
   o.code = makeCode(o.jy, o.jm, o.jd);
   o.createdAt = new Date().toISOString();
   o.createdFa = nowFa();
-  o.status = 'registered';
+  o.status = 'ordered';
+  o.log = [];
+  addLog(o, 'manager', 'دستور عملیات صادر و ابلاغ شد');
   const all = load(); all.unshift(o);
   if (!save(all)) return;
   $('#doneCode').textContent = fd(o.code);
@@ -714,6 +801,7 @@ function submit(){
 
 /* ---------- شروع ---------- */
 $('#newOp').addEventListener('click', () => {
+  if (role !== 'manager') return toast('فقط مدیر اصلی می‌تواند دستور عملیات صادر کند');
   draft = {}; photos = []; step = 1;
   draft.date = null; paintTypes(); paintDateBtn(); buildRegions();
   $('#regionOtherWrap').classList.add('hidden'); $('#regionOther').value = '';
@@ -730,28 +818,166 @@ $('#wipe').addEventListener('click', () => {
   localStorage.removeItem(KEY); render(); toast('پاک شد');
 });
 
+/* ---------- نقش‌ها (مرحله ۳.۲) ---------- */
+let role = null, planId = null, planDraft = {};
+
+function perr(t){ const e = $('#pErr'); e.textContent = t || ''; e.classList.toggle('show', !!t); }
+
+function addLog(o, r, text){
+  o.log = o.log || [];
+  o.log.push({ fa: nowFa(), role: r, text });
+}
+function migrate(all){
+  let ch = false;
+  all.forEach(o => {
+    if (!o.status || o.status === 'registered'){ o.status = 'ordered'; ch = true; }
+    if (!o.log){ o.log = [{ fa: o.createdFa || '', role: 'manager', text: 'دستور عملیات صادر و ابلاغ شد' }]; ch = true; }
+  });
+  if (ch) save(all);
+  return all;
+}
+function buildRoleCards(){
+  $('#roleCards').innerHTML = Object.keys(ROLES).map(k => {
+    const r = ROLES[k];
+    return `<button type="button" class="role${role===k?' on':''}" data-role="${k}">
+      <span class="ic">${r.ic}</span><span class="tx"><b>${esc(r.t)}</b><i>${esc(r.d)}</i></span></button>`;
+  }).join('');
+}
+function setRole(k){
+  role = k;
+  try { localStorage.setItem(ROLE_KEY, k); } catch(e){}
+  buildRoleCards(); render(); show('home');
+  toast('نقش فعال: ' + ROLES[k].t);
+}
+$('#roleCards').addEventListener('click', e => {
+  const b = e.target.closest('[data-role]'); if (b) setRole(b.dataset.role);
+});
+$('#roleChip').addEventListener('click', () => { buildRoleCards(); show('roleGate'); });
+
+/* ---------- برنامه‌ریزی و ارجاع (مدیر اجرایی) ---------- */
+function openPlan(code){
+  const o = load().find(x => x.code === code); if (!o) return;
+  planId = code;
+  planDraft = { date: o.planDate || null };
+  $('#pAssignee').value = o.assignee || '';
+  $('#pNote').value = o.planNote || '';
+  $('#planSum').innerHTML = [
+    ['کد', fd(o.code)],
+    ['نوع عملیات', o.typeName],
+    ['تاریخ دستور', jFmt(o.jy,o.jm,o.jd)],
+    ['منطقه', o.region],
+    ['آدرس', o.address],
+    ['مقدار', fd(o.q1) + ' ' + o.u1 + (o.q2 ? ' — ' + fd(o.q2) + ' ' + o.u2 : '')]
+  ].map(r => `<div><i>${esc(r[0])}</i><b>${esc(r[1])}</b></div>`).join('');
+  paintPlanDate(); perr(''); show('plan');
+}
+$('#pCancel').addEventListener('click', () => { render(); show('home'); });
+$('#pSave').addEventListener('click', () => {
+  const a = $('#pAssignee').value.trim();
+  if (!a) return perr('نام مجری یا ناظر اجباری است و پیش‌فرضی ندارد.');
+  if (!planDraft.date) return perr('تاریخ شروع انتخاب نشده است. روی کادر تاریخ بزن و از تقویم یک روز را انتخاب کن.');
+  const all = load(), o = all.find(x => x.code === planId); if (!o) return;
+  const again = o.status !== 'ordered';
+  o.assignee = a;
+  o.planNote = $('#pNote').value.trim();
+  o.planDate = planDraft.date;
+  o.status = 'planned';
+  addLog(o, 'exec', (again ? 'ویرایش ارجاع: ' : 'برنامه‌ریزی و ارجاع به ') + a +
+    ' — شروع ' + jFmt(planDraft.date.y, planDraft.date.m, planDraft.date.d));
+  if (!save(all)) return;
+  toast('ارجاع ثبت شد'); render(); show('home');
+});
+
+/* ---------- شروع اجرا (ناظر/مجری) ---------- */
+function startRun(code){
+  const all = load(), o = all.find(x => x.code === code); if (!o) return;
+  if (!confirm('شروع اجرای این عملیات ثبت شود؟')) return;
+  o.status = 'inprogress'; o.startedFa = nowFa();
+  addLog(o, 'sup', 'شروع اجرا ثبت شد');
+  if (!save(all)) return;
+  toast('وضعیت: در حال اجرا'); render();
+}
+$('#list').addEventListener('click', e => {
+  const p = e.target.closest('[data-plan]'); if (p) return openPlan(p.dataset.plan);
+  const r = e.target.closest('[data-run]');  if (r) return startRun(r.dataset.run);
+});
+
+/* ---------- نمایش ---------- */
+function flowBar(st){
+  const i = FLOW.indexOf(st);
+  return '<div class="flow">' + FLOW.map((k,n) =>
+    `<i class="${n < i ? 'done' : (n === i ? 'on' : '')}">${ST[k].t}</i>`).join('<span style="color:#cbd5e1">‹</span>') + '</div>';
+}
+function opCard(o){
+  const st = ST[o.status] || ST.ordered;
+  let act = '';
+  if (role === 'exec' && o.status === 'ordered')
+    act = `<div class="actions"><button class="btn primary" data-plan="${esc(o.code)}">🗂 برنامه‌ریزی و ارجاع</button></div>`;
+  else if (role === 'exec' && o.status === 'planned')
+    act = `<div class="actions"><button class="btn ghost" data-plan="${esc(o.code)}">✏️ ویرایش ارجاع</button></div>`;
+  else if (role === 'sup' && o.status === 'planned')
+    act = `<div class="actions"><button class="btn ok" data-run="${esc(o.code)}">▶️ شروع اجرا</button></div>`;
+  const asg = o.assignee ? `<div class="assignbox">👷 مجری: <b>${esc(o.assignee)}</b>` +
+    (o.planDate ? ` • شروع: <b>${esc(jFmt(o.planDate.y,o.planDate.m,o.planDate.d))}</b>` : '') +
+    (o.planNote ? `<br>📝 ${esc(o.planNote)}` : '') + `</div>` : '';
+  const log = (o.log && o.log.length) ?
+    `<details class="log"><summary>تاریخچه (${fd(o.log.length)} رویداد)</summary><ul>` +
+    o.log.map(l => `<li>${esc(l.text)}<br><span style="font-size:10.5px">${esc(l.fa)}</span></li>`).join('') +
+    `</ul></details>` : '';
+  return `<div class="op">
+    <div class="op-top">
+      <div><span class="code">${esc(fd(o.code))}</span><p style="margin:4px 0 0"><b>${esc(o.typeName)}</b></p></div>
+      <span class="st ${st.c}">${esc(st.t)}</span>
+    </div>
+    ${flowBar(o.status)}
+    <p>📅 ${esc(jFmt(o.jy,o.jm,o.jd))} • 📍 ${esc(o.region)} — ${esc(o.address)}</p>
+    <p>📝 ${esc(o.descr)}</p>
+    <p>📦 ${esc(fd(o.q1))} ${esc(o.u1)}${o.q2 ? ' — ' + esc(fd(o.q2)) + ' ' + esc(o.u2) : ''}</p>
+    ${asg}
+    ${(o.photos && o.photos.length) ? `<div class="photos">${o.photos.map(ph => `<div class="ph"><img src="${ph}" alt="عکس"></div>`).join('')}</div>` : ''}
+    <div class="meta">${o.mode === 'amani' ? '👷 اجرای امانی' : '🏢 ' + esc(o.contractor || '—')} • ثبت: ${esc(o.createdFa || '')}</div>
+    ${o.gps ? routeBtns(o.gps.lat, o.gps.lng) : ''}
+    ${act}
+    ${log}
+  </div>`;
+}
 function render(){
-  const all = load(), t = jToday();
-  $('#nAll').textContent = fd(all.length);
-  $('#nToday').textContent = fd(all.filter(o => o.jy === t.y && o.jm === t.m && o.jd === t.d).length);
-  $('#nTypes').textContent = fd(new Set(all.map(o => o.typeId)).size);
-  $('#list').innerHTML = all.length ? all.map(o => `
-    <div class="op">
-      <div class="op-top">
-        <div><span class="code">${esc(fd(o.code))}</span><p style="margin:4px 0 0"><b>${esc(o.typeName)}</b></p></div>
-        <span class="tag">${esc(jFmt(o.jy,o.jm,o.jd))}</span>
-      </div>
-      <p>📍 ${esc(o.region)} — ${esc(o.address)}</p>
-      <p>📝 ${esc(o.descr)}</p>
-      <p>📦 ${esc(fd(o.q1))} ${esc(o.u1)}${o.q2 ? ' — ' + esc(fd(o.q2)) + ' ' + esc(o.u2) : ''}</p>
-      ${(o.photos && o.photos.length) ? `<div class="photos">${o.photos.map(p => `<div class="ph"><img src="${p}" alt="عکس"></div>`).join('')}</div>` : ''}
-      <div class="meta">${o.mode === 'amani' ? '👷 اجرای امانی' : '🏢 ' + esc(o.contractor || '—')} • ثبت: ${esc(o.createdFa || '')}</div>
-      ${o.gps ? routeBtns(o.gps.lat, o.gps.lng) : ''}
-    </div>`).join('') : '<div class="card empty">هنوز عملیاتی ثبت نشده است.<br>با دکمه بالا اولین عملیات را ثبت کن.</div>';
+  if (!role){ buildRoleCards(); show('roleGate'); return; }
+  const all = migrate(load()), t = jToday();
+  const by = k => all.filter(o => o.status === k);
+  const r = ROLES[role];
+  $('#roleChip').classList.remove('hidden');
+  $('#roleChip').textContent = r.ic + ' ' + r.t + ' • تغییر نقش';
+
+  let stats, items, hint = '', empty = '';
+  if (role === 'manager'){
+    stats = [[all.length,'کل دستورها'], [by('ordered').length,'ابلاغ‌شده'], [by('planned').length + by('inprogress').length,'در جریان']];
+    items = all;
+    hint = 'تو می‌توانی دستور عملیات صادر کنی و کل چرخه را ببینی. برنامه‌ریزی و ارجاع بر عهده مدیر اجرایی است.';
+    empty = 'هنوز دستوری صادر نشده است.<br>با دکمه بالا اولین دستور عملیات را صادر کن.';
+  } else if (role === 'exec'){
+    stats = [[by('ordered').length,'در انتظار برنامه‌ریزی'], [by('planned').length,'برنامه‌ریزی‌شده'], [by('inprogress').length,'در حال اجرا']];
+    items = all.filter(o => FLOW.includes(o.status));
+    hint = 'صدور دستور فقط در اختیار مدیر اصلی است. وظیفه تو برنامه‌ریزی دستورهای ابلاغ‌شده و ارجاع آن‌ها به مجری است.';
+    empty = 'فعلاً دستوری برای برنامه‌ریزی وجود ندارد.';
+  } else {
+    const todayPlan = by('planned').filter(o => o.planDate && o.planDate.y === t.y && o.planDate.m === t.m && o.planDate.d === t.d);
+    stats = [[by('planned').length,'ارجاع‌شده به اجرا'], [todayPlan.length,'شروع امروز'], [by('inprogress').length,'در حال اجرا']];
+    items = all.filter(o => o.status === 'planned' || o.status === 'inprogress');
+    hint = 'فقط کارهای ارجاع‌شده را می‌بینی. ثبت شواهد قبل، حین و پایان اجرا در مرحله ۳.۳ اضافه می‌شود.';
+    empty = 'هنوز کاری به اجرا ارجاع نشده است.';
+  }
+  $('#statWrap').innerHTML = stats.map(x => `<div class="stat"><b>${fd(x[0])}</b><span>${esc(x[1])}</span></div>`).join('');
+  $('#newOp').classList.toggle('hidden', role !== 'manager');
+  $('#roleHint').textContent = hint;
+  $('#roleHint').classList.remove('hidden');
+  $('#list').innerHTML = items.length ? items.map(opCard).join('') : `<div class="card empty">${empty}</div>`;
 }
 
-buildRegions(); paintDateBtn(); render();
+try { const sv = localStorage.getItem(ROLE_KEY); if (sv && ROLES[sv]) role = sv; } catch(e){}
+buildRegions(); paintDateBtn(); buildRoleCards();
+if (role){ render(); show('home'); } else { show('roleGate'); }
 console.log('Bazdid Ops ' + APP_VERSION);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a46303ce3f7666c4',t:'MTc5MTI3MjM5Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4648de97b6f0c49',t:'MTc5MTI4ODUzNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
