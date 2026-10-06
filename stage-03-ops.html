@@ -229,7 +229,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
   <header class="head">
     <div>
       <h1>🏗️ ثبت عملیات</h1>
-      <small>نسخه آزمایشی • v3.3.0-EVIDENCE</small>
+      <small>نسخه آزمایشی • v3.3.1-EVIDENCE</small>
       <button type="button" id="roleChip" class="rolechip hidden"></button>
     </div>
     <button class="btn ghost" id="homeBtn">خانه</button>
@@ -245,15 +245,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
       <h3 style="margin:0 0 4px;font-size:16px">نقش خود را انتخاب کن</h3>
       <p class="muted" style="margin:0 0 12px">هر نقش فقط گزینه‌های مربوط به خودش را می‌بیند. برای آزمایش هر وقت خواستی می‌توانی نقش را عوض کنی.</p>
       <div class="rolecards" id="roleCards"></div>
-      <div id="nameWrap" class="hidden" style="margin-top:14px;border-top:1px dashed var(--line);padding-top:12px">
-        <label class="field" style="margin-top:0">
-          <span class="lb">نام و نام خانوادگی شما <span class="req">*</span></span>
-          <input id="myName" placeholder="مثلاً حسن شه‌پناه">
-        </label>
-        <p class="muted">نام تو پای هر اقدامی که ثبت می‌کنی می‌نشیند تا مشخص باشد چه کسی چه کاری کرده است.</p>
-        <p class="err" id="nameErr"></p>
-        <button class="btn primary block" id="nameGo">ورود</button>
-      </div>
+      <button class="btn ghost block hidden" id="editName" style="margin-top:12px">✏️ تغییر نام من در این نقش</button>
     </div>
     <div class="note">
       گردش کار: <b>مدیر اصلی</b> دستور عملیات صادر می‌کند ← <b>مدیر اجرایی</b> آن را برنامه‌ریزی و به مجری ارجاع می‌دهد ← <b>ناظر/مجری</b> اجرا را شروع می‌کند.
@@ -415,6 +407,24 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
   </section>
 
 </div>
+<div class="ovl hidden" id="nameOvl">
+  <div class="cal">
+    <div class="cal-head">
+      <span id="nameTitle" style="flex:1;font-size:15px;font-weight:700">نام شما</span>
+      <button type="button" id="nameCancel">✕</button>
+    </div>
+    <div style="padding:14px">
+      <label class="field" style="margin-top:0">
+        <span class="lb">نام و نام خانوادگی <span class="req">*</span></span>
+        <input id="myName" placeholder="مثلاً حسن شه‌پناه">
+      </label>
+      <p class="muted">نام تو پای هر اقدامی که ثبت می‌کنی می‌نشیند تا مشخص باشد چه کسی چه کاری کرده است. فقط یک بار پرسیده می‌شود.</p>
+      <p class="err" id="nameErr"></p>
+      <button class="btn primary block" id="nameGo">✅ ورود</button>
+    </div>
+  </div>
+</div>
+
 <div class="ovl hidden" id="calOvl">
   <div class="cal">
     <div class="cal-head">
@@ -438,7 +448,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 <div class="msg" id="msg"></div>
 
 <script>
-const APP_VERSION = 'v3.3.0-EVIDENCE';
+const APP_VERSION = 'v3.3.1-EVIDENCE';
 const KEY = 'ops31_local_v1';
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
@@ -985,27 +995,43 @@ function buildRoleCards(){
 function setRole(k){
   role = k; inboxOnly = false; filt = 'active'; $('#q').value = '';
   try { localStorage.setItem(ROLE_KEY, k); } catch(e){}
-  buildRoleCards(); render(); show('home');
+  closeName(); buildRoleCards(); render(); show('home');
   toast(ROLES[k].t + ' • ' + me());
 }
 let pendingRole = null;
+function openName(k){
+  pendingRole = k;
+  $('#nameTitle').textContent = ROLES[k].ic + ' ' + ROLES[k].t;
+  $('#myName').value = names[k] || '';
+  $('#nameErr').classList.remove('show');
+  $('#nameOvl').classList.remove('hidden');
+}
+function closeName(){ $('#nameOvl').classList.add('hidden'); }
 $('#roleCards').addEventListener('click', e => {
   const b = e.target.closest('[data-role]'); if (!b) return;
-  pendingRole = b.dataset.role;
-  $('#myName').value = names[pendingRole] || '';
-  $('#nameErr').classList.remove('show');
-  $('#nameWrap').classList.remove('hidden');
+  const k = b.dataset.role;
+  pendingRole = k;
+  $$('#roleCards .role').forEach(x => x.classList.toggle('on', x.dataset.role === k));
+  if (names[k]) setRole(k); else openName(k);
 });
+$('#editName').addEventListener('click', () => { if (role) openName(role); });
+$('#nameCancel').addEventListener('click', closeName);
+$('#nameOvl').addEventListener('click', e => { if (e.target.id === 'nameOvl') closeName(); });
 $('#nameGo').addEventListener('click', () => {
   const n = $('#myName').value.trim();
   if (n.length < 3){ const e = $('#nameErr'); e.textContent = '⛔ نام و نام خانوادگی را کامل بنویس.'; e.classList.add('show'); return; }
   if (!pendingRole) return;
   names[pendingRole] = n;
   try { localStorage.setItem(NAME_KEY, JSON.stringify(names)); } catch(e){}
-  $('#nameWrap').classList.add('hidden');
+  closeName();
   setRole(pendingRole);
 });
-$('#roleChip').addEventListener('click', () => { buildRoleCards(); $('#nameWrap').classList.add('hidden'); show('roleGate'); });
+$('#roleChip').addEventListener('click', () => {
+  buildRoleCards(); closeName();
+  $('#editName').classList.toggle('hidden', !role);
+  if (role) $('#editName').textContent = '✏️ تغییر نام من در نقش ' + ROLES[role].t + ' (' + me() + ')';
+  show('roleGate');
+});
 $('#fchips').addEventListener('click', e => {
   const b = e.target.closest('[data-f]'); if (!b) return;
   filt = b.dataset.f; render();
@@ -1457,5 +1483,5 @@ buildRegions(); paintDateBtn(); paintDue(); buildRoleCards();
 if (role){ render(); show('home'); } else { show('roleGate'); }
 console.log('Bazdid Ops ' + APP_VERSION);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a46673217aac96f9',t:'MTc5MTMwODQxMQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
