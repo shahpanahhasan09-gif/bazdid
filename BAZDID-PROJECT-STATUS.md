@@ -387,4 +387,11 @@ https://raw.githubusercontent.com/shahpanahhasan09-gif/bazdid/main/BAZDID-PROJEC
 | `BAZDID-PROJECT-STATUS.md` | دفترچه رسمی وضعیت | `https://raw.githubusercontent.com/shahpanahhasan09-gif/bazdid/main/BAZDID-PROJECT-STATUS.md` |
 | `BAZDID-ARCHIVE.md` | بایگانی کامل همه گزارش‌های مرحله‌ای | `https://raw.githubusercontent.com/shahpanahhasan09-gif/bazdid/main/BAZDID-ARCHIVE.md` |
 
-قاعده: در پایان هر زیرمرحله، پس از به‌روزرسانی مستندات، هر سه فایل دوباره در مخزن بارگذاری و جایگزین شوند تا همیشه تازه باشند.
+علاوه بر آن، متن آماده انتقال در دو جای دیگر هم نگهداری می‌شود تا هرگز گم نشود:
+
+| محل | آدرس | ویژگی |
+|---|---|---|
+| کارت نجات | `https://shahpanahhasan09-gif.github.io/bazdid/sos.html` | صفحه‌ای با دکمه «کپی کردن متن»؛ قابل نشان‌کردن روی صفحه اصلی گوشی |
+| صفحه اول مخزن | `https://github.com/shahpanahhasan09-gif/bazdid` | بخش نجات در بالای `README.md` |
+
+**قاعده پایان هر زیرمرحله (اجباری):** پس از نوشتن `STATUS-XX.md`، فایل‌های `BAZDID-HANDOVER.md`، `BAZDID-PROJECT-STATUS.md` و `BAZDID-ARCHIVE.md` به‌روز و با یک بار `Add file → Upload files` در مخزن جایگزین شوند. اگر شماره نسخه، آدرس آزمایش یا «اقدام بعدی» عوض شد، `README.md` و `sos.html` هم به‌روز و بارگذاری شوند. در صورت افزوده‌شدن پسوند `(n)` به نام فایل‌ها، گردش‌کار `fix-docs-names` اجرا شود.

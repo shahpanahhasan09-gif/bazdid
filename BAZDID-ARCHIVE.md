@@ -202,15 +202,17 @@ https://raw.githubusercontent.com/shahpanahhasan09-gif/bazdid/main/BAZDID-PROJEC
 | `sw.js` | سرویس‌ورکر |
 | `manifest.webmanifest` | مانیفست PWA |
 | `icon.svg` · `splash-logo.jpg` | آیکن و لوگوی اسپلش |
-| `README.md` | معرفی |
+| `sos.html` | کارت نجات پروژه — صفحه اضطراری با دکمه کپی متن انتقال |
+| `README.md` | معرفی مخزن؛ بخش «اگر گفتگو قطع شد» در بالای آن قرار دارد |
 
-به این‌ها دو فایل مستندات اضافه می‌شود: `BAZDID-HANDOVER.md` (همین فایل) و `BAZDID-PROJECT-STATUS.md`. این دو عمداً در مخزن‌اند و جزو فایل‌های تکراری نیستند.
+به این‌ها سه فایل حافظه اضافه می‌شود: `BAZDID-HANDOVER.md` (همین فایل)، `BAZDID-PROJECT-STATUS.md` و `BAZDID-ARCHIVE.md`. این سه عمداً در مخزن‌اند و جزو فایل‌های تکراری نیستند.
 
 ### آدرس‌های رسمی
 - تولید پایدار v10: `https://shahpanahhasan09-gif.github.io/bazdid/`
 - مرحله ۲ تأییدشده: `https://shahpanahhasan09-gif.github.io/bazdid/stage-02-core.html?v=21111`
 - مرحله ۳ تأییدشده: `https://shahpanahhasan09-gif.github.io/bazdid/stage-03-ops.html?v=313`
 - محیط نمایشی: `https://shahpanahhasan09-gif.github.io/bazdid/demo-stage-01.html`
+- کارت نجات پروژه: `https://shahpanahhasan09-gif.github.io/bazdid/sos.html`
 
 ---
 
@@ -239,8 +241,9 @@ https://raw.githubusercontent.com/shahpanahhasan09-gif/bazdid/main/BAZDID-PROJEC
    - محتوای خام: `https://raw.githubusercontent.com/shahpanahhasan09-gif/bazdid/main/<file>`
    - کنترل کن که نشانه نسخه داخل فایل منتشرشده درست باشد و اجرای Pages سبز باشد، بعد آدرس آزمایش را بده.
 7. **آزمون مالک روی گوشی** و دریافت تأیید.
-8. **ثبت وضعیت:** `STATUS-XX.md` و `BAZDID-PROJECT-STATUS.md`.
-9. **پاک‌سازی در صورت نیاز** (بخش ۸).
+8. **ثبت وضعیت:** `STATUS-XX.md` و `BAZDID-PROJECT-STATUS.md` را بنویس.
+9. **تازه‌سازی حافظه پروژه (اجباری):** `BAZDID-HANDOVER.md` را به‌روز کن، `BAZDID-ARCHIVE.md` را دوباره بساز، و از مالک بخواه هر سه فایل حافظه را با یک بار `Add file → Upload files` در مخزن جایگزین کند. اگر نام فایلی پسوند `(n)` گرفت، با گردش‌کار `fix-docs-names` اصلاح شود. اگر وضعیت یا آدرس‌ها عوض شد، `README.md` و `sos.html` هم به‌روز و بارگذاری شوند.
+10. **پاک‌سازی در صورت نیاز** (بخش ۸).
 
 ---
 
@@ -324,6 +327,23 @@ jobs:
 ## ۱۲) گزارش‌های تفصیلی مراحل
 
 گزارش کامل هر مرحله در فایل‌های `STATUS-00.md`، `STATUS-01.md`، `STATUS-02-01.md` تا `STATUS-02-10.md` و `STATUS-03-01.md` ثبت شده است. متن کامل همه آن‌ها به‌علاوه دفترچه وضعیت، در فایل `BAZDID-ARCHIVE.md` یک‌جا نگهداری می‌شود.
+
+---
+
+## ۱۳) کیت نجات — جایی که متن انتقال همیشه در دسترس است
+
+برای اینکه متن انتقال هرگز گم نشود، در سه جای مستقل نگهداری می‌شود:
+
+| محل | آدرس | ویژگی |
+|---|---|---|
+| صفحه کارت نجات | `https://shahpanahhasan09-gif.github.io/bazdid/sos.html` | یک دکمه «کپی کردن متن»؛ قابل نشان‌کردن و افزودن به صفحه اصلی گوشی |
+| صفحه اول مخزن | `https://github.com/shahpanahhasan09-gif/bazdid` | بخش «اگر گفتگوی من با دستیار هوش مصنوعی قطع شد» در بالای `README.md` |
+| همین فایل | بخش ۱ | متن کامل آماده چسباندن |
+
+هر دستیاری که این پروژه را ادامه می‌دهد موظف است:
+- اگر آدرس‌ها، شماره نسخه یا «اقدام بعدی» تغییر کرد، هر سه محل بالا را هماهنگ به‌روز کند؛
+- فایل `sos.html` را ساده و خودکفا نگه دارد، بدون کتابخانه بیرونی و بدون وابستگی به شبکه؛
+- بخش نجات را از `README.md` حذف نکند.
 
 
 
@@ -723,7 +743,14 @@ https://raw.githubusercontent.com/shahpanahhasan09-gif/bazdid/main/BAZDID-PROJEC
 | `BAZDID-PROJECT-STATUS.md` | دفترچه رسمی وضعیت | `https://raw.githubusercontent.com/shahpanahhasan09-gif/bazdid/main/BAZDID-PROJECT-STATUS.md` |
 | `BAZDID-ARCHIVE.md` | بایگانی کامل همه گزارش‌های مرحله‌ای | `https://raw.githubusercontent.com/shahpanahhasan09-gif/bazdid/main/BAZDID-ARCHIVE.md` |
 
-قاعده: در پایان هر زیرمرحله، پس از به‌روزرسانی مستندات، هر سه فایل دوباره در مخزن بارگذاری و جایگزین شوند تا همیشه تازه باشند.
+علاوه بر آن، متن آماده انتقال در دو جای دیگر هم نگهداری می‌شود تا هرگز گم نشود:
+
+| محل | آدرس | ویژگی |
+|---|---|---|
+| کارت نجات | `https://shahpanahhasan09-gif.github.io/bazdid/sos.html` | صفحه‌ای با دکمه «کپی کردن متن»؛ قابل نشان‌کردن روی صفحه اصلی گوشی |
+| صفحه اول مخزن | `https://github.com/shahpanahhasan09-gif/bazdid` | بخش نجات در بالای `README.md` |
+
+**قاعده پایان هر زیرمرحله (اجباری):** پس از نوشتن `STATUS-XX.md`، فایل‌های `BAZDID-HANDOVER.md`، `BAZDID-PROJECT-STATUS.md` و `BAZDID-ARCHIVE.md` به‌روز و با یک بار `Add file → Upload files` در مخزن جایگزین شوند. اگر شماره نسخه، آدرس آزمایش یا «اقدام بعدی» عوض شد، `README.md` و `sos.html` هم به‌روز و بارگذاری شوند. در صورت افزوده‌شدن پسوند `(n)` به نام فایل‌ها، گردش‌کار `fix-docs-names` اجرا شود.
 
 
 
