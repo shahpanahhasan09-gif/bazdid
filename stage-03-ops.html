@@ -172,6 +172,17 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 .minip img{width:92px;height:92px;border-radius:12px;object-fit:cover;border:1px solid var(--line);display:block}
 .minip figcaption{font-size:10px;color:var(--muted);margin-top:3px}
 
+.geostamp{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:11px;padding:7px 10px;font-size:11px;line-height:1.95;color:#14532d;margin-top:6px}
+.geostamp b{direction:ltr;display:inline-block;font-weight:800}
+.geostamp .bad{color:#b45309;font-weight:800}
+.srctag{display:inline-block;border-radius:999px;padding:1px 7px;font-size:9.5px;font-weight:800;margin-right:4px}
+.src-cam{background:#dcfce7;color:#15803d}
+.src-gal{background:#fef3c7;color:#92400e}
+.phpics figure{margin:0}
+.byline{font-size:11px;color:var(--muted);margin-top:4px}
+.okline{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;border-radius:11px;padding:7px 10px;font-size:12px;font-weight:700;margin-top:8px}
+.needgeo{background:#fff7ed;border:1px dashed #fdba74;color:#7c2d12;border-radius:11px;padding:8px 10px;font-size:11.5px;line-height:1.9;margin-top:8px}
+
 /* ---------- تقویم شمسی ---------- */
 .datebtn{width:100%;text-align:right;padding:15px;border:1.5px solid var(--line);border-radius:14px;background:#fbfdff;font:inherit;display:flex;justify-content:space-between;align-items:center;gap:8px;transition:transform .08s}
 .datebtn:active{transform:scale(.99)}
@@ -218,15 +229,15 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
   <header class="head">
     <div>
       <h1>🏗️ ثبت عملیات</h1>
-      <small>نسخه آزمایشی • v3.2.2-BOARD</small>
+      <small>نسخه آزمایشی • v3.3.0-EVIDENCE</small>
       <button type="button" id="roleChip" class="rolechip hidden"></button>
     </div>
     <button class="btn ghost" id="homeBtn">خانه</button>
   </header>
 
   <div class="note">
-    <b>فایل آزمایشی مرحله ۳.۲.۲</b><br>
-    چرخه چهارنقشی: مدیر اصلی دستور می‌دهد ← مدیر اجرایی برنامه‌ریزی می‌کند یا پیشنهاد اصلاح می‌دهد ← اکیپ اجرا می‌کند ← ناظر تأیید می‌کند. داده‌ها فقط در حافظه همین مرورگر ذخیره می‌شود و هیچ ارتباطی با سامانه اصلی، سرور و داده‌های واقعی ندارد.
+    <b>فایل آزمایشی مرحله ۳.۳</b><br>
+    چرخه چهارنقشی با شواهد قفل‌دار: مدیر اصلی دستور می‌دهد ← مدیر اجرایی برنامه‌ریزی می‌کند یا پیشنهاد اصلاح می‌دهد ← اکیپ با عکس و موقعیت اجرا را ثبت می‌کند ← ناظر تأیید می‌کند. داده‌ها فقط در حافظه همین مرورگر ذخیره می‌شود و هیچ ارتباطی با سامانه اصلی، سرور و داده‌های واقعی ندارد.
   </div>
 
   <section id="roleGate" class="hidden">
@@ -234,6 +245,15 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
       <h3 style="margin:0 0 4px;font-size:16px">نقش خود را انتخاب کن</h3>
       <p class="muted" style="margin:0 0 12px">هر نقش فقط گزینه‌های مربوط به خودش را می‌بیند. برای آزمایش هر وقت خواستی می‌توانی نقش را عوض کنی.</p>
       <div class="rolecards" id="roleCards"></div>
+      <div id="nameWrap" class="hidden" style="margin-top:14px;border-top:1px dashed var(--line);padding-top:12px">
+        <label class="field" style="margin-top:0">
+          <span class="lb">نام و نام خانوادگی شما <span class="req">*</span></span>
+          <input id="myName" placeholder="مثلاً حسن شه‌پناه">
+        </label>
+        <p class="muted">نام تو پای هر اقدامی که ثبت می‌کنی می‌نشیند تا مشخص باشد چه کسی چه کاری کرده است.</p>
+        <p class="err" id="nameErr"></p>
+        <button class="btn primary block" id="nameGo">ورود</button>
+      </div>
     </div>
     <div class="note">
       گردش کار: <b>مدیر اصلی</b> دستور عملیات صادر می‌کند ← <b>مدیر اجرایی</b> آن را برنامه‌ریزی و به مجری ارجاع می‌دهد ← <b>ناظر/مجری</b> اجرا را شروع می‌کند.
@@ -244,6 +264,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
     <button class="inbox hidden" id="inboxBtn"></button>
     <div class="searchbar"><input id="q" placeholder="🔎 جست‌وجو: کد، نوع، منطقه، آدرس، شرح، مجری"><button type="button" id="qClear" class="hidden">✖</button></div>
     <p class="muted hidden" id="qInfo" style="margin:0 2px 10px"></p>
+    <div class="chips" id="fchips" style="margin-bottom:12px"></div>
     <div class="card stats" id="statWrap"></div>
     <button class="btn primary block hidden" id="newOp">➕ صدور دستور عملیات جدید</button>
     <p class="muted hidden" id="roleHint" style="margin:10px 2px 0"></p>
@@ -417,7 +438,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 <div class="msg" id="msg"></div>
 
 <script>
-const APP_VERSION = 'v3.2.2-BOARD';
+const APP_VERSION = 'v3.3.0-EVIDENCE';
 const KEY = 'ops31_local_v1';
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
@@ -467,6 +488,8 @@ const PRIO = {
   critical: {t:'بحرانی', c:'prio-critical', r:2}
 };
 const ROLE_KEY = 'ops32_role';
+const NAME_KEY = 'ops32_names';
+const FILT = [{k:'active',t:'در جریان'},{k:'late',t:'تأخیردار'},{k:'done',t:'تأییدشده'},{k:'all',t:'همه'}];
 
 /* ---------- تاریخ شمسی ---------- */
 function jParts(d){
@@ -727,30 +750,47 @@ $('#prioBox').addEventListener('click', e => {
 $('#dueBtn').addEventListener('click', () => openCal('due'));
 $('#dueClear').addEventListener('click', () => { draft.due = null; paintDue(); toast('مهلت حذف شد'); });
 
-$('#camBtn').addEventListener('click', () => $('#camInput').click());
-$('#galBtn').addEventListener('click', () => $('#galInput').click());
+let wizSrc = 'camera';
+$('#camBtn').addEventListener('click', () => { wizSrc = 'camera'; $('#camInput').click(); });
+$('#galBtn').addEventListener('click', () => { wizSrc = 'gallery'; $('#galInput').click(); });
 async function addPhotos(e){
   const files = Array.from(e.target.files || []);
   e.target.value = '';
   for (const f of files){
     if (photos.length >= 3){ toast('حداکثر ۳ عکس'); break; }
-    try { photos.push(await shrink(f)); } catch(x){ toast('خواندن عکس ناموفق بود'); }
+    try { photos.push(await shrink(f)); draft.photoSrc = wizSrc; } catch(x){ toast('خواندن عکس ناموفق بود'); }
   }
   paintPhotos();
+  if (photos.length && !draft.gps){
+    toast('در حال ثبت موقعیت عکس…');
+    try { draft.gps = await getGeo(); draft.photoGeo = true; paintGps(); pending(); toast('موقعیت عکس ثبت شد'); }
+    catch(e){ toast('موقعیت ثبت نشد — در صورت نیاز دستی ثبت کن'); }
+  }
 }
 $('#camInput').addEventListener('change', addPhotos);
-let actPhotos = [];
+let actPhotos = [], actGeo = null, actGeoReq = false, actSrc = 'camera';
 function paintActPhotos(){
   const b = $('#aPhotoBox'); if (!b) return;
-  b.innerHTML = actPhotos.map((p,i) => `<div class="ph"><img src="${p}" alt="عکس"><button type="button" data-ap="${i}">×</button></div>`).join('');
+  b.innerHTML = actPhotos.map((p,i) => `<div class="ph"><img src="${pdata(p)}" alt="عکس"><button type="button" data-ap="${i}">×</button></div>`).join('');
 }
 async function addActPhotos(e){
   const files = Array.from(e.target.files || []); e.target.value = '';
   for (const f of files){
     if (actPhotos.length >= 3){ toast('حداکثر ۳ عکس'); break; }
-    try { actPhotos.push(await shrink(f)); } catch(x){ toast('خواندن عکس ناموفق بود'); }
+    try { actPhotos.push({ d: await shrink(f), src: actSrc }); } catch(x){ toast('خواندن عکس ناموفق بود'); }
   }
-  paintActPhotos();
+  paintActPhotos(); aerr('');
+  if (actGeoReq && !actGeo && actPhotos.length){
+    toast('در حال ثبت موقعیت عکس…');
+    try { actGeo = await getGeo(); paintActGeo(); toast('موقعیت ثبت شد'); }
+    catch(e){ paintActGeo(); toast('موقعیت خودکار نگرفت — دکمه ثبت موقعیت را بزن'); }
+  }
+}
+function paintActGeo(){
+  const b = $('#aGeoBox'); if (!b) return;
+  b.innerHTML = actGeo
+    ? `طول و عرض: <b style="direction:ltr;display:inline-block">${actGeo.lat.toFixed(6)}, ${actGeo.lng.toFixed(6)}</b><br>دقت تقریبی: <span class="${actGeo.acc<=50?'acc-ok':'acc-bad'}">${fd(actGeo.acc)} متر</span>${actGeo.acc>50?' — بهتر است زیر آسمان باز دوباره بگیری':''}<br>🕒 ${esc(actGeo.fa)}`
+    : 'موقعیتی ثبت نشده است.';
 }
 $('#aCamInput').addEventListener('change', addActPhotos);
 $('#aGalInput').addEventListener('change', addActPhotos);
@@ -793,6 +833,7 @@ function collect(){
     region, address: $('#address').value.trim(), descr: $('#descr').value.trim(),
     u1: t ? t.u1 : '', u2: t ? t.u2 : '',
     prio: draft.prio, due: draft.due || null,
+    photoSrc: draft.photoSrc || '', photoGeo: !!draft.photoGeo,
     place: draft.place, gps: draft.gps || null, photos: photos.slice()
   };
 }
@@ -849,6 +890,7 @@ function submit(){
   o.createdFa = nowFa();
   o.status = 'ordered';
   o.origin = (role === 'exec') ? 'exec' : 'manager';
+  o.orderBy = me();
   o.log = [];
   addLog(o, o.origin, o.origin === 'exec' ? 'کار مستقل توسط مدیر اجرایی ثبت شد' : 'دستور عملیات صادر و ابلاغ شد');
   const all = load(); all.unshift(o);
@@ -868,7 +910,7 @@ $('#newOp').addEventListener('click', () => {
   draft.date = null; paintTypes(); paintDateBtn(); buildRegions();
   $('#regionOtherWrap').classList.add('hidden'); $('#regionOther').value = '';
   $('#address').value = ''; $('#descr').value = '';
-  draft.prio = null; draft.due = null; paintPrio(); paintDue();
+  draft.prio = null; draft.due = null; draft.photoSrc = ''; draft.photoGeo = false; paintPrio(); paintDue();
   $$('#placeMode .type').forEach(x => x.classList.remove('sel'));
   $('#gpsWrap').classList.add('hidden'); draft.gps = null; draft.place = null;
   $('#gpsBtn').disabled = false; $('#gpsBtn').textContent = '📍 ثبت موقعیت فعلی';
@@ -880,7 +922,31 @@ $('#wipe').addEventListener('click', () => {
 });
 
 /* ---------- نقش‌ها و گردش کار (مرحله ۳.۲.۱) ---------- */
-let role = null, actId = null, actKind = null, actDraft = {}, inboxOnly = false;
+let role = null, actId = null, actKind = null, actDraft = {}, inboxOnly = false, filt = 'active';
+let names = {}; try { names = JSON.parse(localStorage.getItem(NAME_KEY) || '{}'); } catch(e){ names = {}; }
+const me = () => (names[role] || (ROLES[role] ? ROLES[role].t : '—'));
+const pdata = x => (typeof x === 'string' ? x : (x && x.d) || '');
+const psrc  = x => (typeof x === 'string' ? '' : (x && x.src) || '');
+function getGeo(){
+  return new Promise((res, rej) => {
+    if (!navigator.geolocation) return rej(new Error('nogeo'));
+    navigator.geolocation.getCurrentPosition(
+      p => res({lat:p.coords.latitude, lng:p.coords.longitude, acc:Math.round(p.coords.accuracy||0), fa:nowFa(), at:new Date().toISOString()}),
+      e => rej(e), {enableHighAccuracy:true, timeout:15000, maximumAge:0});
+  });
+}
+function geoStamp(g, srcs){
+  if (!g) return '';
+  return `<div class="geostamp">📍 موقعیت ثبت‌شده: <b>${g.lat.toFixed(6)}, ${g.lng.toFixed(6)}</b>
+    • دقت <span class="${g.acc<=50?'':'bad'}">${fd(g.acc)} متر</span><br>🕒 ${esc(g.fa||'')}
+    ${srcs ? '<br>📷 منبع: ' + srcs : ''}${routeBtns(g.lat, g.lng)}</div>`;
+}
+function srcTags(list){
+  return (list||[]).map(x => {
+    const sc = psrc(x);
+    return sc ? `<span class="srctag ${sc==='camera'?'src-cam':'src-gal'}">${sc==='camera'?'دوربین':'گالری'}</span>` : '';
+  }).join('');
+}
 
 function aerr(t){ const e = $('#actErr'); e.textContent = t || ''; e.classList.toggle('show', !!t); }
 function addLog(o, r, text, sc){ o.log = o.log || []; o.log.push({ fa: nowFa(), role: r, text, sc: sc || 'work' }); }
@@ -917,15 +983,33 @@ function buildRoleCards(){
   }).join('');
 }
 function setRole(k){
-  role = k; inboxOnly = false;
+  role = k; inboxOnly = false; filt = 'active'; $('#q').value = '';
   try { localStorage.setItem(ROLE_KEY, k); } catch(e){}
   buildRoleCards(); render(); show('home');
-  toast('نقش فعال: ' + ROLES[k].t);
+  toast(ROLES[k].t + ' • ' + me());
 }
+let pendingRole = null;
 $('#roleCards').addEventListener('click', e => {
-  const b = e.target.closest('[data-role]'); if (b) setRole(b.dataset.role);
+  const b = e.target.closest('[data-role]'); if (!b) return;
+  pendingRole = b.dataset.role;
+  $('#myName').value = names[pendingRole] || '';
+  $('#nameErr').classList.remove('show');
+  $('#nameWrap').classList.remove('hidden');
 });
-$('#roleChip').addEventListener('click', () => { buildRoleCards(); show('roleGate'); });
+$('#nameGo').addEventListener('click', () => {
+  const n = $('#myName').value.trim();
+  if (n.length < 3){ const e = $('#nameErr'); e.textContent = '⛔ نام و نام خانوادگی را کامل بنویس.'; e.classList.add('show'); return; }
+  if (!pendingRole) return;
+  names[pendingRole] = n;
+  try { localStorage.setItem(NAME_KEY, JSON.stringify(names)); } catch(e){}
+  $('#nameWrap').classList.add('hidden');
+  setRole(pendingRole);
+});
+$('#roleChip').addEventListener('click', () => { buildRoleCards(); $('#nameWrap').classList.add('hidden'); show('roleGate'); });
+$('#fchips').addEventListener('click', e => {
+  const b = e.target.closest('[data-f]'); if (!b) return;
+  filt = b.dataset.f; render();
+});
 $('#inboxBtn').addEventListener('click', () => { inboxOnly = !inboxOnly; render(); });
 const lat = x => String(x == null ? '' : x).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
 $('#q').addEventListener('input', () => render());
@@ -965,7 +1049,7 @@ const ACTS = {
     apply: o => {
       const again = o.status === 'planned';
       o.mode = actDraft.mode; o.assignee = $('#aName').value.trim();
-      o.planDate = actDraft.date; o.planNote = $('#aNote').value.trim(); o.status = 'planned';
+      o.planDate = actDraft.date; o.planNote = $('#aNote').value.trim(); o.status = 'planned'; o.planBy = me();
       addLog(o,'exec',(again?'ویرایش ارجاع: ':'ارجاع به ') + o.assignee + ' — شروع ' + jFmt(actDraft.date.y,actDraft.date.m,actDraft.date.d));
       return 'ارجاع ثبت شد';
     }
@@ -1019,8 +1103,8 @@ const ACTS = {
     fill: () => {},
     check: () => '',
     apply: o => {
-      o.reviewNote = $('#aNote').value.trim(); o.reviewFa = nowFa(); o.status = 'approved'; o.rejectReason = '';
-      addLog(o,'sup','کار بازدید و تأیید نهایی شد' + (o.reviewNote ? ' — ' + o.reviewNote : ''));
+      o.reviewNote = $('#aNote').value.trim(); o.reviewFa = nowFa(); o.reviewBy = me(); o.status = 'approved'; o.rejectReason = '';
+      addLog(o,'sup','کار توسط ' + me() + ' بازدید و تأیید نهایی شد' + (o.reviewNote ? ' — ' + o.reviewNote : ''));
       return 'کار تأیید شد';
     }
   },
@@ -1032,8 +1116,8 @@ const ACTS = {
     check: () => $('#aText').value.trim().length < 5 ? 'نوشتن دلیل برگشت اجباری است.' : '',
     apply: o => {
       o.rejectReason = $('#aText').value.trim(); o.rejectPhotos = actPhotos.slice();
-      o.status = 'rejected'; o.reviewFa = nowFa();
-      addLog(o,'sup','کار برگشت داده شد — ' + o.rejectReason);
+      o.status = 'rejected'; o.reviewFa = nowFa(); o.reviewBy = me();
+      addLog(o,'sup','کار توسط ' + me() + ' برگشت داده شد — ' + o.rejectReason);
       return 'کار برای اصلاح به اکیپ برگشت';
     }
   },
@@ -1045,23 +1129,28 @@ const ACTS = {
     check: () => $('#aText').value.trim().length < 3 ? 'شرح اصلاح اجباری است.' : '',
     apply: o => {
       o.fixes = o.fixes || [];
-      o.fixes.push({ fa: nowFa(), text: $('#aText').value.trim(), photos: actPhotos.slice() });
+      o.fixes.push({ fa: nowFa(), text: $('#aText').value.trim(), photos: actPhotos.slice(), by: me() });
       o.status = 'finished'; o.finishedFa = nowFa();
-      addLog(o,'crew','اصلاح انجام شد — ' + $('#aText').value.trim());
+      addLog(o,'crew','اصلاح توسط ' + me() + ' انجام شد — ' + $('#aText').value.trim());
       return 'دوباره برای تأیید ناظر ارسال شد';
     }
   }
 };
 
 const PH = [
-  {k:'before', n:'قبل از اجرا', hint:'وضعیت محل را پیش از شروع کار ثبت کن.',  ph:'مثلاً: محل تحویل گرفته شد، معبر بسته و علائم ایمنی نصب شد.'},
-  {k:'during', n:'حین اجرا',    hint:'وضعیت کار را در میانه اجرا ثبت کن.',     ph:'مثلاً: تخریب و زیرسازی انجام شد، آسفالت در حال پخش است.'},
-  {k:'end',    n:'پایان کار',   hint:'پایان کار و مقدار واقعی اجراشده را ثبت کن.', ph:'مثلاً: کار تمام شد، معبر نظافت و تحویل داده شد.'}
+  {k:'before', n:'قبل از اجرا', req:true,  hint:'وضعیت محل را پیش از شروع کار با عکس و موقعیت ثبت کن. این مدرک، اصالت محل عملیات را تثبیت می‌کند.', ph:'مثلاً: محل تحویل گرفته شد، معبر بسته و علائم ایمنی نصب شد.'},
+  {k:'during', n:'حین اجرا',    req:false, hint:'وضعیت کار را در میانه اجرا ثبت کن.',     ph:'مثلاً: تخریب و زیرسازی انجام شد، آسفالت در حال پخش است.'},
+  {k:'end',    n:'پایان کار',   req:true,  hint:'پایان کار را با عکس و موقعیت ثبت کن و مقدار واقعی اجراشده را بنویس.', ph:'مثلاً: کار تمام شد، معبر نظافت و تحویل داده شد.'}
 ];
-const PHOTOBLOCK = `<span class="lb" style="display:block;margin:14px 0 5px">عکس این مرحله (اختیاری، حداکثر ۳)</span>
+function photoBlock(req){
+  return `<span class="lb" style="display:block;margin:14px 0 5px">عکس این مرحله ${req ? '<span class="req">*</span> (حداقل ۱، حداکثر ۳)' : '(اختیاری، حداکثر ۳)'}</span>
   <div class="actions"><button type="button" class="btn primary" id="aCamBtn">📷 گرفتن عکس</button><button type="button" class="btn" id="aGalBtn">🖼 انتخاب از گالری</button></div>
-  <div class="photos" id="aPhotoBox"></div>
-  <p class="muted">در مرحله ۳.۳ ثبت عکس برای هر فاز اجباری می‌شود و موقعیت و زمان هم روی اولین عکس ثبت خواهد شد.</p>`;
+  <div class="photos" id="aPhotoBox"></div>` +
+  (req ? `<div class="needgeo">برای اصالت مدرک، همراه عکس باید <b>موقعیت جغرافیایی</b> ثبت شود. با گرفتن اولین عکس، موقعیت خودکار ثبت می‌شود؛ اگر نشد دکمه زیر را بزن.</div>
+  <div class="gpsbox" id="aGeoBox" style="margin-top:8px">موقعیتی ثبت نشده است.</div>
+  <button type="button" class="btn block" id="aGeoBtn">📍 ثبت / به‌روزرسانی موقعیت</button>` : '');
+}
+const PHOTOBLOCK = photoBlock(false);
 function phOpen(o, i){
   const ph = o.phases || {};
   if (i === 0) return o.status === 'planned' || o.status === 'running';
@@ -1079,16 +1168,20 @@ PH.forEach((p, i) => {
         <div class="qrow"><input id="aQ1" type="number" inputmode="decimal" min="0" step="any" placeholder="مثلاً ۱۲٫۵"><span class="unit">${esc(o.u1 || '—')}</span></div></label>` +
         (o.u2 ? `<label class="field"><span class="lb">مقدار بر حسب ${esc(o.u2)} (اختیاری)</span>
         <div class="qrow"><input id="aQ2" type="number" inputmode="decimal" min="0" step="any" placeholder="اختیاری"><span class="unit">${esc(o.u2)}</span></div></label>` : '') : '') +
-      PHOTOBLOCK,
+      photoBlock(p.req),
     fill: o => {
       const cur = (o.phases || {})[p.k];
       $('#aText').value = cur ? cur.note : '';
       if (last){ $('#aQ1').value = o.q1 || ''; if ($('#aQ2')) $('#aQ2').value = o.q2 || ''; }
       actPhotos = (cur && cur.photos) ? cur.photos.slice() : [];
-      paintActPhotos();
+      actGeoReq = !!p.req;
+      actGeo = (cur && cur.geo) ? cur.geo : null;
+      paintActPhotos(); paintActGeo();
     },
     check: () => {
       if ($('#aText').value.trim().length < 3) return 'شرح این مرحله اجباری است.';
+      if (p.req && !actPhotos.length) return 'برای این مرحله حداقل یک عکس اجباری است. دکمه «گرفتن عکس» را بزن.';
+      if (p.req && !actGeo) return 'ثبت موقعیت جغرافیایی برای این مرحله اجباری است. دکمه «ثبت موقعیت» را بزن.';
       if (last){
         const v = $('#aQ1').value.trim();
         if (!v) return 'ثبت مقدار واقعی اجراشده اجباری است.';
@@ -1098,13 +1191,13 @@ PH.forEach((p, i) => {
     },
     apply: o => {
       o.phases = o.phases || {};
-      o.phases[p.k] = { fa: nowFa(), note: $('#aText').value.trim(), photos: actPhotos.slice() };
+      o.phases[p.k] = { fa: nowFa(), note: $('#aText').value.trim(), photos: actPhotos.slice(), geo: actGeo, by: me() };
       if (i === 0 && o.status === 'planned'){ o.status = 'running'; o.startedFa = nowFa(); }
       if (last){
         o.q1 = $('#aQ1').value.trim(); o.q2 = $('#aQ2') ? $('#aQ2').value.trim() : '';
         o.status = 'finished'; o.finishedFa = nowFa();
       }
-      addLog(o,'crew','مرحله «' + p.n + '» ثبت شد' + (last ? ' — مقدار واقعی: ' + fd(o.q1) + ' ' + o.u1 : ''));
+      addLog(o,'crew','مرحله «' + p.n + '» توسط ' + me() + ' ثبت شد' + (last ? ' — مقدار واقعی: ' + fd(o.q1) + ' ' + o.u1 : ''));
       return last ? 'کار برای تأیید ناظر ارسال شد' : 'مرحله «' + p.n + '» ثبت شد';
     }
   };
@@ -1120,7 +1213,7 @@ function openAct(kind, code){
     ['اولویت', PRIO[o.prio] ? PRIO[o.prio].t : '—'],
     ['منطقه', o.region], ['آدرس', o.address], ['شرح', o.descr]
   ].map(r => `<div><i>${esc(r[0])}</i><b>${esc(r[1])}</b></div>`).join('');
-  actPhotos = [];
+  actPhotos = []; actGeo = null; actGeoReq = false;
   $('#actBody').innerHTML = A.body(o);
   A.fill(o);
   if ($('#aDateBtn')) fillDate('#aDateBtn','#aDateTxt','#aDateSub', actDraft.date);
@@ -1128,8 +1221,15 @@ function openAct(kind, code){
   aerr(''); show('act');
 }
 $('#actBody').addEventListener('click', e => {
-  if (e.target.closest('#aCamBtn')) return $('#aCamInput').click();
-  if (e.target.closest('#aGalBtn')) return $('#aGalInput').click();
+  if (e.target.closest('#aCamBtn')){ actSrc = 'camera'; return $('#aCamInput').click(); }
+  if (e.target.closest('#aGalBtn')){ actSrc = 'gallery'; return $('#aGalInput').click(); }
+  if (e.target.closest('#aGeoBtn')){
+    const btn = $('#aGeoBtn'); btn.disabled = true; btn.textContent = '⏳ در حال دریافت موقعیت…';
+    getGeo().then(g => { actGeo = g; paintActGeo(); aerr(''); toast('موقعیت ثبت شد'); })
+      .catch(() => toast('دریافت موقعیت ناموفق بود'))
+      .then(() => { btn.disabled = false; btn.textContent = '📍 ثبت / به‌روزرسانی موقعیت'; });
+    return;
+  }
   const dp = e.target.closest('[data-ap]');
   if (dp){ actPhotos.splice(+dp.dataset.ap, 1); paintActPhotos(); return; }
   const m = e.target.closest('[data-mode]');
@@ -1168,20 +1268,24 @@ function actionsFor(o){
   return a.length ? `<div class="actions">${a.join('')}</div>` : '';
 }
 function phasesBlock(o){
+  if (role === 'manager') return '';
   if (!['planned','running','finished','approved','rejected'].includes(o.status)) return '';
   const ph = o.phases || {};
   const rows = PH.map((p,i) => {
-    const done = !!ph[p.k], can = role === 'crew' && phOpen(o,i) && !done;
+    const d = ph[p.k], done = !!d, can = role === 'crew' && phOpen(o,i) && !done;
     const edit = role === 'crew' && done && o.status === 'running';
+    const pics = (done && d.photos && d.photos.length)
+      ? `<div class="phpics">${d.photos.map(x => `<img src="${pdata(x)}" alt="عکس">`).join('')}</div>` : '';
+    const stamp = done ? geoStamp(d.geo, srcTags(d.photos)) : '';
     return `<div class="phrow ${done ? 'done' : (can ? 'now' : '')}">
       <span class="ic">${done ? '✓' : fd(i+1)}</span>
-      <span class="tx"><b>${esc(p.n)}</b><i>${done ? esc(ph[p.k].fa) + ' — ' + esc(ph[p.k].note)
-        : (can ? 'آماده ثبت' : 'قفل تا تکمیل مرحله قبل')}</i></span>
+      <span class="tx"><b>${esc(p.n)}${p.req ? ' <span style="color:#dc2626">*</span>' : ''}</b>
+        <i>${done ? esc(d.fa) + (d.by ? ' — ' + esc(d.by) : '') + '<br>' + esc(d.note)
+          : (can ? (p.req ? 'آماده ثبت — عکس و موقعیت اجباری' : 'آماده ثبت') : 'قفل تا تکمیل مرحله قبل')}</i></span>
       ${can ? `<button class="btn primary" data-act="ph_${p.k}" data-code="${esc(o.code)}">ثبت</button>`
         : (edit ? `<button class="btn ghost" data-act="ph_${p.k}" data-code="${esc(o.code)}">ویرایش</button>`
         : (done ? '' : '<span class="lock">🔒</span>'))}
-    </div>` + (done && ph[p.k].photos && ph[p.k].photos.length
-        ? `<div class="phpics">${ph[p.k].photos.map(x => `<img src="${x}" alt="عکس">`).join('')}</div>` : '');
+    </div>${pics}${stamp ? `<div style="padding:0 11px 10px">${stamp}</div>` : ''}`;
   }).join('');
   return `<div class="phases"><div class="ttl">🧭 روند عملیات</div>${rows}</div>`;
 }
@@ -1196,8 +1300,8 @@ function decBox(o){
 }
 function beforeAfter(o){
   const ph = o.phases || {};
-  const b = (ph.before && ph.before.photos && ph.before.photos.length) ? ph.before.photos[0] : (o.photos && o.photos.length ? o.photos[0] : '');
-  const a = (ph.end && ph.end.photos && ph.end.photos.length) ? ph.end.photos[0] : '';
+  const b = (ph.before && ph.before.photos && ph.before.photos.length) ? pdata(ph.before.photos[0]) : (o.photos && o.photos.length ? pdata(o.photos[0]) : '');
+  const a = (ph.end && ph.end.photos && ph.end.photos.length) ? pdata(ph.end.photos[0]) : '';
   if (!b && !a) return '';
   return `<div class="minip">
     ${b ? `<figure><img src="${b}" alt="قبل"><figcaption>قبل</figcaption></figure>` : ''}
@@ -1226,8 +1330,8 @@ function histBlock(o){
 }
 function fixBlock(o){
   if (!o.fixes || !o.fixes.length) return '';
-  return o.fixes.map(f => `<div class="abox"><b>🔧 اصلاح اکیپ:</b> ${esc(f.text)}<br><span style="font-size:10.5px">${esc(f.fa)}</span>` +
-    (f.photos && f.photos.length ? `<div class="phpics" style="padding:6px 0 0">${f.photos.map(x => `<img src="${x}" alt="عکس">`).join('')}</div>` : '') + '</div>').join('');
+  return o.fixes.map(f => `<div class="abox"><b>🔧 اصلاح اکیپ:</b> ${esc(f.text)}<br><span style="font-size:10.5px">${esc(f.fa)}${f.by ? ' — ' + esc(f.by) : ''}</span>` +
+    (f.photos && f.photos.length ? `<div class="phpics" style="padding:6px 0 0">${f.photos.map(x => `<img src="${pdata(x)}" alt="عکس">`).join('')}</div>` : '') + '</div>').join('');
 }
 function opCard(o){
   const late = isLate(o), talk = (role === 'manager' || role === 'exec');
@@ -1237,23 +1341,26 @@ function opCard(o){
     (o.planDate ? ` • شروع: <b>${esc(jFmt(o.planDate.y,o.planDate.m,o.planDate.d))}</b>` : '') +
     (o.planNote ? `<br>📝 ${esc(o.planNote)}` : '') + '</div>' : '';
   const rej  = (o.status === 'rejected' && o.rejectReason) ? `<div class="rbox"><b>↩️ دلیل برگشت ناظر:</b><br>${esc(o.rejectReason)}` +
-    ((o.rejectPhotos && o.rejectPhotos.length) ? `<div class="phpics" style="padding:6px 0 0">${o.rejectPhotos.map(x => `<img src="${x}" alt="عکس">`).join('')}</div>` : '') + '</div>' : '';
+    ((o.rejectPhotos && o.rejectPhotos.length) ? `<div class="phpics" style="padding:6px 0 0">${o.rejectPhotos.map(x => `<img src="${pdata(x)}" alt="عکس">`).join('')}</div>` : '') +
+    (o.reviewBy ? `<br><span style="font-size:10.5px">ناظر: ${esc(o.reviewBy)}</span>` : '') + '</div>' : '';
   const qty  = o.q1 ? `<p>📦 مقدار واقعی: <b>${esc(fd(o.q1))} ${esc(o.u1)}</b>${o.q2 ? ' — ' + esc(fd(o.q2)) + ' ' + esc(o.u2) : ''}</p>` : '';
 
   if (role === 'manager'){
-    const brief = (o.descr || '').length > 95 ? o.descr.slice(0,95) + '…' : (o.descr || '');
+    const brief = (o.descr || '').length > 90 ? o.descr.slice(0,90) + '…' : (o.descr || '');
+    const okl = (o.status === 'approved')
+      ? `<div class="okline">✅ تأیید نهایی توسط <b>${esc(o.reviewBy || 'ناظر')}</b>${o.reviewFa ? ' • ' + esc(o.reviewFa) : ''}${o.reviewNote ? '<br>' + esc(o.reviewNote) : ''}</div>` : '';
     return `<div class="op${late ? ' islate' : ''}">
       ${head(o)}${badges(o)}${flowBar(o.status)}
-      <p>📝 ${esc(brief)}</p>
+      <p>📍 ${esc(o.region)} — 📝 ${esc(brief)}</p>
       ${beforeAfter(o)}
+      ${okl}
       ${o.status === 'proposed' ? prop : ''}
       ${actionsFor(o)}
       <details class="more"><summary>جزئیات کامل</summary>
-        <p>📅 ${esc(jFmt(o.jy,o.jm,o.jd))} • 📍 ${esc(o.region)} — ${esc(o.address)}</p>
+        <p>📅 ${esc(jFmt(o.jy,o.jm,o.jd))} • 📍 ${esc(o.address)}</p>
         <p>📝 ${esc(o.descr)}</p>
-        ${qty}${asg}${o.status !== 'proposed' ? prop : ''}${dec}${rej}${fixBlock(o)}${phasesBlock(o)}
-        <div class="meta">ثبت: ${esc(o.createdFa || '')}${o.finishedFa ? ' • پایان: ' + esc(o.finishedFa) : ''}</div>
-        ${o.gps ? routeBtns(o.gps.lat, o.gps.lng) : ''}
+        ${qty}${asg}${o.status !== 'proposed' ? prop : ''}${dec}${rej}
+        <div class="meta">ثبت: ${esc(o.createdFa || '')}${o.orderBy ? ' — ' + esc(o.orderBy) : ''}${o.finishedFa ? ' • پایان: ' + esc(o.finishedFa) : ''}</div>
         ${histBlock(o)}
       </details>
     </div>`;
@@ -1263,7 +1370,9 @@ function opCard(o){
     <p>📅 ${esc(jFmt(o.jy,o.jm,o.jd))} • 📍 ${esc(o.region)} — ${esc(o.address)}</p>
     <p>📝 ${esc(o.descr)}</p>
     ${qty}${asg}${prop}${dec}${rej}${fixBlock(o)}
-    ${(o.photos && o.photos.length) ? `<div class="photos">${o.photos.map(x => `<div class="ph"><img src="${x}" alt="عکس"></div>`).join('')}</div>` : ''}
+    ${o.status === 'approved' ? `<div class="okline">✅ تأیید نهایی توسط <b>${esc(o.reviewBy || 'ناظر')}</b>${o.reviewFa ? ' • ' + esc(o.reviewFa) : ''}${o.reviewNote ? '<br>' + esc(o.reviewNote) : ''}</div>` : ''}
+    ${(o.photos && o.photos.length) ? `<div class="photos">${o.photos.map(x => `<div class="ph"><img src="${pdata(x)}" alt="عکس"></div>`).join('')}</div>` : ''}
+    ${(o.photos && o.photos.length && o.gps && o.photoGeo) ? geoStamp(o.gps, '') : ''}
     ${phasesBlock(o)}
     <div class="meta">ثبت: ${esc(o.createdFa || '')}${o.finishedFa ? ' • پایان: ' + esc(o.finishedFa) : ''}</div>
     ${o.gps ? routeBtns(o.gps.lat, o.gps.lng) : ''}
@@ -1287,9 +1396,18 @@ function render(){
 
   const qq = $('#q').value.trim();
   $('#qClear').classList.toggle('hidden', !qq);
-  let base = all.filter(o => VIS[role].includes(o.status));
+  const base = all.filter(o => VIS[role].includes(o.status));
   const mine = base.filter(needsMe);
-  let items = inboxOnly ? mine : base;
+  const FN = {
+    all:    () => true,
+    active: o => o.status !== 'approved',
+    done:   o => o.status === 'approved',
+    late:   o => isLate(o)
+  };
+  const counts = {}; FILT.forEach(f => counts[f.k] = base.filter(FN[f.k]).length);
+  $('#fchips').innerHTML = FILT.map(f =>
+    `<button type="button" class="chip${filt===f.k?' sel':''}" data-f="${f.k}">${esc(f.t)} ${fd(counts[f.k])}</button>`).join('');
+  let items = (inboxOnly ? mine : base).filter(FN[filt] || FN.all);
   if (qq) items = items.filter(o => matches(o, qq));
   items = items.slice().sort((a,b) =>
     (isLate(b) - isLate(a)) || (PRIO[b.prio]||PRIO.normal).r - (PRIO[a.prio]||PRIO.normal).r ||
@@ -1329,7 +1447,9 @@ function render(){
   $('#roleHint').textContent = hint;
   $('#roleHint').classList.remove('hidden');
   $('#list').innerHTML = items.length ? items.map(opCard).join('')
-    : `<div class="card empty">${qq ? 'چیزی با این جست‌وجو پیدا نشد.' : (inboxOnly ? 'کارتابل تو خالی است. 👌' : empty)}</div>`;
+    : `<div class="card empty">${qq ? 'چیزی با این جست‌وجو پیدا نشد.'
+        : (inboxOnly ? 'کارتابل تو خالی است. 👌'
+        : (filt !== 'all' ? 'در این فیلتر چیزی نیست. روی «همه» بزن.' : empty))}</div>`;
 }
 
 try { const sv = localStorage.getItem(ROLE_KEY); if (sv && ROLES[sv]) role = sv; } catch(e){}
@@ -1337,5 +1457,5 @@ buildRegions(); paintDateBtn(); paintDue(); buildRoleCards();
 if (role){ render(); show('home'); } else { show('roleGate'); }
 console.log('Bazdid Ops ' + APP_VERSION);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4663ea01e5e5329',t:'MTc5MTMwNjI2MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a46673217aac96f9',t:'MTc5MTMwODQxMQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
