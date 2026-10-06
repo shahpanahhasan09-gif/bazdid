@@ -114,6 +114,34 @@ details.log ul{margin:7px 0 0;padding-right:17px;font-size:11.5px;color:var(--mu
 .assignbox{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:12px;padding:9px 11px;font-size:12px;line-height:2;margin-top:8px}
 .assignbox b{color:var(--p)}
 
+.inbox{width:100%;display:flex;align-items:center;gap:10px;text-align:right;border:0;border-radius:16px;padding:14px;margin-bottom:12px;font:inherit;
+  background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;box-shadow:0 10px 24px -16px #1e3a8a;transition:transform .08s}
+.inbox:active{transform:scale(.985)}
+.inbox.off{background:#eef2f7;color:#64748b;box-shadow:none}
+.inbox .n{font-size:26px;font-weight:800;min-width:38px;text-align:center}
+.inbox .tx b{display:block;font-size:14.5px}
+.inbox .tx i{font-style:normal;font-size:11.5px;opacity:.85}
+.inbox .go{margin-right:auto;font-size:11.5px;background:#ffffff26;border-radius:999px;padding:4px 10px}
+.inbox.on-filter{outline:3px solid #93c5fd}
+.st-prop{background:#f5f3ff;color:#6d28d9;border:1px solid #ddd6fe}
+.st-run2{background:#fefce8;color:#a16207;border:1px solid #fde68a}
+.st-fin{background:#fdf4ff;color:#a21caf;border:1px solid #f5d0fe}
+.st-okk{background:#ecfdf5;color:#047857;border:1px solid #a7f3d0}
+.st-rej{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
+.late{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;border-radius:999px;padding:3px 9px;font-size:10.5px;font-weight:800}
+.op.islate{border-color:#fca5a5;box-shadow:0 0 0 3px #fee2e2}
+.prio{border-radius:999px;padding:3px 9px;font-size:10.5px;font-weight:800;white-space:nowrap}
+.prio-normal{background:#f1f5f9;color:#475569}
+.prio-urgent{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
+.prio-critical{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
+.badges{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:7px}
+.pbox{background:#f5f3ff;border:1px dashed #c4b5fd;border-radius:12px;padding:9px 11px;font-size:12px;line-height:2;margin-top:8px;color:#4c1d95}
+.abox{background:#ecfdf5;border:1px dashed #6ee7b7;border-radius:12px;padding:9px 11px;font-size:12px;line-height:2;margin-top:8px;color:#065f46}
+.rbox{background:#fef2f2;border:1px dashed #fca5a5;border-radius:12px;padding:9px 11px;font-size:12px;line-height:2;margin-top:8px;color:#7f1d1d}
+.pbox b,.abox b,.rbox b{font-weight:800}
+.prog{margin-top:8px;font-size:12px;color:var(--muted);line-height:2}
+.prog i{font-style:normal;color:#0f172a}
+
 /* ---------- تقویم شمسی ---------- */
 .datebtn{width:100%;text-align:right;padding:15px;border:1.5px solid var(--line);border-radius:14px;background:#fbfdff;font:inherit;display:flex;justify-content:space-between;align-items:center;gap:8px;transition:transform .08s}
 .datebtn:active{transform:scale(.99)}
@@ -160,15 +188,15 @@ details.log ul{margin:7px 0 0;padding-right:17px;font-size:11.5px;color:var(--mu
   <header class="head">
     <div>
       <h1>🏗️ ثبت عملیات</h1>
-      <small>نسخه آزمایشی • v3.2.0-ROLES</small>
+      <small>نسخه آزمایشی • v3.2.1-FLOW4</small>
       <button type="button" id="roleChip" class="rolechip hidden"></button>
     </div>
     <button class="btn ghost" id="homeBtn">خانه</button>
   </header>
 
   <div class="note">
-    <b>فایل آزمایشی مرحله ۳.۲</b><br>
-    آزمایش «گردش نقش‌ها»: مدیر اصلی دستور می‌دهد، مدیر اجرایی برنامه‌ریزی و ارجاع می‌کند، ناظر/مجری اجرا را شروع می‌کند. داده‌ها فقط در حافظه همین مرورگر ذخیره می‌شود و هیچ ارتباطی با سامانه اصلی، سرور و داده‌های واقعی ندارد.
+    <b>فایل آزمایشی مرحله ۳.۲.۱</b><br>
+    چرخه چهارنقشی: مدیر اصلی دستور می‌دهد ← مدیر اجرایی برنامه‌ریزی می‌کند یا پیشنهاد اصلاح می‌دهد ← اکیپ اجرا می‌کند ← ناظر تأیید می‌کند. داده‌ها فقط در حافظه همین مرورگر ذخیره می‌شود و هیچ ارتباطی با سامانه اصلی، سرور و داده‌های واقعی ندارد.
   </div>
 
   <section id="roleGate" class="hidden">
@@ -183,6 +211,7 @@ details.log ul{margin:7px 0 0;padding-right:17px;font-size:11.5px;color:var(--mu
   </section>
 
   <section id="home">
+    <button class="inbox hidden" id="inboxBtn"></button>
     <div class="card stats" id="statWrap"></div>
     <button class="btn primary block hidden" id="newOp">➕ صدور دستور عملیات جدید</button>
     <p class="muted hidden" id="roleHint" style="margin:10px 2px 0"></p>
@@ -261,33 +290,25 @@ details.log ul{margin:7px 0 0;padding-right:17px;font-size:11.5px;color:var(--mu
 
       <!-- گام ۶ -->
       <div class="step hidden" data-step="6">
-        <label class="field">
-          <span class="lb" id="q1Label">مقدار <span class="req">*</span></span>
-          <div class="qrow"><input id="q1" type="number" inputmode="decimal" min="0" step="any" placeholder="مثلاً ۱۲٫۵"><span class="unit" id="q1Unit">—</span></div>
-        </label>
-        <label class="field hidden" id="q2Wrap">
-          <span class="lb" id="q2Label">مقدار دوم (اختیاری)</span>
-          <div class="qrow"><input id="q2" type="number" inputmode="decimal" min="0" step="any" placeholder="اختیاری"><span class="unit" id="q2Unit">—</span></div>
-        </label>
-        <p class="muted" id="qHint"></p>
-      </div>
-
-      <!-- گام ۷ -->
-      <div class="step hidden" data-step="7">
-        <span class="lb">نحوه اجرا را مشخص کن <span class="req">*</span></span>
-        <div class="typegrid" id="execMode">
-          <button type="button" class="type" data-mode="contractor"><b>🏢 با پیمانکار</b><small>نام پیمانکار لازم است</small></button>
-          <button type="button" class="type" data-mode="amani"><b>👷 اجرای امانی</b><small>با نیروی داخلی، بدون پیمانکار</small></button>
+        <span class="lb">اولویت کار <span class="req">*</span></span>
+        <div class="typegrid" id="prioBox" style="grid-template-columns:1fr">
+          <button type="button" class="type" data-p="normal"><b>🟢 عادی</b><small>در نوبت عادی انجام شود</small></button>
+          <button type="button" class="type" data-p="urgent"><b>🟠 فوری</b><small>زودتر از کارهای عادی</small></button>
+          <button type="button" class="type" data-p="critical"><b>🔴 بحرانی</b><small>خطر جانی یا توقف خدمات — بلافاصله</small></button>
         </div>
-        <label class="field hidden" id="cWrap">
-          <span class="lb">نام پیمانکار <span class="req">*</span></span>
-          <input id="contractor" placeholder="نام پیمانکار یا شرکت">
-        </label>
-        <div class="pend" id="p7">نحوه اجرا هنوز مشخص نشده است.</div>
+        <div class="pend" id="p6">اولویت هنوز انتخاب نشده است.</div>
+
+        <span class="lb" style="display:block;margin:16px 0 5px">مهلت انجام (اختیاری)</span>
+        <button type="button" class="datebtn empty" id="dueBtn">
+          <span><b id="dueTxt">مهلتی تعیین نشده</b><small id="dueSub">برای تعیین مهلت، تقویم شمسی را باز کن</small></span>
+          <span class="ico">⏳</span>
+        </button>
+        <button type="button" class="btn ghost block hidden" id="dueClear">✖ حذف مهلت</button>
+        <p class="muted">اگر مهلت تعیین کنی، کارهای عقب‌افتاده با نشان قرمز «تأخیر» بالای فهرست دیده می‌شوند.</p>
       </div>
 
       <!-- بازبینی -->
-      <div class="step hidden" data-step="8">
+      <div class="step hidden" data-step="7">
         <div class="sum" id="review"></div>
         <div class="field" style="margin-top:14px">
           <span class="lb">عکس وضعیت موجود (اختیاری، حداکثر ۳)</span>
@@ -312,29 +333,17 @@ details.log ul{margin:7px 0 0;padding-right:17px;font-size:11.5px;color:var(--mu
     </div>
   </section>
 
-  <section id="plan" class="hidden">
+  <section id="act" class="hidden">
     <div class="card">
-      <h3 style="margin:0 0 10px;font-size:16px">🗂 برنامه‌ریزی و ارجاع</h3>
-      <div class="sum" id="planSum"></div>
+      <h3 id="actTitle" style="margin:0 0 10px;font-size:16px"></h3>
+      <div class="sum" id="actSum"></div>
     </div>
     <div class="card">
-      <label class="field">
-        <span class="lb">مجری / ناظر مسئول <span class="req">*</span></span>
-        <input id="pAssignee" placeholder="نام فرد یا اکیپ مسئول اجرا">
-      </label>
-      <span class="lb" style="display:block;color:var(--muted);font-size:12px;font-weight:700;margin:12px 0 5px">تاریخ شروع برنامه‌ریزی‌شده <span class="req">*</span></span>
-      <button type="button" class="datebtn empty" id="pDateBtn">
-        <span><b id="pDateTxt">تاریخی انتخاب نشده</b><small id="pDateSub">برای باز شدن تقویم شمسی بزن</small></span>
-        <span class="ico">📅</span>
-      </button>
-      <label class="field">
-        <span class="lb">یادداشت برای مجری (اختیاری)</span>
-        <textarea id="pNote" placeholder="مثلاً هماهنگی با ترافیک، ساعت شروع، تجهیزات لازم"></textarea>
-      </label>
-      <p class="err" id="pErr"></p>
+      <div id="actBody"></div>
+      <p class="err" id="actErr"></p>
       <div class="row" style="margin-top:12px">
-        <button class="btn ghost" id="pCancel">انصراف</button>
-        <button class="btn primary" id="pSave">✅ ثبت ارجاع</button>
+        <button class="btn ghost" id="actCancel">انصراف</button>
+        <button class="btn primary" id="actSave">ثبت</button>
       </div>
     </div>
   </section>
@@ -374,7 +383,7 @@ details.log ul{margin:7px 0 0;padding-right:17px;font-size:11.5px;color:var(--mu
 <div class="msg" id="msg"></div>
 
 <script>
-const APP_VERSION = 'v3.2.0-ROLES';
+const APP_VERSION = 'v3.2.1-FLOW4';
 const KEY = 'ops31_local_v1';
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
@@ -399,18 +408,30 @@ const WEEK = ['شنبه','یکشنبه','دوشنبه','سه‌شنبه','چها
 const MONTHS = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
 const REGIONS = ['منطقه ۱','منطقه ۲','منطقه ۳','منطقه ۴','منطقه ۵','منطقه ۶','منطقه ۷','منطقه ۸','سایر'];
 
-/* ---------- نقش‌ها و وضعیت‌ها (مرحله ۳.۲) ---------- */
+/* ---------- نقش‌ها، وضعیت‌ها و اولویت (مرحله ۳.۲.۱) ---------- */
 const ROLES = {
-  manager: {ic:'👔', t:'مدیر اصلی',   d:'صدور دستور عملیات و دیدن کل چرخه کار'},
-  exec:    {ic:'🧭', t:'مدیر اجرایی', d:'برنامه‌ریزی دستورها، تعیین مجری و تاریخ شروع'},
-  sup:     {ic:'🦺', t:'ناظر / مجری', d:'دیدن کارهای ارجاع‌شده و ثبت شروع اجرا'}
+  manager: {ic:'👔', t:'مدیر اصلی',   d:'صدور دستور عملیات و تصمیم درباره پیشنهادهای مدیر اجرایی'},
+  exec:    {ic:'🧭', t:'مدیر اجرایی', d:'برنامه‌ریزی و ارجاع به اکیپ، یا پیشنهاد اصلاح به مدیر'},
+  crew:    {ic:'👷', t:'اکیپ اجرا',   d:'شروع کار، ثبت پیشرفت، پایان کار و ثبت مقدار واقعی'},
+  sup:     {ic:'🦺', t:'ناظر',        d:'بازدید نهایی و تأیید یا برگشت کار'}
 };
 const ST = {
-  ordered:    {t:'ابلاغ‌شده',        c:'st-ord'},
-  planned:    {t:'برنامه‌ریزی‌شده',  c:'st-pln'},
-  inprogress: {t:'در حال اجرا',      c:'st-run'}
+  ordered:  {t:'ابلاغ‌شده',        c:'st-ord',  s:1},
+  proposed: {t:'پیشنهاد اصلاح',    c:'st-prop', s:1},
+  planned:  {t:'برنامه‌ریزی‌شده',  c:'st-pln',  s:2},
+  running:  {t:'در حال اجرا',      c:'st-run2', s:3},
+  finished: {t:'منتظر تأیید ناظر', c:'st-fin',  s:3},
+  approved: {t:'تأییدشده',         c:'st-okk',  s:4},
+  rejected: {t:'برگشتی',           c:'st-rej',  s:3}
 };
-const FLOW = ['ordered','planned','inprogress'];
+const FLOW = ['ابلاغ','برنامه‌ریزی','اجرا','تأیید'];
+const INBOX = { manager:['proposed'], exec:['ordered'], crew:['planned','running','rejected'], sup:['finished'] };
+const INBOX_T = { manager:'پیشنهاد منتظر تصمیم تو', exec:'دستور منتظر برنامه‌ریزی', crew:'کار منتظر اقدام تو', sup:'کار منتظر تأیید تو' };
+const PRIO = {
+  normal:   {t:'عادی',   c:'prio-normal',   r:0},
+  urgent:   {t:'فوری',   c:'prio-urgent',   r:1},
+  critical: {t:'بحرانی', c:'prio-critical', r:2}
+};
 const ROLE_KEY = 'ops32_role';
 
 /* ---------- تاریخ شمسی ---------- */
@@ -460,11 +481,11 @@ function makeCode(jy,jm,jd){
 
 /* ---------- وضعیت ویزارد ---------- */
 let step = 1, draft = {}, photos = [];
-const LAST = 8;
-const TITLES = {1:'نوع عملیات',2:'تاریخ عملیات',3:'منطقه و موقعیت',4:'آدرس دقیق',5:'شرح عملیات',6:'مقدار کار',7:'نحوه اجرا',8:'بازبینی و ثبت'};
+const LAST = 7;
+const TITLES = {1:'نوع عملیات',2:'تاریخ دستور',3:'منطقه و موقعیت',4:'آدرس دقیق',5:'شرح عملیات',6:'اولویت و مهلت',7:'بازبینی و صدور'};
 
 function show(sec){
-  ['roleGate','home','wizard','plan','done'].forEach(x => $('#'+x).classList.toggle('hidden', x !== sec));
+  ['roleGate','home','wizard','act','done'].forEach(x => $('#'+x).classList.toggle('hidden', x !== sec));
   window.scrollTo(0,0);
 }
 function err(t){
@@ -478,12 +499,11 @@ function paintStep(){
   $$('.step').forEach(s => s.classList.toggle('hidden', +s.dataset.step !== step));
   $('#wizBar').style.width = Math.round(step / LAST * 100) + '%';
   $('#wizTitle').textContent = TITLES[step];
-  $('#wizStep').textContent = step === LAST ? 'بازبینی نهایی' : 'گام ' + fd(step) + ' از ۷';
+  $('#wizStep').textContent = step === LAST ? 'بازبینی نهایی' : 'گام ' + fd(step) + ' از ۶';
   $('#prev').disabled = step === 1;
-  $('#next').textContent = step === LAST ? '✅ ثبت نهایی' : 'بعدی ▶';
+  $('#next').textContent = step === LAST ? '✅ صدور دستور' : 'بعدی ▶';
   $('#next').classList.toggle('ok', step === LAST);
   err('');
-  if (step === 6) paintQty();
   if (step === LAST){ paintReview(); paintPhotos(); }
   pending();
   window.scrollTo(0,0);
@@ -494,7 +514,7 @@ function pending(){
   set('#p1', !draft.typeId);
   set('#p2', !draft.date);
   set('#p3', !$('#region').value || !draft.place || (draft.place === 'onsite' && !draft.gps));
-  set('#p7', !draft.mode);
+  set('#p6', !draft.prio);
   $('#dateBtn').classList.toggle('empty', !draft.date);
   $('#region').classList.toggle('empty', !$('#region').value);
 }
@@ -514,7 +534,7 @@ $('#typeGrid').addEventListener('click', e => {
 /* ---------- گام ۲: تقویم شمسی ---------- */
 let calY = 0, calM = 0;
 let calCtx = 'wizard';
-const calDate = () => calCtx === 'plan' ? planDraft.date : draft.date;
+const calDate = () => calCtx === 'act' ? actDraft.date : (calCtx === 'due' ? draft.due : draft.date);
 function fillDate(b, t, u, d){
   $(b).classList.toggle('empty', !d);
   if (d){
@@ -528,9 +548,8 @@ function fillDate(b, t, u, d){
   }
 }
 function paintDateBtn(){ fillDate('#dateBtn','#dateTxt','#dateSub', draft.date); }
-function paintPlanDate(){ fillDate('#pDateBtn','#pDateTxt','#pDateSub', planDraft.date); }
 function openCal(ctx){
-  calCtx = ctx === 'plan' ? 'plan' : 'wizard';
+  calCtx = (ctx === 'act' || ctx === 'due') ? ctx : 'wizard';
   const t = jToday(), d = calDate();
   calY = d ? d.y : t.y; calM = d ? d.m : t.m;
   $('#calPick').classList.add('hidden');
@@ -553,9 +572,12 @@ function paintCal(){
   $('#calGrid').innerHTML = h;
 }
 function pickDate(y,m,d){
-  if (calCtx === 'plan'){
-    planDraft.date = {y,m,d};
-    paintPlanDate(); perr(''); closeCal();
+  if (calCtx === 'act'){
+    actDraft.date = {y,m,d};
+    fillDate('#aDateBtn','#aDateTxt','#aDateSub', actDraft.date); aerr(''); closeCal();
+  } else if (calCtx === 'due'){
+    draft.due = {y,m,d};
+    paintDue(); err(''); closeCal();
   } else {
     draft.date = {y,m,d};
     paintDateBtn(); pending(); err(''); closeCal();
@@ -563,7 +585,6 @@ function pickDate(y,m,d){
   toast('تاریخ ' + jFmt(y,m,d) + ' انتخاب شد');
 }
 $('#dateBtn').addEventListener('click', () => openCal('wizard'));
-$('#pDateBtn').addEventListener('click', () => openCal('plan'));
 $('#calClose').addEventListener('click', closeCal);
 $('#calOvl').addEventListener('click', e => { if (e.target.id === 'calOvl') closeCal(); });
 $('#calPrev').addEventListener('click', () => { calM--; if (calM < 1){ calM = 12; calY--; } paintCal(); });
@@ -655,28 +676,23 @@ document.addEventListener('click', e => {
 
 /* ---------- گام ۶ ---------- */
 function curType(){ return TYPES.find(t => t.id === draft.typeId) || null; }
-function paintQty(){
-  const t = curType(); if (!t) return;
-  $('#q1Label').innerHTML = 'مقدار بر حسب ' + esc(t.u1) + ' <span class="req">*</span>';
-  $('#q1Unit').textContent = t.u1;
-  $('#q2Wrap').classList.toggle('hidden', !t.u2);
-  if (t.u2){ $('#q2Label').textContent = 'مقدار بر حسب ' + t.u2 + ' (اختیاری)'; $('#q2Unit').textContent = t.u2; }
-  $('#qHint').textContent = t.u2
-    ? 'واحد اصلی ' + t.u1 + ' است. اگر ' + t.u2 + ' را هم وارد کنی، گزارش‌ها و کنترل کیفیت دقیق‌تر می‌شوند.'
-    : 'واحد این نوع عملیات ' + t.u1 + ' است.';
+
+/* ---------- گام ۶: اولویت و مهلت ---------- */
+function paintPrio(){
+  $$('#prioBox .type').forEach(x => x.classList.toggle('sel', x.dataset.p === draft.prio));
 }
-
-/* ---------- گام ۷ (انتخاب صریح) ---------- */
-$('#execMode').addEventListener('click', e => {
+function paintDue(){
+  fillDate('#dueBtn','#dueTxt','#dueSub', draft.due);
+  if (!draft.due){ $('#dueTxt').textContent = 'مهلتی تعیین نشده'; $('#dueSub').textContent = 'برای تعیین مهلت، تقویم شمسی را باز کن'; }
+  $('#dueClear').classList.toggle('hidden', !draft.due);
+}
+$('#prioBox').addEventListener('click', e => {
   const b = e.target.closest('.type'); if (!b) return;
-  draft.mode = b.dataset.mode;
-  $$('#execMode .type').forEach(x => x.classList.toggle('sel', x.dataset.mode === draft.mode));
-  $('#cWrap').classList.toggle('hidden', draft.mode !== 'contractor');
-  if (draft.mode === 'amani') $('#contractor').value = '';
-  pending(); err('');
+  draft.prio = b.dataset.p; paintPrio(); pending(); err('');
 });
+$('#dueBtn').addEventListener('click', () => openCal('due'));
+$('#dueClear').addEventListener('click', () => { draft.due = null; paintDue(); toast('مهلت حذف شد'); });
 
-/* ---------- عکس اختیاری وضعیت موجود ---------- */
 $('#camBtn').addEventListener('click', () => $('#camInput').click());
 $('#galBtn').addEventListener('click', () => $('#galInput').click());
 async function addPhotos(e){
@@ -726,8 +742,8 @@ function collect(){
     typeId: draft.typeId, typeName: t ? t.name : '',
     jy: draft.date ? draft.date.y : 0, jm: draft.date ? draft.date.m : 0, jd: draft.date ? draft.date.d : 0,
     region, address: $('#address').value.trim(), descr: $('#descr').value.trim(),
-    q1: $('#q1').value.trim(), u1: t ? t.u1 : '', q2: $('#q2').value.trim(), u2: t ? t.u2 : '',
-    mode: draft.mode, contractor: draft.mode === 'contractor' ? $('#contractor').value.trim() : '',
+    u1: t ? t.u1 : '', u2: t ? t.u2 : '',
+    prio: draft.prio, due: draft.due || null,
     place: draft.place, gps: draft.gps || null, photos: photos.slice()
   };
 }
@@ -739,8 +755,8 @@ function paintReview(){
     ['منطقه', o.region],
     ['آدرس دقیق', o.address],
     ['شرح', o.descr],
-    ['مقدار', fd(o.q1) + ' ' + o.u1 + (o.q2 ? ' — ' + fd(o.q2) + ' ' + o.u2 : '')],
-    ['نحوه اجرا', o.mode === 'amani' ? 'اجرای امانی' : 'پیمانکار: ' + o.contractor],
+    ['اولویت', PRIO[o.prio] ? PRIO[o.prio].t : '—'],
+    ['مهلت انجام', o.due ? jFmt(o.due.y,o.due.m,o.due.d) : 'تعیین نشده'],
     ['محل ثبت', o.place === 'onsite' ? 'در محل عملیات' : 'از دفتر'],
     ['موقعیت', o.gps ? o.gps.lat.toFixed(5) + ', ' + o.gps.lng.toFixed(5) + ' (±' + fd(o.gps.acc) + ' متر)' : 'ثبت نشده']
   ];
@@ -759,15 +775,7 @@ function validate(){
   }
   if (step === 4 && $('#address').value.trim().length < 3) return 'آدرس دقیق اجباری است.';
   if (step === 5 && $('#descr').value.trim().length < 3) return 'شرح عملیات اجباری است.';
-  if (step === 6){
-    const v = $('#q1').value.trim();
-    if (!v) return 'مقدار اجباری است.';
-    if (!(parseFloat(v) > 0)) return 'مقدار باید عددی بزرگ‌تر از صفر باشد.';
-  }
-  if (step === 7){
-    if (!draft.mode) return 'نحوه اجرا را انتخاب کن: با پیمانکار یا اجرای امانی.';
-    if (draft.mode === 'contractor' && !$('#contractor').value.trim()) return 'نام پیمانکار را بنویس یا گزینه اجرای امانی را انتخاب کن.';
-  }
+  if (step === 6 && !draft.prio) return 'اولویت کار اجباری است و پیش‌فرضی ندارد. یکی از سه گزینه را انتخاب کن.';
   return '';
 }
 
@@ -805,9 +813,8 @@ $('#newOp').addEventListener('click', () => {
   draft = {}; photos = []; step = 1;
   draft.date = null; paintTypes(); paintDateBtn(); buildRegions();
   $('#regionOtherWrap').classList.add('hidden'); $('#regionOther').value = '';
-  $('#address').value = ''; $('#descr').value = ''; $('#q1').value = ''; $('#q2').value = '';
-  $('#contractor').value = ''; $('#cWrap').classList.add('hidden');
-  $$('#execMode .type').forEach(x => x.classList.remove('sel'));
+  $('#address').value = ''; $('#descr').value = '';
+  draft.prio = null; draft.due = null; paintPrio(); paintDue();
   $$('#placeMode .type').forEach(x => x.classList.remove('sel'));
   $('#gpsWrap').classList.add('hidden'); draft.gps = null; draft.place = null;
   $('#gpsBtn').disabled = false; $('#gpsBtn').textContent = '📍 ثبت موقعیت فعلی';
@@ -818,24 +825,34 @@ $('#wipe').addEventListener('click', () => {
   localStorage.removeItem(KEY); render(); toast('پاک شد');
 });
 
-/* ---------- نقش‌ها (مرحله ۳.۲) ---------- */
-let role = null, planId = null, planDraft = {};
+/* ---------- نقش‌ها و گردش کار (مرحله ۳.۲.۱) ---------- */
+let role = null, actId = null, actKind = null, actDraft = {}, inboxOnly = false;
 
-function perr(t){ const e = $('#pErr'); e.textContent = t || ''; e.classList.toggle('show', !!t); }
+function aerr(t){ const e = $('#actErr'); e.textContent = t || ''; e.classList.toggle('show', !!t); }
+function addLog(o, r, text){ o.log = o.log || []; o.log.push({ fa: nowFa(), role: r, text }); }
+const num = d => d ? d.y*10000 + d.m*100 + d.d : 0;
 
-function addLog(o, r, text){
-  o.log = o.log || [];
-  o.log.push({ fa: nowFa(), role: r, text });
-}
 function migrate(all){
   let ch = false;
   all.forEach(o => {
     if (!o.status || o.status === 'registered'){ o.status = 'ordered'; ch = true; }
+    if (o.status === 'inprogress'){ o.status = 'running'; ch = true; }
+    if (!o.prio){ o.prio = 'normal'; ch = true; }
     if (!o.log){ o.log = [{ fa: o.createdFa || '', role: 'manager', text: 'دستور عملیات صادر و ابلاغ شد' }]; ch = true; }
   });
   if (ch) save(all);
   return all;
 }
+function isLate(o){
+  if (o.status === 'approved') return false;
+  const now = num(jToday());
+  if (o.due && num(o.due) < now) return true;
+  if (o.status === 'planned' && o.planDate && num(o.planDate) < now) return true;
+  return false;
+}
+function needsMe(o){ return (INBOX[role] || []).includes(o.status); }
+
+/* ---------- انتخاب نقش ---------- */
 function buildRoleCards(){
   $('#roleCards').innerHTML = Object.keys(ROLES).map(k => {
     const r = ROLES[k];
@@ -844,7 +861,7 @@ function buildRoleCards(){
   }).join('');
 }
 function setRole(k){
-  role = k;
+  role = k; inboxOnly = false;
   try { localStorage.setItem(ROLE_KEY, k); } catch(e){}
   buildRoleCards(); render(); show('home');
   toast('نقش فعال: ' + ROLES[k].t);
@@ -853,131 +870,311 @@ $('#roleCards').addEventListener('click', e => {
   const b = e.target.closest('[data-role]'); if (b) setRole(b.dataset.role);
 });
 $('#roleChip').addEventListener('click', () => { buildRoleCards(); show('roleGate'); });
+$('#inboxBtn').addEventListener('click', () => { inboxOnly = !inboxOnly; render(); });
 
-/* ---------- برنامه‌ریزی و ارجاع (مدیر اجرایی) ---------- */
-function openPlan(code){
-  const o = load().find(x => x.code === code); if (!o) return;
-  planId = code;
-  planDraft = { date: o.planDate || null };
-  $('#pAssignee').value = o.assignee || '';
-  $('#pNote').value = o.planNote || '';
-  $('#planSum').innerHTML = [
-    ['کد', fd(o.code)],
-    ['نوع عملیات', o.typeName],
-    ['تاریخ دستور', jFmt(o.jy,o.jm,o.jd)],
-    ['منطقه', o.region],
-    ['آدرس', o.address],
-    ['مقدار', fd(o.q1) + ' ' + o.u1 + (o.q2 ? ' — ' + fd(o.q2) + ' ' + o.u2 : '')]
+/* ---------- برگه اقدام ---------- */
+const DATEBTN = (lb, req) => `<span class="lb" style="display:block;margin:12px 0 5px">${lb}${req?' <span class="req">*</span>':''}</span>
+  <button type="button" class="datebtn empty" id="aDateBtn">
+    <span><b id="aDateTxt">تاریخی انتخاب نشده</b><small id="aDateSub">برای باز شدن تقویم شمسی بزن</small></span>
+    <span class="ico">📅</span></button>`;
+const TA = (id, lb, ph, req) => `<label class="field"><span class="lb">${lb}${req?' <span class="req">*</span>':''}</span>
+  <textarea id="${id}" placeholder="${ph}"></textarea></label>`;
+const IN = (id, lb, ph, req, type) => `<label class="field"><span class="lb">${lb}${req?' <span class="req">*</span>':''}</span>
+  <input id="${id}" ${type||''} placeholder="${ph}"></label>`;
+
+const ACTS = {
+  plan: {
+    t: '🗂 برنامه‌ریزی و ارجاع', btn: '✅ ثبت ارجاع',
+    body: o => `<span class="lb">نحوه اجرا <span class="req">*</span></span>
+      <div class="typegrid" id="aMode">
+        <button type="button" class="type${o.mode==='amani'?' sel':''}" data-mode="amani"><b>👷 اکیپ امانی</b><small>با نیروی داخلی</small></button>
+        <button type="button" class="type${o.mode==='contractor'?' sel':''}" data-mode="contractor"><b>🏢 پیمانکار</b><small>واگذاری به پیمانکار</small></button>
+      </div>
+      ${IN('aName','نام اکیپ یا پیمانکار','مثلاً اکیپ ۳ یا شرکت آریا',1)}
+      ${DATEBTN('تاریخ شروع برنامه‌ریزی‌شده',1)}
+      ${TA('aNote','یادداشت برای اکیپ (اختیاری)','هماهنگی با ترافیک، ساعت شروع، تجهیزات لازم')}`,
+    fill: o => { actDraft.mode = o.mode || null; actDraft.date = o.planDate || null; $('#aName').value = o.assignee || ''; $('#aNote').value = o.planNote || ''; },
+    check: () => !actDraft.mode ? 'نحوه اجرا را انتخاب کن: اکیپ امانی یا پیمانکار.'
+      : !$('#aName').value.trim() ? 'نام اکیپ یا پیمانکار اجباری است و پیش‌فرضی ندارد.'
+      : !actDraft.date ? 'تاریخ شروع انتخاب نشده است. روی کادر تاریخ بزن.' : '',
+    apply: o => {
+      const again = o.status === 'planned';
+      o.mode = actDraft.mode; o.assignee = $('#aName').value.trim();
+      o.planDate = actDraft.date; o.planNote = $('#aNote').value.trim(); o.status = 'planned';
+      addLog(o,'exec',(again?'ویرایش ارجاع: ':'ارجاع به ') + o.assignee + ' — شروع ' + jFmt(actDraft.date.y,actDraft.date.m,actDraft.date.d));
+      return 'ارجاع ثبت شد';
+    }
+  },
+  propose: {
+    t: '💡 پیشنهاد اصلاح به مدیر', btn: '📨 ارسال پیشنهاد',
+    body: () => `<p class="muted" style="margin:0 0 10px">اگر فکر می‌کنی این دستور بهتر است به شکل دیگری اجرا شود، پیشنهادت را بنویس. تا تصمیم مدیر، کار به اکیپ ارجاع نمی‌شود.</p>
+      ${TA('aText','متن پیشنهاد','مثلاً: با توجه به ترافیک، بهتر است شب‌کاری انجام شود و محدوده به دو فاز تقسیم گردد.',1)}`,
+    fill: o => { $('#aText').value = o.proposal ? o.proposal.text : ''; },
+    check: () => $('#aText').value.trim().length < 5 ? 'متن پیشنهاد اجباری است و باید روشن نوشته شود.' : '',
+    apply: o => {
+      o.proposal = { text: $('#aText').value.trim(), fa: nowFa() };
+      o.status = 'proposed';
+      addLog(o,'exec','پیشنهاد اصلاح به مدیر ارسال شد');
+      return 'پیشنهاد برای مدیر ارسال شد';
+    }
+  },
+  accept: {
+    t: '✅ موافقت با پیشنهاد', btn: '✅ تأیید می‌کنم',
+    body: o => `<div class="pbox"><b>پیشنهاد مدیر اجرایی:</b><br>${esc(o.proposal ? o.proposal.text : '—')}</div>
+      ${TA('aNote','توضیح مدیر (اختیاری)','مثلاً: موافقم، فقط ایمنی معبر رعایت شود.')}`,
+    fill: () => {},
+    check: () => '',
+    apply: o => {
+      const n = $('#aNote').value.trim();
+      o.amend = { text: (o.proposal ? o.proposal.text : '') + (n ? ' — توضیح مدیر: ' + n : ''), fa: nowFa() };
+      o.proposal = null; o.status = 'ordered';
+      addLog(o,'manager','با پیشنهاد مدیر اجرایی موافقت شد' + (n ? ' — ' + n : ''));
+      return 'موافقت ثبت شد؛ کار به مدیر اجرایی برگشت';
+    }
+  },
+  keep: {
+    t: '❌ اجرا طبق دستور اولیه', btn: '📌 ثبت تصمیم',
+    body: o => `<div class="pbox"><b>پیشنهاد مدیر اجرایی:</b><br>${esc(o.proposal ? o.proposal.text : '—')}</div>
+      ${TA('aText','دلیل رد پیشنهاد','چرا دستور اولیه باید اجرا شود؟',1)}`,
+    fill: () => {},
+    check: () => $('#aText').value.trim().length < 3 ? 'نوشتن دلیل اجباری است تا تصمیم مستند بماند.' : '',
+    apply: o => {
+      const n = $('#aText').value.trim();
+      o.amend = { text: 'پیشنهاد پذیرفته نشد — ' + n, fa: nowFa() };
+      o.proposal = null; o.status = 'ordered';
+      addLog(o,'manager','پیشنهاد رد شد — ' + n);
+      return 'تصمیم ثبت شد؛ دستور اولیه معتبر است';
+    }
+  },
+  prog: {
+    t: '📈 ثبت پیشرفت کار', btn: '📈 ثبت',
+    body: () => TA('aText','شرح پیشرفت','مثلاً: ۶۰٪ محدوده تخریب و آماده‌سازی شد.',1),
+    fill: () => {},
+    check: () => $('#aText').value.trim().length < 3 ? 'شرح پیشرفت اجباری است.' : '',
+    apply: o => {
+      o.progress = o.progress || [];
+      o.progress.push({ fa: nowFa(), text: $('#aText').value.trim() });
+      addLog(o,'crew','ثبت پیشرفت: ' + $('#aText').value.trim());
+      return 'پیشرفت ثبت شد';
+    }
+  },
+  finish: {
+    t: '🏁 پایان کار و ثبت مقدار', btn: '🏁 تحویل به ناظر',
+    body: o => `<p class="muted" style="margin:0 0 10px">مقدار واقعی اجراشده را ثبت کن. این عدد مبنای گزارش‌ها و کنترل ناظر است.</p>
+      <label class="field"><span class="lb">مقدار واقعی بر حسب ${esc(o.u1||'')} <span class="req">*</span></span>
+        <div class="qrow"><input id="aQ1" type="number" inputmode="decimal" min="0" step="any" placeholder="مثلاً ۱۲٫۵"><span class="unit">${esc(o.u1||'—')}</span></div></label>
+      ${o.u2 ? `<label class="field"><span class="lb">مقدار بر حسب ${esc(o.u2)} (اختیاری)</span>
+        <div class="qrow"><input id="aQ2" type="number" inputmode="decimal" min="0" step="any" placeholder="اختیاری"><span class="unit">${esc(o.u2)}</span></div></label>` : ''}
+      ${TA('aNote','گزارش پایان کار (اختیاری)','نکات اجرا، مشکلات، تحویل معبر')}`,
+    fill: o => { $('#aQ1').value = o.q1 || ''; if ($('#aQ2')) $('#aQ2').value = o.q2 || ''; },
+    check: () => {
+      const v = $('#aQ1').value.trim();
+      if (!v) return 'ثبت مقدار واقعی اجباری است.';
+      if (!(parseFloat(v) > 0)) return 'مقدار باید عددی بزرگ‌تر از صفر باشد.';
+      return '';
+    },
+    apply: o => {
+      o.q1 = $('#aQ1').value.trim();
+      o.q2 = $('#aQ2') ? $('#aQ2').value.trim() : '';
+      o.finishNote = $('#aNote').value.trim(); o.finishedFa = nowFa(); o.status = 'finished';
+      addLog(o,'crew','پایان کار — مقدار واقعی: ' + fd(o.q1) + ' ' + o.u1);
+      return 'کار برای تأیید ناظر ارسال شد';
+    }
+  },
+  approve: {
+    t: '✅ تأیید نهایی کار', btn: '✅ تأیید می‌کنم',
+    body: o => `<div class="abox"><b>مقدار ثبت‌شده اکیپ:</b> ${esc(fd(o.q1||'—'))} ${esc(o.u1||'')}${o.q2?' — '+esc(fd(o.q2))+' '+esc(o.u2):''}</div>
+      ${TA('aNote','یادداشت ناظر (اختیاری)','کیفیت کار، نکات تحویل')}`,
+    fill: () => {},
+    check: () => '',
+    apply: o => {
+      o.reviewNote = $('#aNote').value.trim(); o.reviewFa = nowFa(); o.status = 'approved'; o.rejectReason = '';
+      addLog(o,'sup','کار بازدید و تأیید نهایی شد' + (o.reviewNote ? ' — ' + o.reviewNote : ''));
+      return 'کار تأیید شد';
+    }
+  },
+  reject: {
+    t: '↩️ برگشت کار برای اصلاح', btn: '↩️ برگشت به اکیپ',
+    body: () => `<p class="muted" style="margin:0 0 10px">دلیل برگشت باید روشن باشد تا اکیپ بداند دقیقاً چه چیزی اصلاح شود.</p>
+      ${TA('aText','دلیل برگشت','مثلاً: ضخامت آسفالت کمتر از حد مجاز است و لبه‌ها تراز نیست.',1)}`,
+    fill: () => {},
+    check: () => $('#aText').value.trim().length < 5 ? 'نوشتن دلیل برگشت اجباری است.' : '',
+    apply: o => {
+      o.rejectReason = $('#aText').value.trim(); o.status = 'rejected'; o.reviewFa = nowFa();
+      addLog(o,'sup','کار برگشت داده شد — ' + o.rejectReason);
+      return 'کار برای اصلاح به اکیپ برگشت';
+    }
+  },
+  fixdone: {
+    t: '🔧 ثبت اصلاح انجام‌شده', btn: '🏁 ارسال دوباره به ناظر',
+    body: o => `<div class="rbox"><b>دلیل برگشت ناظر:</b><br>${esc(o.rejectReason || '—')}</div>
+      ${TA('aText','شرح اصلاح انجام‌شده','چه کاری برای رفع ایراد انجام شد؟',1)}`,
+    fill: () => {},
+    check: () => $('#aText').value.trim().length < 3 ? 'شرح اصلاح اجباری است.' : '',
+    apply: o => {
+      o.progress = o.progress || [];
+      o.progress.push({ fa: nowFa(), text: 'اصلاح: ' + $('#aText').value.trim() });
+      o.status = 'finished'; o.finishedFa = nowFa();
+      addLog(o,'crew','اصلاح انجام شد — ' + $('#aText').value.trim());
+      return 'دوباره برای تأیید ناظر ارسال شد';
+    }
+  }
+};
+
+function openAct(kind, code){
+  const o = load().find(x => x.code === code); if (!o || !ACTS[kind]) return;
+  actId = code; actKind = kind; actDraft = {};
+  const A = ACTS[kind];
+  $('#actTitle').textContent = A.t;
+  $('#actSum').innerHTML = [
+    ['کد', fd(o.code)], ['نوع عملیات', o.typeName],
+    ['اولویت', PRIO[o.prio] ? PRIO[o.prio].t : '—'],
+    ['منطقه', o.region], ['آدرس', o.address], ['شرح', o.descr]
   ].map(r => `<div><i>${esc(r[0])}</i><b>${esc(r[1])}</b></div>`).join('');
-  paintPlanDate(); perr(''); show('plan');
+  $('#actBody').innerHTML = A.body(o);
+  A.fill(o);
+  if ($('#aDateBtn')) fillDate('#aDateBtn','#aDateTxt','#aDateSub', actDraft.date);
+  $('#actSave').textContent = A.btn;
+  aerr(''); show('act');
 }
-$('#pCancel').addEventListener('click', () => { render(); show('home'); });
-$('#pSave').addEventListener('click', () => {
-  const a = $('#pAssignee').value.trim();
-  if (!a) return perr('نام مجری یا ناظر اجباری است و پیش‌فرضی ندارد.');
-  if (!planDraft.date) return perr('تاریخ شروع انتخاب نشده است. روی کادر تاریخ بزن و از تقویم یک روز را انتخاب کن.');
-  const all = load(), o = all.find(x => x.code === planId); if (!o) return;
-  const again = o.status !== 'ordered';
-  o.assignee = a;
-  o.planNote = $('#pNote').value.trim();
-  o.planDate = planDraft.date;
-  o.status = 'planned';
-  addLog(o, 'exec', (again ? 'ویرایش ارجاع: ' : 'برنامه‌ریزی و ارجاع به ') + a +
-    ' — شروع ' + jFmt(planDraft.date.y, planDraft.date.m, planDraft.date.d));
-  if (!save(all)) return;
-  toast('ارجاع ثبت شد'); render(); show('home');
+$('#actBody').addEventListener('click', e => {
+  const m = e.target.closest('[data-mode]');
+  if (m){ actDraft.mode = m.dataset.mode; $$('#aMode .type').forEach(x => x.classList.toggle('sel', x.dataset.mode === actDraft.mode)); aerr(''); return; }
+  if (e.target.closest('#aDateBtn')) openCal('act');
 });
-
-/* ---------- شروع اجرا (ناظر/مجری) ---------- */
+$('#actCancel').addEventListener('click', () => { render(); show('home'); });
+$('#actSave').addEventListener('click', () => {
+  const A = ACTS[actKind]; if (!A) return;
+  const bad = A.check(); if (bad) return aerr(bad);
+  const all = load(), o = all.find(x => x.code === actId); if (!o) return;
+  const msg = A.apply(o);
+  if (!save(all)) return;
+  toast(msg); render(); show('home');
+});
 function startRun(code){
   const all = load(), o = all.find(x => x.code === code); if (!o) return;
-  if (!confirm('شروع اجرای این عملیات ثبت شود؟')) return;
-  o.status = 'inprogress'; o.startedFa = nowFa();
-  addLog(o, 'sup', 'شروع اجرا ثبت شد');
+  if (!confirm('شروع کار این عملیات ثبت شود؟')) return;
+  o.status = 'running'; o.startedFa = nowFa();
+  addLog(o,'crew','شروع کار ثبت شد');
   if (!save(all)) return;
   toast('وضعیت: در حال اجرا'); render();
 }
 $('#list').addEventListener('click', e => {
-  const p = e.target.closest('[data-plan]'); if (p) return openPlan(p.dataset.plan);
-  const r = e.target.closest('[data-run]');  if (r) return startRun(r.dataset.run);
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  if (b.dataset.act === 'start') return startRun(b.dataset.code);
+  openAct(b.dataset.act, b.dataset.code);
 });
 
 /* ---------- نمایش ---------- */
 function flowBar(st){
-  const i = FLOW.indexOf(st);
-  return '<div class="flow">' + FLOW.map((k,n) =>
-    `<i class="${n < i ? 'done' : (n === i ? 'on' : '')}">${ST[k].t}</i>`).join('<span style="color:#cbd5e1">‹</span>') + '</div>';
+  const cur = (ST[st] || ST.ordered).s;
+  return '<div class="flow">' + FLOW.map((n,i) =>
+    `<i class="${i+1 < cur ? 'done' : (i+1 === cur ? 'on' : '')}">${n}</i>`
+  ).join('<span style="color:#cbd5e1">‹</span>') + '</div>';
+}
+function actionsFor(o){
+  const B = (k,t,c) => `<button class="btn ${c||''}" data-act="${k}" data-code="${esc(o.code)}">${t}</button>`;
+  let a = [];
+  if (role === 'exec'  && o.status === 'ordered'){ a.push(B('plan','🗂 برنامه‌ریزی و ارجاع','primary')); a.push(B('propose','💡 پیشنهاد به مدیر','ghost')); }
+  if (role === 'exec'  && o.status === 'planned')  a.push(B('plan','✏️ ویرایش ارجاع','ghost'));
+  if (role === 'manager' && o.status === 'proposed'){ a.push(B('accept','✅ موافقم','ok')); a.push(B('keep','❌ طبق دستور اولیه','ghost')); }
+  if (role === 'crew'  && o.status === 'planned')  a.push(B('start','▶️ شروع کار','ok'));
+  if (role === 'crew'  && o.status === 'running'){ a.push(B('prog','📈 ثبت پیشرفت','ghost')); a.push(B('finish','🏁 پایان کار','primary')); }
+  if (role === 'crew'  && o.status === 'rejected') a.push(B('fixdone','🔧 اصلاح شد','primary'));
+  if (role === 'sup'   && o.status === 'finished'){ a.push(B('approve','✅ تأیید نهایی','ok')); a.push(B('reject','↩️ برگشت','danger')); }
+  return a.length ? `<div class="actions">${a.join('')}</div>` : '';
 }
 function opCard(o){
-  const st = ST[o.status] || ST.ordered;
-  let act = '';
-  if (role === 'exec' && o.status === 'ordered')
-    act = `<div class="actions"><button class="btn primary" data-plan="${esc(o.code)}">🗂 برنامه‌ریزی و ارجاع</button></div>`;
-  else if (role === 'exec' && o.status === 'planned')
-    act = `<div class="actions"><button class="btn ghost" data-plan="${esc(o.code)}">✏️ ویرایش ارجاع</button></div>`;
-  else if (role === 'sup' && o.status === 'planned')
-    act = `<div class="actions"><button class="btn ok" data-run="${esc(o.code)}">▶️ شروع اجرا</button></div>`;
-  const asg = o.assignee ? `<div class="assignbox">👷 مجری: <b>${esc(o.assignee)}</b>` +
+  const st = ST[o.status] || ST.ordered, pr = PRIO[o.prio] || PRIO.normal, late = isLate(o);
+  const asg = o.assignee ? `<div class="assignbox">${o.mode === 'contractor' ? '🏢 پیمانکار' : '👷 اکیپ'}: <b>${esc(o.assignee)}</b>` +
     (o.planDate ? ` • شروع: <b>${esc(jFmt(o.planDate.y,o.planDate.m,o.planDate.d))}</b>` : '') +
-    (o.planNote ? `<br>📝 ${esc(o.planNote)}` : '') + `</div>` : '';
-  const log = (o.log && o.log.length) ?
-    `<details class="log"><summary>تاریخچه (${fd(o.log.length)} رویداد)</summary><ul>` +
-    o.log.map(l => `<li>${esc(l.text)}<br><span style="font-size:10.5px">${esc(l.fa)}</span></li>`).join('') +
-    `</ul></details>` : '';
-  return `<div class="op">
+    (o.planNote ? `<br>📝 ${esc(o.planNote)}` : '') + '</div>' : '';
+  const prop = o.proposal ? `<div class="pbox"><b>💡 پیشنهاد مدیر اجرایی:</b><br>${esc(o.proposal.text)}</div>` : '';
+  const amend = o.amend ? `<div class="abox"><b>📌 اصلاحیه مدیر:</b><br>${esc(o.amend.text)}</div>` : '';
+  const rej  = (o.status === 'rejected' && o.rejectReason) ? `<div class="rbox"><b>↩️ دلیل برگشت ناظر:</b><br>${esc(o.rejectReason)}</div>` : '';
+  const qty  = o.q1 ? `<p>📦 مقدار واقعی: <b>${esc(fd(o.q1))} ${esc(o.u1)}</b>${o.q2 ? ' — ' + esc(fd(o.q2)) + ' ' + esc(o.u2) : ''}</p>` : '';
+  const prog = (o.progress && o.progress.length) ? `<div class="prog">${o.progress.map(x => `• <i>${esc(x.text)}</i> <span style="font-size:10.5px">${esc(x.fa)}</span>`).join('<br>')}</div>` : '';
+  const log  = (o.log && o.log.length) ? `<details class="log"><summary>تاریخچه (${fd(o.log.length)} رویداد)</summary><ul>` +
+    o.log.map(l => `<li>${esc(l.text)}<br><span style="font-size:10.5px">${esc(l.fa)}</span></li>`).join('') + '</ul></details>' : '';
+  return `<div class="op${late ? ' islate' : ''}">
     <div class="op-top">
       <div><span class="code">${esc(fd(o.code))}</span><p style="margin:4px 0 0"><b>${esc(o.typeName)}</b></p></div>
       <span class="st ${st.c}">${esc(st.t)}</span>
     </div>
+    <div class="badges"><span class="prio ${pr.c}">${esc(pr.t)}</span>
+      ${o.due ? `<span class="prio prio-normal">مهلت ${esc(jFmt(o.due.y,o.due.m,o.due.d))}</span>` : ''}
+      ${late ? '<span class="late">⏰ تأخیر</span>' : ''}
+      ${needsMe(o) ? '<span class="late" style="background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe">منتظر اقدام تو</span>' : ''}
+    </div>
     ${flowBar(o.status)}
     <p>📅 ${esc(jFmt(o.jy,o.jm,o.jd))} • 📍 ${esc(o.region)} — ${esc(o.address)}</p>
     <p>📝 ${esc(o.descr)}</p>
-    <p>📦 ${esc(fd(o.q1))} ${esc(o.u1)}${o.q2 ? ' — ' + esc(fd(o.q2)) + ' ' + esc(o.u2) : ''}</p>
-    ${asg}
+    ${qty}${asg}${prop}${amend}${rej}${prog}
     ${(o.photos && o.photos.length) ? `<div class="photos">${o.photos.map(ph => `<div class="ph"><img src="${ph}" alt="عکس"></div>`).join('')}</div>` : ''}
-    <div class="meta">${o.mode === 'amani' ? '👷 اجرای امانی' : '🏢 ' + esc(o.contractor || '—')} • ثبت: ${esc(o.createdFa || '')}</div>
+    <div class="meta">ثبت: ${esc(o.createdFa || '')}${o.finishedFa ? ' • پایان: ' + esc(o.finishedFa) : ''}</div>
     ${o.gps ? routeBtns(o.gps.lat, o.gps.lng) : ''}
-    ${act}
+    ${actionsFor(o)}
     ${log}
   </div>`;
 }
+const VIS = {
+  manager: ['ordered','proposed','planned','running','finished','approved','rejected'],
+  exec:    ['ordered','proposed','planned','running','finished','approved','rejected'],
+  crew:    ['planned','running','finished','rejected','approved'],
+  sup:     ['finished','approved','rejected']
+};
 function render(){
   if (!role){ buildRoleCards(); show('roleGate'); return; }
-  const all = migrate(load()), t = jToday();
-  const by = k => all.filter(o => o.status === k);
+  const all = migrate(load());
+  const by = k => all.filter(o => o.status === k).length;
   const r = ROLES[role];
   $('#roleChip').classList.remove('hidden');
   $('#roleChip').textContent = r.ic + ' ' + r.t + ' • تغییر نقش';
 
-  let stats, items, hint = '', empty = '';
+  let items = all.filter(o => VIS[role].includes(o.status));
+  const mine = items.filter(needsMe);
+  if (inboxOnly) items = mine;
+  items = items.slice().sort((a,b) =>
+    (isLate(b) - isLate(a)) || (PRIO[b.prio]||PRIO.normal).r - (PRIO[a.prio]||PRIO.normal).r ||
+    (b.createdAt || '').localeCompare(a.createdAt || ''));
+
+  const ib = $('#inboxBtn');
+  ib.classList.remove('hidden');
+  ib.classList.toggle('off', mine.length === 0);
+  ib.classList.toggle('on-filter', inboxOnly);
+  ib.innerHTML = `<span class="n">${fd(mine.length)}</span><span class="tx"><b>کارتابل من</b><i>${esc(INBOX_T[role])}</i></span>` +
+    `<span class="go">${inboxOnly ? '✖ نمایش همه' : 'فقط همین‌ها'}</span>`;
+
+  let stats, hint = '', empty = '';
   if (role === 'manager'){
-    stats = [[all.length,'کل دستورها'], [by('ordered').length,'ابلاغ‌شده'], [by('planned').length + by('inprogress').length,'در جریان']];
-    items = all;
-    hint = 'تو می‌توانی دستور عملیات صادر کنی و کل چرخه را ببینی. برنامه‌ریزی و ارجاع بر عهده مدیر اجرایی است.';
+    stats = [[all.length,'کل دستورها'], [by('proposed'),'منتظر تصمیم تو'], [by('approved'),'تأییدشده']];
+    hint = 'تو دستور صادر می‌کنی و درباره پیشنهادهای مدیر اجرایی تصمیم می‌گیری.';
     empty = 'هنوز دستوری صادر نشده است.<br>با دکمه بالا اولین دستور عملیات را صادر کن.';
   } else if (role === 'exec'){
-    stats = [[by('ordered').length,'در انتظار برنامه‌ریزی'], [by('planned').length,'برنامه‌ریزی‌شده'], [by('inprogress').length,'در حال اجرا']];
-    items = all.filter(o => FLOW.includes(o.status));
-    hint = 'صدور دستور فقط در اختیار مدیر اصلی است. وظیفه تو برنامه‌ریزی دستورهای ابلاغ‌شده و ارجاع آن‌ها به مجری است.';
+    stats = [[by('ordered'),'منتظر برنامه‌ریزی'], [by('planned')+by('running')+by('finished')+by('rejected'),'در جریان'], [by('approved'),'تأییدشده']];
+    hint = 'دستورها را به اکیپ ارجاع بده، یا اگر اجرای بهتری سراغ داری به مدیر پیشنهاد بده.';
     empty = 'فعلاً دستوری برای برنامه‌ریزی وجود ندارد.';
+  } else if (role === 'crew'){
+    stats = [[by('planned'),'ارجاع‌شده به اکیپ'], [by('running'),'در حال اجرا'], [by('rejected'),'برگشتی برای اصلاح']];
+    hint = 'کار را شروع کن، پیشرفت را ثبت کن و در پایان مقدار واقعی را وارد کن.';
+    empty = 'هنوز کاری به اکیپ ارجاع نشده است.';
   } else {
-    const todayPlan = by('planned').filter(o => o.planDate && o.planDate.y === t.y && o.planDate.m === t.m && o.planDate.d === t.d);
-    stats = [[by('planned').length,'ارجاع‌شده به اجرا'], [todayPlan.length,'شروع امروز'], [by('inprogress').length,'در حال اجرا']];
-    items = all.filter(o => o.status === 'planned' || o.status === 'inprogress');
-    hint = 'فقط کارهای ارجاع‌شده را می‌بینی. ثبت شواهد قبل، حین و پایان اجرا در مرحله ۳.۳ اضافه می‌شود.';
-    empty = 'هنوز کاری به اجرا ارجاع نشده است.';
+    stats = [[by('finished'),'منتظر تأیید تو'], [by('approved'),'تأییدشده'], [by('rejected'),'برگشتی']];
+    hint = 'کارهای تحویل‌شده را بازدید کن و تأیید یا با ذکر دلیل برگشت بده.';
+    empty = 'فعلاً کاری برای تأیید وجود ندارد.';
   }
   $('#statWrap').innerHTML = stats.map(x => `<div class="stat"><b>${fd(x[0])}</b><span>${esc(x[1])}</span></div>`).join('');
   $('#newOp').classList.toggle('hidden', role !== 'manager');
   $('#roleHint').textContent = hint;
   $('#roleHint').classList.remove('hidden');
-  $('#list').innerHTML = items.length ? items.map(opCard).join('') : `<div class="card empty">${empty}</div>`;
+  $('#list').innerHTML = items.length ? items.map(opCard).join('')
+    : `<div class="card empty">${inboxOnly ? 'کارتابل تو خالی است. 👌' : empty}</div>`;
 }
 
 try { const sv = localStorage.getItem(ROLE_KEY); if (sv && ROLES[sv]) role = sv; } catch(e){}
-buildRegions(); paintDateBtn(); buildRoleCards();
+buildRegions(); paintDateBtn(); paintDue(); buildRoleCards();
 if (role){ render(); show('home'); } else { show('roleGate'); }
 console.log('Bazdid Ops ' + APP_VERSION);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4648de97b6f0c49',t:'MTc5MTI4ODUzNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
