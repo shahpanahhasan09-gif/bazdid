@@ -190,19 +190,34 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 .nm button{border:1.5px solid var(--line);background:#fff;border-radius:18px;padding:6px 11px;font:700 12px Tahoma;color:#334155}
 .nm button:active{background:#eff6ff}
 
-@keyframes pulseRed { 0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.40)} 50%{box-shadow:0 0 0 7px rgba(220,38,38,0)} }
-@keyframes pulseBlue{ 0%,100%{box-shadow:0 0 0 0 rgba(37,99,235,.38)} 50%{box-shadow:0 0 0 7px rgba(37,99,235,0)} }
-@keyframes dotFade { 0%,100%{opacity:1} 50%{opacity:.15} }
-.op.bk-red {animation:pulseRed 1.9s ease-in-out infinite;border-color:#fca5a5}
-.op.bk-blue{animation:pulseBlue 1.9s ease-in-out infinite;border-color:#93c5fd}
-.bkbadge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:3px 10px;font-size:10.5px;font-weight:800}
-.bkbadge.r{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
-.bkbadge.b{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
-.bkbadge i{width:7px;height:7px;border-radius:50%;display:inline-block;animation:dotFade 1.2s ease-in-out infinite}
+@keyframes cardRed {
+  0%,100%{ background:#fff5f5; box-shadow:0 0 0 0 rgba(220,38,38,.30) }
+  50%    { background:#fee2e2; box-shadow:0 0 0 6px rgba(220,38,38,.22) }
+}
+@keyframes cardBlue {
+  0%,100%{ background:#f5f9ff; box-shadow:0 0 0 0 rgba(37,99,235,.28) }
+  50%    { background:#dbeafe; box-shadow:0 0 0 6px rgba(37,99,235,.20) }
+}
+@keyframes dotFade { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.12;transform:scale(.7)} }
+@keyframes badgeRed  { 0%,100%{background:#fee2e2} 50%{background:#fca5a5} }
+@keyframes badgeBlue { 0%,100%{background:#dbeafe} 50%{background:#93c5fd} }
+@keyframes inboxGlow { 0%,100%{box-shadow:0 10px 24px -16px #1e3a8a} 50%{box-shadow:0 0 0 5px rgba(37,99,235,.35)} }
+
+/* حالت پایه: حتی بدون انیمیشن هم کاملاً پیداست */
+.op.bk-red {border:2px solid #ef4444;border-right-width:7px;background:#fff5f5;animation:cardRed 1.3s ease-in-out infinite}
+.op.bk-blue{border:2px solid #3b82f6;border-right-width:7px;background:#f5f9ff;animation:cardBlue 1.3s ease-in-out infinite}
+.bkbadge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 12px;font-size:12px;font-weight:800}
+.bkbadge.r{background:#fee2e2;color:#991b1b;border:1.5px solid #ef4444;animation:badgeRed 1.3s ease-in-out infinite}
+.bkbadge.b{background:#dbeafe;color:#1e3a8a;border:1.5px solid #3b82f6;animation:badgeBlue 1.3s ease-in-out infinite}
+.bkbadge i{width:10px;height:10px;border-radius:50%;display:inline-block;animation:dotFade .85s ease-in-out infinite}
 .bkbadge.r i{background:#dc2626}
-.bkbadge.b i{background:#2563eb}
+.bkbadge.b i{background:#1d4ed8}
+.inbox.alive{animation:inboxGlow 1.3s ease-in-out infinite}
+.inbox .bell{font-size:17px}
 @media (prefers-reduced-motion: reduce){
-  .op.bk-red,.op.bk-blue,.bkbadge i{animation:none}
+  .op.bk-red,.op.bk-blue,.bkbadge,.bkbadge i,.inbox.alive{animation:none!important}
+  .bkbadge.r{background:#fecaca}
+  .bkbadge.b{background:#bfdbfe}
 }
 
 /* ---------- تقویم شمسی ---------- */
@@ -251,7 +266,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
   <header class="head">
     <div>
       <h1>🏗️ ثبت عملیات</h1>
-      <small>نسخه آزمایشی • v3.3.4-PULSE</small>
+      <small>نسخه آزمایشی • v3.3.5-PULSE2</small>
       <button type="button" id="roleChip" class="rolechip hidden"></button>
     </div>
     <button class="btn ghost" id="homeBtn">خانه</button>
@@ -289,6 +304,8 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
       <summary>⚙️ ابزار آزمایش</summary>
       <div class="card" style="margin-top:10px">
         <p class="muted">برای شروع دوباره آزمایش می‌توانی همه داده‌های محلی این صفحه را پاک کنی. روی سامانه اصلی هیچ اثری ندارد.</p>
+        <button class="btn ok block" id="seed">🔔 ساخت ۵ نمونه برای آزمایش چشمک‌زن</button>
+        <p class="muted">پنج کار نمونه می‌سازد تا در هر نقش یک چشمک ببینی. نام اکیپ نمونه، همان نام ورود تو در نقش اکیپ است.</p>
         <button class="btn danger block" id="wipe">🗑 پاک‌کردن داده‌های آزمایشی</button>
       </div>
     </details>
@@ -472,7 +489,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 <div class="msg" id="msg"></div>
 
 <script>
-const APP_VERSION = 'v3.3.4-PULSE';
+const APP_VERSION = 'v3.3.5-PULSE2';
 const KEY = 'ops31_local_v1';
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
@@ -954,6 +971,32 @@ $('#newOp').addEventListener('click', () => {
   $('#gpsWrap').classList.add('hidden'); draft.gps = null; draft.place = null;
   $('#gpsBtn').disabled = false; $('#gpsBtn').textContent = '📍 ثبت موقعیت فعلی';
   paintGps(); paintPhotos(); paintStep(); show('wizard');
+});
+$('#seed').addEventListener('click', () => {
+  const t = jToday(), crew = names.crew || 'اکیپ نمونه', sup = names.sup || 'ناظر نمونه';
+  const past = {y: t.y, m: t.m, d: 1};
+  const mk = (n, st, ex) => Object.assign({
+    code: 'نمونه-' + n, typeId:'curb', typeName:'جدول‌گذاری', jy:t.y, jm:t.m, jd:t.d,
+    region:'منطقه ۱', address:'خیابان نمونه ' + n, descr:'کار نمونه برای آزمایش چشمک‌زن',
+    u1:'متر طول', u2:'', prio:'normal', due:null, origin:'manager', orderBy:'نمونه',
+    place:'office', gps:null, photos:[], createdFa: nowFa(), createdAt: new Date().toISOString(),
+    status: st, log:[{fa: nowFa(), role:'manager', text:'نمونه آزمایشی ساخته شد', sc:'work'}]
+  }, ex || {});
+  const add = [
+    mk('۱','ordered',   {due: past, prio:'critical'}),
+    mk('۲','planned',   {assignee: crew, supervisor:'', planDate:{y:t.y,m:t.m,d:t.d}, mode:'amani'}),
+    mk('۳','finished',  {assignee: crew, supervisor:'', q1:'12', mode:'amani',
+                         phases:{before:{fa:nowFa(),note:'قبل',photos:[],geo:null,by:crew},
+                                 end:{fa:nowFa(),note:'پایان',photos:[],geo:null,by:crew}}}),
+    mk('۴','approved',  {assignee: crew, supervisor:'', q1:'9', reviewBy: sup, reviewFa: nowFa(), mode:'amani'}),
+    mk('۵','proposed',  {proposal:{text:'پیشنهاد نمونه: بهتر است شب انجام شود', fa: nowFa()}})
+  ];
+  const all = load();
+  const left = all.filter(o => String(o.code).indexOf('نمونه-') !== 0);
+  if (!save(add.concat(left))) return;
+  filt = 'all'; src = 'all'; inboxOnly = false; $('#q').value = '';
+  render(); show('home');
+  toast('۵ نمونه ساخته شد — نقش‌ها را عوض کن');
 });
 $('#wipe').addEventListener('click', () => {
   if (!confirm('همه داده‌های آزمایشی این صفحه پاک شود؟')) return;
@@ -1574,7 +1617,10 @@ function render(){
   ib.classList.remove('hidden');
   ib.classList.toggle('off', mine.length === 0);
   ib.classList.toggle('on-filter', inboxOnly);
-  ib.innerHTML = `<span class="n">${fd(mine.length)}</span><span class="tx"><b>کارتابل من</b><i>${esc(INBOX_T[role])}</i></span>` +
+  const nBlink = base.filter(o => !!blinkOf(o)).length;
+  ib.classList.toggle('alive', nBlink > 0);
+  ib.innerHTML = `<span class="n">${fd(mine.length)}</span><span class="tx"><b>کارتابل من</b>` +
+    `<i>${nBlink ? '🔔 ' + fd(nBlink) + ' مورد نیازمند توجه' : esc(INBOX_T[role])}</i></span>` +
     `<span class="go">${inboxOnly ? '✖ نمایش همه' : 'فقط همین‌ها'}</span>`;
 
   let stats, hint = '', empty = '';
@@ -1617,5 +1663,5 @@ buildRegions(); paintDateBtn(); paintDue(); buildRoleCards();
 if (role){ render(); show('home'); } else { show('roleGate'); }
 console.log('Bazdid Ops ' + APP_VERSION);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a46b3ccbef45aba7',t:'MTc5MTM1ODYxNA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
