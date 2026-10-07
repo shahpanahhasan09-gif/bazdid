@@ -190,35 +190,27 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 .nm button{border:1.5px solid var(--line);background:#fff;border-radius:18px;padding:6px 11px;font:700 12px Tahoma;color:#334155}
 .nm button:active{background:#eff6ff}
 
-@keyframes cardRed {
-  0%,100%{ background:#fff5f5; box-shadow:0 0 0 0 rgba(220,38,38,.30) }
-  50%    { background:#fee2e2; box-shadow:0 0 0 6px rgba(220,38,38,.22) }
-}
-@keyframes cardBlue {
-  0%,100%{ background:#f5f9ff; box-shadow:0 0 0 0 rgba(37,99,235,.28) }
-  50%    { background:#dbeafe; box-shadow:0 0 0 6px rgba(37,99,235,.20) }
-}
-@keyframes dotFade { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.12;transform:scale(.7)} }
-@keyframes badgeRed  { 0%,100%{background:#fee2e2} 50%{background:#fca5a5} }
-@keyframes badgeBlue { 0%,100%{background:#dbeafe} 50%{background:#93c5fd} }
-@keyframes inboxGlow { 0%,100%{box-shadow:0 10px 24px -16px #1e3a8a} 50%{box-shadow:0 0 0 5px rgba(37,99,235,.35)} }
-
-/* حالت پایه: حتی بدون انیمیشن هم کاملاً پیداست */
-.op.bk-red {border:2px solid #ef4444;border-right-width:7px;background:#fff5f5;animation:cardRed 1.3s ease-in-out infinite}
-.op.bk-blue{border:2px solid #3b82f6;border-right-width:7px;background:#f5f9ff;animation:cardBlue 1.3s ease-in-out infinite}
-.bkbadge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 12px;font-size:12px;font-weight:800}
-.bkbadge.r{background:#fee2e2;color:#991b1b;border:1.5px solid #ef4444;animation:badgeRed 1.3s ease-in-out infinite}
-.bkbadge.b{background:#dbeafe;color:#1e3a8a;border:1.5px solid #3b82f6;animation:badgeBlue 1.3s ease-in-out infinite}
-.bkbadge i{width:10px;height:10px;border-radius:50%;display:inline-block;animation:dotFade .85s ease-in-out infinite}
+/* چشمک با جاوااسکریپت کنترل می‌شود تا در همه مرورگرها کار کند */
+.bkcard{transition:background-color .22s linear, box-shadow .22s linear}
+.bkcard.red {border:2px solid #ef4444;border-right-width:9px;background:#fff5f5}
+.bkcard.blue{border:2px solid #3b82f6;border-right-width:9px;background:#f5f9ff}
+.bkcard.red.flash {background:#fca5a5;box-shadow:0 0 0 5px rgba(220,38,38,.30)}
+.bkcard.blue.flash{background:#93c5fd;box-shadow:0 0 0 5px rgba(37,99,235,.30)}
+.bkbadge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 12px;font-size:12px;font-weight:800;
+  transition:background-color .22s linear,color .22s linear}
+.bkbadge.r{background:#fee2e2;color:#991b1b;border:1.5px solid #ef4444}
+.bkbadge.b{background:#dbeafe;color:#1e3a8a;border:1.5px solid #3b82f6}
+.bkbadge.r.flash{background:#dc2626;color:#fff}
+.bkbadge.b.flash{background:#1d4ed8;color:#fff}
+.bkbadge i{width:10px;height:10px;border-radius:50%;display:inline-block;transition:opacity .22s linear,transform .22s linear}
 .bkbadge.r i{background:#dc2626}
 .bkbadge.b i{background:#1d4ed8}
-.inbox.alive{animation:inboxGlow 1.3s ease-in-out infinite}
-.inbox .bell{font-size:17px}
-@media (prefers-reduced-motion: reduce){
-  .op.bk-red,.op.bk-blue,.bkbadge,.bkbadge i,.inbox.alive{animation:none!important}
-  .bkbadge.r{background:#fecaca}
-  .bkbadge.b{background:#bfdbfe}
-}
+.bkbadge.flash i{opacity:.15;transform:scale(.6);background:#fff}
+.inbox.alive{border:2px solid #93c5fd}
+.inbox.alive.flash{box-shadow:0 0 0 5px rgba(37,99,235,.35);filter:brightness(1.15)}
+.demoflash{display:flex;align-items:center;gap:10px;border-radius:12px;padding:11px 13px;font-size:13px;font-weight:700;
+  border:2px solid #3b82f6;background:#f5f9ff;color:#1e3a8a;margin-top:8px;transition:background-color .22s linear}
+.demoflash.flash{background:#93c5fd}
 
 /* ---------- تقویم شمسی ---------- */
 .datebtn{width:100%;text-align:right;padding:15px;border:1.5px solid var(--line);border-radius:14px;background:#fbfdff;font:inherit;display:flex;justify-content:space-between;align-items:center;gap:8px;transition:transform .08s}
@@ -266,7 +258,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
   <header class="head">
     <div>
       <h1>🏗️ ثبت عملیات</h1>
-      <small>نسخه آزمایشی • v3.3.5-PULSE2</small>
+      <small>نسخه آزمایشی • v3.3.6-PULSE3</small>
       <button type="button" id="roleChip" class="rolechip hidden"></button>
     </div>
     <button class="btn ghost" id="homeBtn">خانه</button>
@@ -304,6 +296,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
       <summary>⚙️ ابزار آزمایش</summary>
       <div class="card" style="margin-top:10px">
         <p class="muted">برای شروع دوباره آزمایش می‌توانی همه داده‌های محلی این صفحه را پاک کنی. روی سامانه اصلی هیچ اثری ندارد.</p>
+        <div class="demoflash" id="demoFlash">🔔 نمونه چشمک — اگر این کادر مدام رنگ عوض می‌کند، چشمک‌زن‌ها سالم‌اند.</div>
         <button class="btn ok block" id="seed">🔔 ساخت ۵ نمونه برای آزمایش چشمک‌زن</button>
         <p class="muted">پنج کار نمونه می‌سازد تا در هر نقش یک چشمک ببینی. نام اکیپ نمونه، همان نام ورود تو در نقش اکیپ است.</p>
         <button class="btn danger block" id="wipe">🗑 پاک‌کردن داده‌های آزمایشی</button>
@@ -489,7 +482,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 <div class="msg" id="msg"></div>
 
 <script>
-const APP_VERSION = 'v3.3.5-PULSE2';
+const APP_VERSION = 'v3.3.6-PULSE3';
 const KEY = 'ops31_local_v1';
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
@@ -1104,6 +1097,18 @@ function blinkOf(o){
     return {c:'b', t:'تازه تأیید شد', ack:true};
   return null;
 }
+let flashOn = false;
+function paintFlashSoon(){ setTimeout(paintFlash, 0); }
+function paintFlash(){
+  $$('.bkcard').forEach(el => el.classList.toggle('flash', flashOn));
+  $$('.bkbadge').forEach(el => el.classList.toggle('flash', flashOn));
+  const ib = $('#inboxBtn');
+  if (ib) ib.classList.toggle('flash', flashOn && ib.classList.contains('alive'));
+  const d = $('#demoFlash');
+  if (d) d.classList.toggle('flash', flashOn);
+}
+setInterval(() => { flashOn = !flashOn; paintFlash(); }, 620);
+
 function markSeen(code){
   const all = load(), o = all.find(x => x.code === code); if (!o) return;
   o.seen = o.seen || {}; o.seen[role] = o.status;
@@ -1536,7 +1541,7 @@ function opCard(o){
     const okl = (o.status === 'approved')
       ? `<div class="okline">✅ تأیید نهایی توسط <b>${esc(o.reviewBy || 'ناظر — نام ثبت نشده')}</b>${o.reviewFa ? ' • ' + esc(o.reviewFa) : ''}${o.reviewNote ? '<br>' + esc(o.reviewNote) : ''}</div>` : '';
     const bk = blinkOf(o);
-    return `<div class="op${late ? ' islate' : ''}${bk ? ' bk-' + (bk.c === 'r' ? 'red' : 'blue') : ''}">
+    return `<div class="op${late ? ' islate' : ''}${bk ? ' bkcard ' + (bk.c === 'r' ? 'red' : 'blue') : ''}">
       ${head(o)}${badges(o)}${flowBar(o.status)}
       <p>📍 ${esc(o.region)} — 📝 ${esc(brief)}</p>
       ${beforeAfter(o)}
@@ -1553,7 +1558,7 @@ function opCard(o){
     </div>`;
   }
   const bk2 = blinkOf(o);
-  return `<div class="op${late ? ' islate' : ''}${bk2 ? ' bk-' + (bk2.c === 'r' ? 'red' : 'blue') : ''}">
+  return `<div class="op${late ? ' islate' : ''}${bk2 ? ' bkcard ' + (bk2.c === 'r' ? 'red' : 'blue') : ''}">
     ${head(o)}${badges(o)}${flowBar(o.status)}
     <p>📅 ${esc(jFmt(o.jy,o.jm,o.jd))} • 📍 ${esc(o.region)} — ${esc(o.address)}</p>
     <p>📝 ${esc(o.descr)}</p>
@@ -1652,10 +1657,12 @@ function render(){
   if (role === 'exec') wizOrigin = 'exec';
   $('#roleHint').textContent = hint;
   $('#roleHint').classList.remove('hidden');
+  paintFlashSoon();
   $('#list').innerHTML = items.length ? items.map(opCard).join('')
     : `<div class="card empty">${qq ? 'چیزی با این جست‌وجو پیدا نشد.'
         : (inboxOnly ? 'کارتابل تو خالی است. 👌'
         : (filt !== 'all' ? 'در این فیلتر چیزی نیست. روی «همه» بزن.' : empty))}</div>`;
+  paintFlash();
 }
 
 try { const sv = localStorage.getItem(ROLE_KEY); if (sv && ROLES[sv]) role = sv; } catch(e){}
@@ -1663,5 +1670,5 @@ buildRegions(); paintDateBtn(); paintDue(); buildRoleCards();
 if (role){ render(); show('home'); } else { show('roleGate'); }
 console.log('Bazdid Ops ' + APP_VERSION);
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a46c20584d7355e3',t:'MTc5MTM2NzkzNA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
