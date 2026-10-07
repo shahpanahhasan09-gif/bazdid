@@ -183,6 +183,13 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 .okline{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;border-radius:11px;padding:7px 10px;font-size:12px;font-weight:700;margin-top:8px}
 .needgeo{background:#fff7ed;border:1px dashed #fdba74;color:#7c2d12;border-radius:11px;padding:8px 10px;font-size:11.5px;line-height:1.9;margin-top:8px}
 
+.srcsel{width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:14px;background:#fff;font:inherit;color:inherit;margin-bottom:10px}
+.srcsel:focus{outline:0;border-color:#93c5fd}
+.field input.bad,.field textarea.bad,.field select.bad{border-color:#dc2626;background:#fff5f5}
+.nm{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 0}
+.nm button{border:1.5px solid var(--line);background:#fff;border-radius:18px;padding:6px 11px;font:700 12px Tahoma;color:#334155}
+.nm button:active{background:#eff6ff}
+
 /* ---------- تقویم شمسی ---------- */
 .datebtn{width:100%;text-align:right;padding:15px;border:1.5px solid var(--line);border-radius:14px;background:#fbfdff;font:inherit;display:flex;justify-content:space-between;align-items:center;gap:8px;transition:transform .08s}
 .datebtn:active{transform:scale(.99)}
@@ -229,7 +236,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
   <header class="head">
     <div>
       <h1>🏗️ ثبت عملیات</h1>
-      <small>نسخه آزمایشی • v3.3.1-EVIDENCE</small>
+      <small>نسخه آزمایشی • v3.3.2-FOCUS</small>
       <button type="button" id="roleChip" class="rolechip hidden"></button>
     </div>
     <button class="btn ghost" id="homeBtn">خانه</button>
@@ -256,6 +263,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
     <button class="inbox hidden" id="inboxBtn"></button>
     <div class="searchbar"><input id="q" placeholder="🔎 جست‌وجو: کد، نوع، منطقه، آدرس، شرح، مجری"><button type="button" id="qClear" class="hidden">✖</button></div>
     <p class="muted hidden" id="qInfo" style="margin:0 2px 10px"></p>
+    <select id="srcSel" class="hidden srcsel"></select>
     <div class="chips" id="fchips" style="margin-bottom:12px"></div>
     <div class="card stats" id="statWrap"></div>
     <button class="btn primary block hidden" id="newOp">➕ صدور دستور عملیات جدید</button>
@@ -448,7 +456,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 <div class="msg" id="msg"></div>
 
 <script>
-const APP_VERSION = 'v3.3.1-EVIDENCE';
+const APP_VERSION = 'v3.3.2-FOCUS';
 const KEY = 'ops31_local_v1';
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
@@ -935,6 +943,27 @@ $('#wipe').addEventListener('click', () => {
 let role = null, actId = null, actKind = null, actDraft = {}, inboxOnly = false, filt = 'active';
 let names = {}; try { names = JSON.parse(localStorage.getItem(NAME_KEY) || '{}'); } catch(e){ names = {}; }
 const me = () => (names[role] || (ROLES[role] ? ROLES[role].t : '—'));
+const norm = x => String(x == null ? '' : x).replace(/\u200c/g,' ').replace(/\s+/g,' ').trim().toLowerCase();
+function sameName(a, b){
+  a = norm(a); b = norm(b);
+  return !!a && !!b && (a === b || a.indexOf(b) > -1 || b.indexOf(a) > -1);
+}
+function knownNames(){
+  const set = [];
+  load().forEach(o => { if (o.assignee && !set.some(x => norm(x) === norm(o.assignee))) set.push(o.assignee); });
+  return set.slice(0, 8);
+}
+let src = 'mine';
+const SRC = {
+  manager: [['mine','فقط دستورهای خودم'], ['exec','فقط کارهای مستقل مدیر اجرایی'], ['all','همه کارها']],
+  exec:    [['all','همه کارها'], ['mine','فقط دستورهای مدیر اصلی'], ['exec','فقط کارهای مستقل خودم']]
+};
+function srcPass(o){
+  if (role !== 'manager' && role !== 'exec') return true;
+  if (src === 'all') return true;
+  if (role === 'manager') return src === 'mine' ? o.origin !== 'exec' : o.origin === 'exec';
+  return src === 'mine' ? o.origin !== 'exec' : o.origin === 'exec';
+}
 const pdata = x => (typeof x === 'string' ? x : (x && x.d) || '');
 const psrc  = x => (typeof x === 'string' ? '' : (x && x.src) || '');
 function getGeo(){
@@ -958,7 +987,16 @@ function srcTags(list){
   }).join('');
 }
 
-function aerr(t){ const e = $('#actErr'); e.textContent = t || ''; e.classList.toggle('show', !!t); }
+function aerr(t){
+  $$('#actBody .bad').forEach(x => x.classList.remove('bad'));
+  const e = $('#actErr');
+  if (!t){ e.textContent = ''; e.classList.remove('show'); return; }
+  let id = '', msg = t;
+  const i = t.indexOf('|');
+  if (i > 0){ id = t.slice(0, i); msg = t.slice(i + 1); }
+  e.textContent = '⛔ ' + msg; e.classList.add('show');
+  if (id && $('#' + id)){ $('#' + id).classList.add('bad'); $('#' + id).scrollIntoView({block:'center', behavior:'smooth'}); }
+}
 function addLog(o, r, text, sc){ o.log = o.log || []; o.log.push({ fa: nowFa(), role: r, text, sc: sc || 'work' }); }
 const num = d => d ? d.y*10000 + d.m*100 + d.d : 0;
 
@@ -994,6 +1032,7 @@ function buildRoleCards(){
 }
 function setRole(k){
   role = k; inboxOnly = false; filt = 'active'; $('#q').value = '';
+  src = (k === 'manager') ? 'mine' : 'all';
   try { localStorage.setItem(ROLE_KEY, k); } catch(e){}
   closeName(); buildRoleCards(); render(); show('home');
   toast(ROLES[k].t + ' • ' + me());
@@ -1036,7 +1075,13 @@ $('#fchips').addEventListener('click', e => {
   const b = e.target.closest('[data-f]'); if (!b) return;
   filt = b.dataset.f; render();
 });
-$('#inboxBtn').addEventListener('click', () => { inboxOnly = !inboxOnly; render(); });
+$('#srcSel').addEventListener('change', () => { src = $('#srcSel').value; render(); });
+$('#inboxBtn').addEventListener('click', () => {
+  const cnt = () => ($('#list').innerHTML.match(/<div class="op[" ]/g) || []).length;
+  const n0 = cnt();
+  inboxOnly = !inboxOnly; render();
+  if (inboxOnly && cnt() === n0) toast('همه کارهای این فهرست منتظر اقدام تو هستند');
+});
 const lat = x => String(x == null ? '' : x).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
 $('#q').addEventListener('input', () => render());
 $('#qClear').addEventListener('click', () => { $('#q').value = ''; render(); });
@@ -1066,11 +1111,13 @@ const ACTS = {
         <button type="button" class="type${o.mode==='contractor'?' sel':''}" data-mode="contractor"><b>🏢 پیمانکار</b><small>واگذاری به پیمانکار</small></button>
       </div>
       ${IN('aName','نام اکیپ یا پیمانکار','مثلاً اکیپ ۳ یا شرکت آریا',1)}
+      ${knownNames().length ? `<div class="nm" id="aNames">${knownNames().map(n => `<button type="button" data-nm="${esc(n)}">${esc(n)}</button>`).join('')}</div>
+        <p class="muted">برای اینکه کار در کارتابل اکیپ دیده شود، نام باید دقیقاً همان نامی باشد که اکیپ با آن وارد می‌شود.</p>` : ''}
       ${DATEBTN('تاریخ شروع برنامه‌ریزی‌شده',1)}
       ${TA('aNote','یادداشت برای اکیپ (اختیاری)','هماهنگی با ترافیک، ساعت شروع، تجهیزات لازم')}`,
     fill: o => { actDraft.mode = o.mode || null; actDraft.date = o.planDate || null; $('#aName').value = o.assignee || ''; $('#aNote').value = o.planNote || ''; },
     check: () => !actDraft.mode ? 'نحوه اجرا را انتخاب کن: اکیپ امانی یا پیمانکار.'
-      : !$('#aName').value.trim() ? 'نام اکیپ یا پیمانکار اجباری است و پیش‌فرضی ندارد.'
+      : !$('#aName').value.trim() ? 'aName|نام اکیپ یا پیمانکار اجباری است و پیش‌فرضی ندارد.'
       : !actDraft.date ? 'تاریخ شروع انتخاب نشده است. روی کادر تاریخ بزن.' : '',
     apply: o => {
       const again = o.status === 'planned';
@@ -1085,7 +1132,7 @@ const ACTS = {
     body: () => `<p class="muted" style="margin:0 0 10px">اگر فکر می‌کنی این دستور بهتر است به شکل دیگری اجرا شود، پیشنهادت را بنویس. تا تصمیم مدیر، کار به اکیپ ارجاع نمی‌شود.</p>
       ${TA('aText','متن پیشنهاد','مثلاً: با توجه به ترافیک، بهتر است شب‌کاری انجام شود و محدوده به دو فاز تقسیم گردد.',1)}`,
     fill: o => { $('#aText').value = o.proposal ? o.proposal.text : ''; },
-    check: () => $('#aText').value.trim().length < 5 ? 'متن پیشنهاد اجباری است و باید روشن نوشته شود.' : '',
+    check: () => $('#aText').value.trim().length < 5 ? 'aText|متن پیشنهاد اجباری است و باید روشن نوشته شود.' : '',
     apply: o => {
       o.proposal = { text: $('#aText').value.trim(), fa: nowFa() };
       o.status = 'proposed';
@@ -1112,7 +1159,7 @@ const ACTS = {
     body: o => `<div class="pbox"><b>پیشنهاد مدیر اجرایی:</b><br>${esc(o.proposal ? o.proposal.text : '—')}</div>
       ${TA('aText','دلیل رد پیشنهاد','چرا دستور اولیه باید اجرا شود؟',1)}`,
     fill: () => {},
-    check: () => $('#aText').value.trim().length < 3 ? 'نوشتن دلیل اجباری است تا تصمیم مستند بماند.' : '',
+    check: () => $('#aText').value.trim().length < 3 ? 'aText|نوشتن دلیل اجباری است تا تصمیم مستند بماند.' : '',
     apply: o => {
       const n = $('#aText').value.trim();
       o.decision = { ok:false, prop: o.proposal ? o.proposal.text : '', note:n, fa: nowFa() };
@@ -1139,7 +1186,7 @@ const ACTS = {
     body: () => `<p class="muted" style="margin:0 0 10px">دلیل برگشت باید روشن باشد تا اکیپ بداند دقیقاً چه چیزی را اصلاح کند.</p>
       ${TA('aText','دلیل برگشت','مثلاً: ضخامت آسفالت کمتر از حد مجاز است و لبه‌ها تراز نیست.',1)}${PHOTOBLOCK}`,
     fill: () => { actPhotos = []; paintActPhotos(); },
-    check: () => $('#aText').value.trim().length < 5 ? 'نوشتن دلیل برگشت اجباری است.' : '',
+    check: () => $('#aText').value.trim().length < 5 ? 'aText|نوشتن دلیل برگشت اجباری است.' : '',
     apply: o => {
       o.rejectReason = $('#aText').value.trim(); o.rejectPhotos = actPhotos.slice();
       o.status = 'rejected'; o.reviewFa = nowFa(); o.reviewBy = me();
@@ -1152,7 +1199,7 @@ const ACTS = {
     body: o => `<div class="rbox"><b>دلیل برگشت ناظر:</b><br>${esc(o.rejectReason || '—')}</div>
       ${TA('aText','شرح اصلاح انجام‌شده','چه کاری برای رفع ایراد انجام شد؟',1)}${PHOTOBLOCK}`,
     fill: () => { actPhotos = []; paintActPhotos(); },
-    check: () => $('#aText').value.trim().length < 3 ? 'شرح اصلاح اجباری است.' : '',
+    check: () => $('#aText').value.trim().length < 3 ? 'aText|شرح اصلاح اجباری است.' : '',
     apply: o => {
       o.fixes = o.fixes || [];
       o.fixes.push({ fa: nowFa(), text: $('#aText').value.trim(), photos: actPhotos.slice(), by: me() });
@@ -1205,13 +1252,13 @@ PH.forEach((p, i) => {
       paintActPhotos(); paintActGeo();
     },
     check: () => {
-      if ($('#aText').value.trim().length < 3) return 'شرح این مرحله اجباری است.';
-      if (p.req && !actPhotos.length) return 'برای این مرحله حداقل یک عکس اجباری است. دکمه «گرفتن عکس» را بزن.';
-      if (p.req && !actGeo) return 'ثبت موقعیت جغرافیایی برای این مرحله اجباری است. دکمه «ثبت موقعیت» را بزن.';
+      if ($('#aText').value.trim().length < 3) return 'aText|شرح این مرحله اجباری است و باید حداقل ۳ حرف باشد.';
+      if (p.req && !actPhotos.length) return 'برای این مرحله حداقل یک عکس اجباری است. دکمه «📷 گرفتن عکس» را بزن.';
+      if (p.req && !actGeo) return 'ثبت موقعیت جغرافیایی برای این مرحله اجباری است. دکمه «📍 ثبت موقعیت» را بزن.';
       if (last){
         const v = $('#aQ1').value.trim();
-        if (!v) return 'ثبت مقدار واقعی اجراشده اجباری است.';
-        if (!(parseFloat(v) > 0)) return 'مقدار باید عددی بزرگ‌تر از صفر باشد.';
+        if (!v) return 'aQ1|ثبت مقدار واقعی اجراشده اجباری است.';
+        if (!(parseFloat(v) > 0)) return 'aQ1|مقدار باید عددی بزرگ‌تر از صفر باشد.';
       }
       return '';
     },
@@ -1246,7 +1293,10 @@ function openAct(kind, code){
   $('#actSave').textContent = A.btn;
   aerr(''); show('act');
 }
+$('#actBody').addEventListener('input', e => { if (e.target && e.target.classList) e.target.classList.remove('bad'); });
 $('#actBody').addEventListener('click', e => {
+  const nmb = e.target.closest('[data-nm]');
+  if (nmb){ $('#aName').value = nmb.dataset.nm; aerr(''); return; }
   if (e.target.closest('#aCamBtn')){ actSrc = 'camera'; return $('#aCamInput').click(); }
   if (e.target.closest('#aGalBtn')){ actSrc = 'gallery'; return $('#aGalInput').click(); }
   if (e.target.closest('#aGeoBtn')){
@@ -1368,13 +1418,13 @@ function opCard(o){
     (o.planNote ? `<br>📝 ${esc(o.planNote)}` : '') + '</div>' : '';
   const rej  = (o.status === 'rejected' && o.rejectReason) ? `<div class="rbox"><b>↩️ دلیل برگشت ناظر:</b><br>${esc(o.rejectReason)}` +
     ((o.rejectPhotos && o.rejectPhotos.length) ? `<div class="phpics" style="padding:6px 0 0">${o.rejectPhotos.map(x => `<img src="${pdata(x)}" alt="عکس">`).join('')}</div>` : '') +
-    (o.reviewBy ? `<br><span style="font-size:10.5px">ناظر: ${esc(o.reviewBy)}</span>` : '') + '</div>' : '';
+    ((o.reviewBy && role !== 'crew') ? `<br><span style="font-size:10.5px">ناظر: ${esc(o.reviewBy)}</span>` : '') + '</div>' : '';
   const qty  = o.q1 ? `<p>📦 مقدار واقعی: <b>${esc(fd(o.q1))} ${esc(o.u1)}</b>${o.q2 ? ' — ' + esc(fd(o.q2)) + ' ' + esc(o.u2) : ''}</p>` : '';
 
   if (role === 'manager'){
     const brief = (o.descr || '').length > 90 ? o.descr.slice(0,90) + '…' : (o.descr || '');
     const okl = (o.status === 'approved')
-      ? `<div class="okline">✅ تأیید نهایی توسط <b>${esc(o.reviewBy || 'ناظر')}</b>${o.reviewFa ? ' • ' + esc(o.reviewFa) : ''}${o.reviewNote ? '<br>' + esc(o.reviewNote) : ''}</div>` : '';
+      ? `<div class="okline">✅ تأیید نهایی توسط <b>${esc(o.reviewBy || 'ناظر — نام ثبت نشده')}</b>${o.reviewFa ? ' • ' + esc(o.reviewFa) : ''}${o.reviewNote ? '<br>' + esc(o.reviewNote) : ''}</div>` : '';
     return `<div class="op${late ? ' islate' : ''}">
       ${head(o)}${badges(o)}${flowBar(o.status)}
       <p>📍 ${esc(o.region)} — 📝 ${esc(brief)}</p>
@@ -1396,7 +1446,8 @@ function opCard(o){
     <p>📅 ${esc(jFmt(o.jy,o.jm,o.jd))} • 📍 ${esc(o.region)} — ${esc(o.address)}</p>
     <p>📝 ${esc(o.descr)}</p>
     ${qty}${asg}${prop}${dec}${rej}${fixBlock(o)}
-    ${o.status === 'approved' ? `<div class="okline">✅ تأیید نهایی توسط <b>${esc(o.reviewBy || 'ناظر')}</b>${o.reviewFa ? ' • ' + esc(o.reviewFa) : ''}${o.reviewNote ? '<br>' + esc(o.reviewNote) : ''}</div>` : ''}
+    ${(o.status === 'approved' && role !== 'crew') ? `<div class="okline">✅ تأیید نهایی توسط <b>${esc(o.reviewBy || 'ناظر — نام ثبت نشده')}</b>${o.reviewFa ? ' • ' + esc(o.reviewFa) : ''}${o.reviewNote ? '<br>' + esc(o.reviewNote) : ''}</div>` : ''}
+    ${(o.status === 'approved' && role === 'crew') ? `<div class="okline">✅ این کار تأیید نهایی شد${o.reviewFa ? ' • ' + esc(o.reviewFa) : ''}</div>` : ''}
     ${(o.photos && o.photos.length) ? `<div class="photos">${o.photos.map(x => `<div class="ph"><img src="${pdata(x)}" alt="عکس"></div>`).join('')}</div>` : ''}
     ${(o.photos && o.photos.length && o.gps && o.photoGeo) ? geoStamp(o.gps, '') : ''}
     ${phasesBlock(o)}
@@ -1422,7 +1473,15 @@ function render(){
 
   const qq = $('#q').value.trim();
   $('#qClear').classList.toggle('hidden', !qq);
-  const base = all.filter(o => VIS[role].includes(o.status));
+  const sw = $('#srcSel');
+  if (SRC[role]){
+    sw.classList.remove('hidden');
+    sw.innerHTML = SRC[role].map(x => `<option value="${x[0]}"${src===x[0]?' selected':''}>${esc(x[1])}</option>`).join('');
+    sw.value = src;
+  } else sw.classList.add('hidden');
+
+  const base = all.filter(o => VIS[role].includes(o.status) && srcPass(o)
+    && (role !== 'crew' || sameName(o.assignee, me())));
   const mine = base.filter(needsMe);
   const FN = {
     all:    () => true,
@@ -1451,16 +1510,19 @@ function render(){
   let stats, hint = '', empty = '';
   if (role === 'manager'){
     stats = [[all.length,'کل دستورها'], [by('proposed'),'منتظر تصمیم تو'], [by('approved'),'تأییدشده']];
-    hint = 'نمای خلاصه می‌بینی: عکس قبل و بعد و شرح کوتاه. برای دیدن همه‌چیز روی «جزئیات کامل» بزن.';
+    hint = 'به‌طور پیش‌فرض فقط دستورهای خودت را می‌بینی. برای دیدن کارهای مستقل مدیر اجرایی، از کادر بالا انتخاب کن.';
     empty = 'هنوز دستوری صادر نشده است.<br>با دکمه بالا اولین دستور عملیات را صادر کن.';
   } else if (role === 'exec'){
     stats = [[by('ordered'),'منتظر برنامه‌ریزی'], [by('planned')+by('running')+by('finished')+by('rejected'),'در جریان'], [by('approved'),'تأییدشده']];
-    hint = 'دستورها را به اکیپ ارجاع بده، پیشنهاد اصلاح بفرست، یا کار مستقل ثبت کن.';
+    hint = 'با کادر بالا می‌توانی فقط «دستورهای مدیر اصلی» را ببینی و وضعیت هرکدام را یک‌جا دنبال کنی.';
     empty = 'فعلاً کاری وجود ندارد.';
   } else if (role === 'crew'){
     stats = [[by('planned'),'ارجاع‌شده به اکیپ'], [by('running'),'در حال اجرا'], [by('rejected'),'برگشتی برای اصلاح']];
-    hint = 'روند عملیات را گام‌به‌گام ثبت کن: قبل از اجرا ← حین اجرا ← پایان کار.';
-    empty = 'هنوز کاری به اکیپ ارجاع نشده است.';
+    hint = 'فقط کارهای ارجاع‌شده به «' + esc(me()) + '» را می‌بینی. روند را گام‌به‌گام ثبت کن: قبل از اجرا ← حین اجرا ← پایان کار.';
+    const others = all.filter(o => o.assignee && !sameName(o.assignee, me())).length;
+    empty = others
+      ? 'کاری به نام «' + esc(me()) + '» ارجاع نشده است.<br>' + fd(others) + ' کار به اکیپ‌های دیگر سپرده شده.<br><span style="font-size:11.5px">اگر مطمئنی کار مال توست، نام ورودت باید دقیقاً همان نامی باشد که مدیر اجرایی وارد کرده است. از «تغییر نقش ← ✏️ تغییر نام» اصلاحش کن.</span>'
+      : 'هنوز کاری به اکیپ ارجاع نشده است.';
   } else {
     stats = [[by('finished'),'منتظر تأیید تو'], [by('approved'),'تأییدشده'], [by('rejected'),'برگشتی']];
     hint = 'روند سه‌مرحله‌ای و عکس‌های اکیپ را ببین، بعد تأیید کن یا با ذکر دلیل برگشت بده.';
@@ -1483,5 +1545,5 @@ buildRegions(); paintDateBtn(); paintDue(); buildRoleCards();
 if (role){ render(); show('home'); } else { show('roleGate'); }
 console.log('Bazdid Ops ' + APP_VERSION);
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a46a8ebbceac4e5c',t:'MTc5MTM1MTQ4NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
