@@ -1,0 +1,1582 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1d4ed8">
+<title>ثبت عملیات — مرحله ۳.۱</title>
+<style>
+*{box-sizing:border-box}
+:root{--p:#1d4ed8;--bg:#f5f7fb;--line:#e2e8f0;--muted:#64748b;--ok:#16a34a;--warn:#d97706;--danger:#dc2626}
+body{margin:0;background:var(--bg);font-family:Tahoma,system-ui;color:#0f172a;padding-bottom:40px}
+.app{max-width:720px;margin:auto;padding:0 12px}
+.head{margin:0 -12px 14px;padding:18px;background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;border-radius:0 0 24px 24px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.head h1{font-size:18px;margin:0}
+.head small{opacity:.85;font-size:11px;font-weight:400}
+.card{background:#fff;border:1px solid #e7ebf2;border-radius:18px;padding:15px;margin-bottom:12px;box-shadow:0 10px 28px -22px #0f172a}
+.note{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:14px;padding:10px 12px;font-size:12px;line-height:1.9;margin-bottom:12px}
+.field{display:block;margin:12px 0}
+.field span.lb{display:block;color:var(--muted);font-size:12px;font-weight:700;margin-bottom:5px}
+.req{color:var(--danger)}
+.field input,.field textarea,.field select{width:100%;padding:12px;border:1.5px solid var(--line);border-radius:12px;background:#fbfdff;font:inherit;color:inherit}
+.field textarea{min-height:92px;resize:vertical}
+.field input:focus,.field textarea:focus,.field select:focus{outline:0;border-color:#93c5fd;background:#fff}
+select.empty{color:#94a3b8;border-color:#fcd34d;background:#fffdf5}
+.btn{border:0;border-radius:12px;padding:12px 14px;font:700 14px inherit;background:#e2e8f0;color:#0f172a;transition:transform .08s,filter .08s}
+.btn:active{transform:scale(.97);filter:brightness(.92)}
+.btn.block{width:100%;margin-top:8px}
+.btn.primary{background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:#fff}
+.btn.ok{background:#16a34a;color:#fff}
+.btn.ghost{background:#fff;border:1.5px solid var(--line)}
+.btn.danger{background:#fee2e2;color:#991b1b}
+.btn[disabled]{opacity:.5}
+.hidden{display:none!important}
+.row{display:flex;gap:8px}
+.row>*{flex:1}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{text-align:center;background:#f8fafc;border-radius:13px;padding:10px 3px}
+.stat b{display:block;font-size:22px;color:var(--p)}
+.stat span{font-size:11px;color:var(--muted)}
+.muted{color:var(--muted);font-size:12px;line-height:1.9}
+.msg{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 18px;border-radius:25px;display:none;z-index:30;font-size:13px}
+.msg.show{display:block}
+.wiz-top{margin-bottom:10px}
+.wiz-bar{height:6px;background:#e2e8f0;border-radius:6px;overflow:hidden}
+.wiz-bar i{display:block;height:100%;background:linear-gradient(90deg,#1d4ed8,#60a5fa);transition:width .25s}
+.wiz-meta{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.wiz-meta b{font-size:15px}
+.wiz-meta span{font-size:11px;color:var(--muted);background:#eef2ff;padding:4px 9px;border-radius:12px}
+.typegrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.type{border:1.5px solid var(--line);background:#fbfdff;border-radius:14px;padding:11px 9px;text-align:right;font:inherit;transition:transform .08s}
+.type:active{transform:scale(.97)}
+.type b{display:block;font-size:13px}
+.type small{color:var(--muted);font-size:10px}
+.type.sel{border-color:#1d4ed8;background:#eff6ff;box-shadow:0 0 0 3px #dbeafe}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:20px;padding:7px 12px;font:700 12px inherit;color:#334155;transition:transform .08s}
+.chip:active{transform:scale(.96)}
+.chip.sel{border-color:#1d4ed8;background:#eff6ff;color:#1d4ed8}
+.err{display:none;margin:10px 0 0;background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:12px;padding:9px 11px;font-size:12px;font-weight:700;line-height:1.9}
+.err.show{display:block}
+.pend{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:12px;padding:9px 11px;font-size:12px;font-weight:700;margin-top:10px}
+.gpsbox{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:13px;padding:11px;font-size:12px;line-height:2}
+.gpsbox b{color:var(--p);direction:ltr;display:inline-block}
+.unit{background:#eef2ff;color:#1e40af;border-radius:10px;padding:0 10px;display:flex;align-items:center;font-weight:700;font-size:13px;flex:0 0 auto}
+.qrow{display:flex;gap:8px}
+.qrow input{flex:1}
+.sum{border-right:4px solid #bfdbfe;padding-right:12px;margin:4px 0 0}
+.sum div{display:flex;gap:8px;padding:7px 0;border-bottom:1px dashed #e2e8f0;font-size:13px}
+.sum div:last-child{border:0}
+.sum i{font-style:normal;color:var(--muted);min-width:92px;font-size:12px}
+.sum b{font-weight:700;flex:1}
+.photos{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+.ph{position:relative}
+.ph img{width:84px;height:84px;border-radius:12px;object-fit:cover;border:1px solid var(--line)}
+.ph button{position:absolute;top:-7px;left:-7px;width:24px;height:24px;border-radius:50%;border:2px solid #fff;background:#dc2626;color:#fff;font:700 13px Tahoma;line-height:1;padding:0}
+.op{background:#fff;border:1px solid var(--line);border-radius:16px;padding:13px;margin-bottom:9px}
+.op-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.code{direction:ltr;color:var(--p);font-weight:800;font-size:13px}
+.tag{font-size:10px;padding:4px 9px;border-radius:14px;background:#eff6ff;color:#1d4ed8;font-weight:700;white-space:nowrap}
+.op p{margin:8px 0 0;font-size:13px;line-height:1.9}
+.op .meta{color:var(--muted);font-size:11px;margin-top:6px}
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:26px 10px}
+details.tools summary{cursor:pointer;font-weight:700;padding:10px;background:#f8fafc;border-radius:12px;font-size:13px;color:var(--muted)}
+.okbox{text-align:center;padding:14px 6px}
+.okbox .big{font-size:44px}
+.okbox h2{margin:6px 0 4px;font-size:18px}
+.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.actions .btn{flex:1;font-size:13px;padding:11px 8px}
+.acc-ok{color:#16a34a;font-weight:700}
+.acc-bad{color:#b45309;font-weight:700}
+
+/* ---------- نقش‌ها و گردش کار ---------- */
+.rolecards{display:grid;gap:10px}
+.role{display:flex;gap:12px;align-items:center;background:#fbfdff;border:1.5px solid var(--line);border-radius:16px;padding:14px;text-align:right;font:inherit;transition:transform .08s}
+.role:active{transform:scale(.98)}
+.role.on{border-color:#1d4ed8;background:#eff6ff;box-shadow:0 0 0 3px #dbeafe}
+.role .ic{font-size:27px;flex:0 0 auto}
+.role .tx{flex:1}
+.role b{display:block;font-size:15px;color:var(--p);margin-bottom:2px}
+.role i{font-style:normal;display:block;font-size:11.5px;color:var(--muted);line-height:1.8}
+.rolechip{margin-top:6px;background:#ffffff26;border:1px solid #ffffff59;color:#fff;border-radius:999px;padding:4px 11px;font:700 11px Tahoma;transition:transform .08s}
+.rolechip:active{transform:scale(.95)}
+.st{display:inline-block;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:700;white-space:nowrap}
+.st-ord{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
+.st-pln{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+.st-run{background:#ecfdf5;color:#047857;border:1px solid #a7f3d0}
+.flow{display:flex;align-items:center;gap:4px;margin:9px 0 0}
+.flow i{font-style:normal;flex:1;text-align:center;font-size:9.5px;color:#94a3b8;background:#f1f5f9;border-radius:8px;padding:4px 2px}
+.flow i.on{background:#dbeafe;color:#1d4ed8;font-weight:700}
+.flow i.done{background:#dcfce7;color:#15803d;font-weight:700}
+details.log{margin-top:9px}
+details.log summary{cursor:pointer;font-size:11.5px;color:var(--p);font-weight:700}
+details.log ul{margin:7px 0 0;padding-right:17px;font-size:11.5px;color:var(--muted);line-height:2}
+.assignbox{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:12px;padding:9px 11px;font-size:12px;line-height:2;margin-top:8px}
+.assignbox b{color:var(--p)}
+
+.inbox{width:100%;display:flex;align-items:center;gap:10px;text-align:right;border:0;border-radius:16px;padding:14px;margin-bottom:12px;font:inherit;
+  background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;box-shadow:0 10px 24px -16px #1e3a8a;transition:transform .08s}
+.inbox:active{transform:scale(.985)}
+.inbox.off{background:#eef2f7;color:#64748b;box-shadow:none}
+.inbox .n{font-size:26px;font-weight:800;min-width:38px;text-align:center}
+.inbox .tx b{display:block;font-size:14.5px}
+.inbox .tx i{font-style:normal;font-size:11.5px;opacity:.85}
+.inbox .go{margin-right:auto;font-size:11.5px;background:#ffffff26;border-radius:999px;padding:4px 10px}
+.inbox.on-filter{outline:3px solid #93c5fd}
+.st-prop{background:#f5f3ff;color:#6d28d9;border:1px solid #ddd6fe}
+.st-run2{background:#fefce8;color:#a16207;border:1px solid #fde68a}
+.st-fin{background:#fdf4ff;color:#a21caf;border:1px solid #f5d0fe}
+.st-okk{background:#ecfdf5;color:#047857;border:1px solid #a7f3d0}
+.st-rej{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
+.late{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;border-radius:999px;padding:3px 9px;font-size:10.5px;font-weight:800}
+.op.islate{border-color:#fca5a5;box-shadow:0 0 0 3px #fee2e2}
+.prio{border-radius:999px;padding:3px 9px;font-size:10.5px;font-weight:800;white-space:nowrap}
+.prio-normal{background:#f1f5f9;color:#475569}
+.prio-urgent{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
+.prio-critical{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
+.badges{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:7px}
+.pbox{background:#f5f3ff;border:1px dashed #c4b5fd;border-radius:12px;padding:9px 11px;font-size:12px;line-height:2;margin-top:8px;color:#4c1d95}
+.abox{background:#ecfdf5;border:1px dashed #6ee7b7;border-radius:12px;padding:9px 11px;font-size:12px;line-height:2;margin-top:8px;color:#065f46}
+.rbox{background:#fef2f2;border:1px dashed #fca5a5;border-radius:12px;padding:9px 11px;font-size:12px;line-height:2;margin-top:8px;color:#7f1d1d}
+.pbox b,.abox b,.rbox b{font-weight:800}
+.prog{margin-top:8px;font-size:12px;color:var(--muted);line-height:2}
+.prog i{font-style:normal;color:#0f172a}
+
+.searchbar{display:flex;gap:7px;margin-bottom:10px}
+.searchbar input{flex:1;padding:12px 14px;border:1.5px solid var(--line);border-radius:14px;background:#fff;font:inherit}
+.searchbar input:focus{outline:0;border-color:#93c5fd}
+.searchbar button{border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:0 15px;font:700 15px Tahoma;color:#64748b}
+.dbox{border-radius:12px;padding:9px 11px;font-size:12px;line-height:2;margin-top:8px}
+.dbox.ok{background:#ecfdf5;border:1px dashed #6ee7b7;color:#065f46}
+.dbox.no{background:#fff7ed;border:1px dashed #fdba74;color:#7c2d12}
+.dbox b{font-weight:800}
+.phases{margin-top:10px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.phases .ttl{background:#f8fafc;padding:8px 11px;font-size:12px;font-weight:800;color:#334155}
+.phrow{display:flex;align-items:center;gap:9px;padding:10px 11px;border-top:1px solid #eef2f7}
+.phrow .ic{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:800;background:#e2e8f0;color:#64748b;flex:0 0 auto}
+.phrow.done .ic{background:#dcfce7;color:#15803d}
+.phrow.now .ic{background:#dbeafe;color:#1d4ed8}
+.phrow .tx{flex:1;font-size:12.5px}
+.phrow .tx b{display:block}
+.phrow .tx i{font-style:normal;font-size:10.5px;color:var(--muted)}
+.phrow .btn{padding:8px 12px;font-size:12px}
+.phrow .lock{font-size:11px;color:#94a3b8}
+.phpics{display:flex;gap:6px;flex-wrap:wrap;padding:0 11px 10px}
+.phpics img{width:62px;height:62px;border-radius:10px;object-fit:cover;border:1px solid var(--line)}
+.srcbadge{background:#eef2ff;color:#3730a3;border:1px solid #c7d2fe;border-radius:999px;padding:3px 9px;font-size:10.5px;font-weight:800}
+details.more{margin-top:9px}
+details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:700}
+.minip{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+.minip figure{margin:0;text-align:center}
+.minip img{width:92px;height:92px;border-radius:12px;object-fit:cover;border:1px solid var(--line);display:block}
+.minip figcaption{font-size:10px;color:var(--muted);margin-top:3px}
+
+.geostamp{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:11px;padding:7px 10px;font-size:11px;line-height:1.95;color:#14532d;margin-top:6px}
+.geostamp b{direction:ltr;display:inline-block;font-weight:800}
+.geostamp .bad{color:#b45309;font-weight:800}
+.srctag{display:inline-block;border-radius:999px;padding:1px 7px;font-size:9.5px;font-weight:800;margin-right:4px}
+.src-cam{background:#dcfce7;color:#15803d}
+.src-gal{background:#fef3c7;color:#92400e}
+.phpics figure{margin:0}
+.byline{font-size:11px;color:var(--muted);margin-top:4px}
+.okline{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;border-radius:11px;padding:7px 10px;font-size:12px;font-weight:700;margin-top:8px}
+.needgeo{background:#fff7ed;border:1px dashed #fdba74;color:#7c2d12;border-radius:11px;padding:8px 10px;font-size:11.5px;line-height:1.9;margin-top:8px}
+
+.srcsel{width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:14px;background:#fff;font:inherit;color:inherit;margin-bottom:10px}
+.srcsel:focus{outline:0;border-color:#93c5fd}
+.field input.bad,.field textarea.bad,.field select.bad{border-color:#dc2626;background:#fff5f5}
+.nm{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 0}
+.nm button{border:1.5px solid var(--line);background:#fff;border-radius:18px;padding:6px 11px;font:700 12px Tahoma;color:#334155}
+.nm button:active{background:#eff6ff}
+
+/* ---------- تقویم شمسی ---------- */
+.datebtn{width:100%;text-align:right;padding:15px;border:1.5px solid var(--line);border-radius:14px;background:#fbfdff;font:inherit;display:flex;justify-content:space-between;align-items:center;gap:8px;transition:transform .08s}
+.datebtn:active{transform:scale(.99)}
+.datebtn.empty{border-color:#fcd34d;background:#fffdf5}
+.datebtn b{font-size:17px;color:var(--p)}
+.datebtn.empty b{color:#94a3b8;font-size:15px}
+.datebtn small{color:var(--muted);font-size:11px;display:block;margin-top:3px;font-weight:400}
+.datebtn .ico{font-size:22px}
+.ovl{position:fixed;inset:0;background:#0f172ac7;z-index:60;display:flex;align-items:center;justify-content:center;padding:14px}
+.cal{background:#fff;border-radius:22px;width:min(400px,100%);max-height:94vh;overflow:auto;box-shadow:0 30px 70px -20px #000a}
+.cal-head{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:13px 14px;background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;border-radius:22px 22px 0 0}
+.cal-head button{background:#ffffff1f;border:0;color:#fff;border-radius:11px;padding:9px 13px;font:700 15px Tahoma}
+.cal-head button:active{background:#ffffff33}
+.cal-head #calTitle{flex:1;font-size:16px}
+.cal-body{padding:12px}
+.cal-week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px}
+.cal-week span{text-align:center;font-size:11px;font-weight:700;color:var(--muted);padding:4px 0}
+.cal-week span:last-child{color:#dc2626}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-grid .d{border:0;background:#f8fafc;border-radius:12px;padding:7px 0 5px;font:inherit;text-align:center;transition:transform .08s}
+.cal-grid .d:active{transform:scale(.92)}
+.cal-grid .d b{display:block;font-size:16px;color:#0f172a;line-height:1.2}
+.cal-grid .d i{font-style:normal;display:block;font-size:9px;color:#94a3b8;direction:ltr}
+.cal-grid .d.fri b{color:#dc2626}
+.cal-grid .d.today{box-shadow:inset 0 0 0 2px #2563eb}
+.cal-grid .d.sel{background:linear-gradient(135deg,#1d4ed8,#3b82f6)}
+.cal-grid .d.sel b,.cal-grid .d.sel i{color:#fff}
+.cal-grid .d.off{visibility:hidden}
+.cal-quick{display:flex;gap:6px;margin-top:11px}
+.cal-quick button{flex:1;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:10px 4px;font:700 12px Tahoma;color:#334155}
+.cal-quick button:active{background:#eff6ff}
+.cal-foot{display:flex;gap:7px;padding:0 12px 13px}
+.cal-foot button{flex:1}
+.cal-pick{padding:12px;border-top:1px solid var(--line)}
+.cal-pick .ttl{font-size:12px;color:var(--muted);font-weight:700;margin:0 0 7px}
+.cal-pick .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:11px}
+.cal-pick .grid button{border:1.5px solid var(--line);background:#fff;border-radius:11px;padding:9px 3px;font:700 12px Tahoma;color:#334155}
+.cal-pick .grid button.on{border-color:#1d4ed8;background:#eff6ff;color:#1d4ed8}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="head">
+    <div>
+      <h1>🏗️ ثبت عملیات</h1>
+      <small>نسخه آزمایشی • v3.3.3-ASSIGN</small>
+      <button type="button" id="roleChip" class="rolechip hidden"></button>
+    </div>
+    <button class="btn ghost" id="homeBtn">خانه</button>
+  </header>
+
+  <div class="note">
+    <b>فایل آزمایشی مرحله ۳.۳</b><br>
+    چرخه چهارنقشی با شواهد قفل‌دار: مدیر اصلی دستور می‌دهد ← مدیر اجرایی برنامه‌ریزی می‌کند یا پیشنهاد اصلاح می‌دهد ← اکیپ با عکس و موقعیت اجرا را ثبت می‌کند ← ناظر تأیید می‌کند. داده‌ها فقط در حافظه همین مرورگر ذخیره می‌شود و هیچ ارتباطی با سامانه اصلی، سرور و داده‌های واقعی ندارد.
+  </div>
+
+  <section id="roleGate" class="hidden">
+    <div class="card">
+      <h3 style="margin:0 0 4px;font-size:16px">نقش خود را انتخاب کن</h3>
+      <p class="muted" style="margin:0 0 12px">هر نقش فقط گزینه‌های مربوط به خودش را می‌بیند. برای آزمایش هر وقت خواستی می‌توانی نقش را عوض کنی.</p>
+      <div class="rolecards" id="roleCards"></div>
+      <button class="btn ghost block hidden" id="editName" style="margin-top:12px">✏️ تغییر نام من در این نقش</button>
+    </div>
+    <div class="note">
+      گردش کار: <b>مدیر اصلی</b> دستور عملیات صادر می‌کند ← <b>مدیر اجرایی</b> آن را برنامه‌ریزی و به مجری ارجاع می‌دهد ← <b>ناظر/مجری</b> اجرا را شروع می‌کند.
+    </div>
+  </section>
+
+  <section id="home">
+    <button class="inbox hidden" id="inboxBtn"></button>
+    <div class="searchbar"><input id="q" placeholder="🔎 جست‌وجو: کد، نوع، منطقه، آدرس، شرح، مجری"><button type="button" id="qClear" class="hidden">✖</button></div>
+    <p class="muted hidden" id="qInfo" style="margin:0 2px 10px"></p>
+    <select id="srcSel" class="hidden srcsel"></select>
+    <div class="chips" id="fchips" style="margin-bottom:12px"></div>
+    <div class="card stats" id="statWrap"></div>
+    <button class="btn primary block hidden" id="newOp">➕ صدور دستور عملیات جدید</button>
+    <button class="btn ok block hidden" id="newOrder">➕ ثبت دستور مدیر اصلی (ابلاغ شفاهی)</button>
+    <p class="muted hidden" id="roleHint" style="margin:10px 2px 0"></p>
+    <div id="list"></div>
+    <details class="tools">
+      <summary>⚙️ ابزار آزمایش</summary>
+      <div class="card" style="margin-top:10px">
+        <p class="muted">برای شروع دوباره آزمایش می‌توانی همه داده‌های محلی این صفحه را پاک کنی. روی سامانه اصلی هیچ اثری ندارد.</p>
+        <button class="btn danger block" id="wipe">🗑 پاک‌کردن داده‌های آزمایشی</button>
+      </div>
+    </details>
+  </section>
+
+  <section id="wizard" class="hidden">
+    <div class="card">
+      <div class="wiz-top">
+        <div class="wiz-bar"><i id="wizBar" style="width:13%"></i></div>
+        <div class="wiz-meta"><b id="wizTitle">نوع عملیات</b><span id="wizStep">گام ۱ از ۷</span></div>
+      </div>
+
+      <!-- گام ۱ -->
+      <div class="step" data-step="1">
+        <span class="lb">نوع عملیات را انتخاب کن <span class="req">*</span></span>
+        <div class="typegrid" id="typeGrid"></div>
+        <div class="pend" id="p1">هنوز انتخابی انجام نشده است.</div>
+      </div>
+
+      <!-- گام ۲ -->
+      <div class="step hidden" data-step="2">
+        <span class="lb">تاریخ عملیات (شمسی) <span class="req">*</span></span>
+        <button type="button" class="datebtn empty" id="dateBtn">
+          <span><b id="dateTxt">تاریخی انتخاب نشده</b><small id="dateSub">برای باز شدن تقویم شمسی بزن</small></span>
+          <span class="ico">📅</span>
+        </button>
+        <div class="pend" id="p2">هیچ تاریخی از پیش انتخاب نشده است. تاریخ را خودت انتخاب کن.</div>
+      </div>
+
+      <!-- گام ۳ -->
+      <div class="step hidden" data-step="3">
+        <label class="field">
+          <span class="lb">منطقه <span class="req">*</span></span>
+          <select id="region"></select>
+        </label>
+        <label class="field hidden" id="regionOtherWrap">
+          <span class="lb">نام منطقه <span class="req">*</span></span>
+          <input id="regionOther" placeholder="مثلاً شهرک صنعتی">
+        </label>
+        <span class="lb">الان کجا هستی؟ <span class="req">*</span></span>
+        <div class="typegrid" id="placeMode">
+          <button type="button" class="type" data-place="onsite"><b>📍 در محل هستم</b><small>ثبت موقعیت اجباری است</small></button>
+          <button type="button" class="type" data-place="office"><b>🏢 ثبت از دفتر</b><small>موقعیت لازم نیست</small></button>
+        </div>
+        <div id="gpsWrap" class="hidden">
+          <button class="btn ghost block" id="gpsBtn">📍 ثبت موقعیت فعلی</button>
+          <div class="gpsbox" id="gpsBox" style="margin-top:10px">موقعیتی ثبت نشده است.</div>
+        </div>
+        <div class="pend" id="p3">منطقه و محل حضور هنوز مشخص نشده است.</div>
+      </div>
+
+      <!-- گام ۴ -->
+      <div class="step hidden" data-step="4">
+        <label class="field">
+          <span class="lb">آدرس دقیق <span class="req">*</span></span>
+          <textarea id="address" placeholder="خیابان، کوچه، پلاک یا نشانه شاخص"></textarea>
+        </label>
+        <p class="muted">هرچه دقیق‌تر باشد، پیگیری و تحویل کار ساده‌تر می‌شود.</p>
+      </div>
+
+      <!-- گام ۵ -->
+      <div class="step hidden" data-step="5">
+        <label class="field">
+          <span class="lb">شرح عملیات <span class="req">*</span></span>
+          <textarea id="descr" placeholder="چه کاری باید انجام شود؟"></textarea>
+        </label>
+      </div>
+
+      <!-- گام ۶ -->
+      <div class="step hidden" data-step="6">
+        <span class="lb">اولویت کار <span class="req">*</span></span>
+        <div class="typegrid" id="prioBox" style="grid-template-columns:1fr">
+          <button type="button" class="type" data-p="normal"><b>🟢 عادی</b><small>در نوبت عادی انجام شود</small></button>
+          <button type="button" class="type" data-p="urgent"><b>🟠 فوری</b><small>زودتر از کارهای عادی</small></button>
+          <button type="button" class="type" data-p="critical"><b>🔴 بحرانی</b><small>خطر جانی یا توقف خدمات — بلافاصله</small></button>
+        </div>
+        <div class="pend" id="p6">اولویت هنوز انتخاب نشده است.</div>
+
+        <span class="lb" style="display:block;margin:16px 0 5px">مهلت انجام (اختیاری)</span>
+        <button type="button" class="datebtn empty" id="dueBtn">
+          <span><b id="dueTxt">مهلتی تعیین نشده</b><small id="dueSub">برای تعیین مهلت، تقویم شمسی را باز کن</small></span>
+          <span class="ico">⏳</span>
+        </button>
+        <button type="button" class="btn ghost block hidden" id="dueClear">✖ حذف مهلت</button>
+        <p class="muted">اگر مهلت تعیین کنی، کارهای عقب‌افتاده با نشان قرمز «تأخیر» بالای فهرست دیده می‌شوند.</p>
+      </div>
+
+      <!-- بازبینی -->
+      <div class="step hidden" data-step="7">
+        <div class="sum" id="review"></div>
+        <div class="field" style="margin-top:14px">
+          <span class="lb">عکس وضعیت موجود (اختیاری، حداکثر ۳)</span>
+          <div class="actions">
+            <button type="button" class="btn primary" id="camBtn">📷 گرفتن عکس</button>
+            <button type="button" class="btn" id="galBtn">🖼 انتخاب از گالری</button>
+          </div>
+          <input id="camInput" type="file" accept="image/*" capture="environment" class="hidden">
+          <input id="galInput" type="file" accept="image/*" multiple class="hidden">
+          <div class="photos" id="photoBox"></div>
+          <p class="muted">این عکس‌ها فقط «وضعیت فعلی محل» را هنگام ثبت دستور ثبت می‌کنند و جایگزین شواهد اجرا نیستند. عکس‌های قبل از اجرا، حین اجرا و پایان کار با قفل ترتیبی، حداقل تعداد و ثبت GPS در مرحله ۳.۳ گرفته می‌شوند.</p>
+        </div>
+      </div>
+
+      <p class="err" id="err"></p>
+
+      <div class="row" style="margin-top:14px">
+        <button class="btn ghost" id="prev">◀ قبلی</button>
+        <button class="btn primary" id="next">بعدی ▶</button>
+      </div>
+      <button class="btn block ghost" id="cancel" style="margin-top:8px">انصراف</button>
+    </div>
+  </section>
+
+  <section id="act" class="hidden">
+    <div class="card">
+      <h3 id="actTitle" style="margin:0 0 10px;font-size:16px"></h3>
+      <div class="sum" id="actSum"></div>
+    </div>
+    <div class="card">
+      <div id="actBody"></div>
+      <input id="aCamInput" type="file" accept="image/*" capture="environment" class="hidden">
+      <input id="aGalInput" type="file" accept="image/*" multiple class="hidden">
+      <p class="err" id="actErr"></p>
+      <div class="row" style="margin-top:12px">
+        <button class="btn ghost" id="actCancel">انصراف</button>
+        <button class="btn primary" id="actSave">ثبت</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="done" class="hidden">
+    <div class="card okbox">
+      <div class="big">✅</div>
+      <h2 id="doneTitle">دستور عملیات صادر شد</h2>
+      <p class="muted">وضعیت: <span class="st st-ord">ابلاغ‌شده</span><br>کد رهگیری این عملیات:</p>
+      <p class="code" id="doneCode" style="font-size:20px"></p>
+      <p class="muted" style="margin-top:10px" id="doneHint">گام بعدی: مدیر اجرایی این دستور را برنامه‌ریزی و به اکیپ ارجاع می‌دهد.</p>
+      <button class="btn primary block" id="doneHome">بازگشت به فهرست</button>
+    </div>
+  </section>
+
+</div>
+<div class="ovl hidden" id="nameOvl">
+  <div class="cal">
+    <div class="cal-head">
+      <span id="nameTitle" style="flex:1;font-size:15px;font-weight:700">نام شما</span>
+      <button type="button" id="nameCancel">✕</button>
+    </div>
+    <div style="padding:14px">
+      <label class="field" style="margin-top:0">
+        <span class="lb">نام و نام خانوادگی <span class="req">*</span></span>
+        <input id="myName" placeholder="مثلاً حسن شه‌پناه">
+      </label>
+      <p class="muted">نام تو پای هر اقدامی که ثبت می‌کنی می‌نشیند تا مشخص باشد چه کسی چه کاری کرده است. فقط یک بار پرسیده می‌شود.</p>
+      <p class="err" id="nameErr"></p>
+      <button class="btn primary block" id="nameGo">✅ ورود</button>
+    </div>
+  </div>
+</div>
+
+<div class="ovl hidden" id="calOvl">
+  <div class="cal">
+    <div class="cal-head">
+      <button type="button" id="calPrev">‹</button>
+      <button type="button" id="calTitle">—</button>
+      <button type="button" id="calNext">›</button>
+    </div>
+    <div class="cal-body">
+      <div class="cal-week"><span>ش</span><span>ی</span><span>د</span><span>س</span><span>چ</span><span>پ</span><span>ج</span></div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div class="cal-quick">
+        <button type="button" data-q="-1">دیروز</button>
+        <button type="button" data-q="0">امروز</button>
+        <button type="button" data-q="1">فردا</button>
+      </div>
+    </div>
+    <div class="cal-pick hidden" id="calPick"></div>
+    <div class="cal-foot"><button type="button" class="btn ghost" id="calClose">بستن</button></div>
+  </div>
+</div>
+<div class="msg" id="msg"></div>
+
+<script>
+const APP_VERSION = 'v3.3.3-ASSIGN';
+const KEY = 'ops31_local_v1';
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const pad2 = n => String(n).padStart(2, '0');
+const fd = s => String(s).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+const TYPES = [
+  {id:'asphalt',   name:'آسفالت‌ریزی',            u1:'تن',      u2:'متر مربع'},
+  {id:'patch',     name:'لکه‌گیری آسفالت',        u1:'تن',      u2:'متر مربع'},
+  {id:'trench',    name:'ترمیم ترانشه',           u1:'متر طول', u2:'متر مربع'},
+  {id:'curb',      name:'جدول‌گذاری',             u1:'متر طول', u2:''},
+  {id:'sidewalk',  name:'پیاده‌روسازی',           u1:'متر مربع',u2:''},
+  {id:'drain',     name:'دفع آبگرفتگی / لایروبی', u1:'متر طول', u2:''},
+  {id:'clean',     name:'نظافت و جمع‌آوری نخاله', u1:'تن',      u2:'سرویس'},
+  {id:'green',     name:'فضای سبز و هرس',         u1:'اصله',    u2:'متر مربع'},
+  {id:'light',     name:'روشنایی معابر',          u1:'عدد',     u2:''},
+  {id:'furniture', name:'تعمیر مبلمان شهری',      u1:'عدد',     u2:''},
+  {id:'safety',    name:'رفع خطر و ایمن‌سازی',    u1:'مورد',    u2:''}
+];
+const WEEK = ['شنبه','یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنجشنبه','جمعه'];
+const MONTHS = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+const REGIONS = ['منطقه ۱','منطقه ۲','منطقه ۳','منطقه ۴','منطقه ۵','منطقه ۶','منطقه ۷','منطقه ۸','سایر'];
+
+/* ---------- نقش‌ها، وضعیت‌ها و اولویت (مرحله ۳.۲.۱) ---------- */
+const ROLES = {
+  manager: {ic:'👔', t:'مدیر اصلی',   d:'صدور دستور عملیات و تصمیم درباره پیشنهادهای مدیر اجرایی'},
+  exec:    {ic:'🧭', t:'مدیر اجرایی', d:'برنامه‌ریزی و ارجاع به اکیپ، یا پیشنهاد اصلاح به مدیر'},
+  crew:    {ic:'👷', t:'اکیپ اجرا',   d:'شروع کار، ثبت پیشرفت، پایان کار و ثبت مقدار واقعی'},
+  sup:     {ic:'🦺', t:'ناظر',        d:'بازدید نهایی و تأیید یا برگشت کار'}
+};
+const ST = {
+  ordered:  {t:'ابلاغ‌شده',        c:'st-ord',  s:1},
+  proposed: {t:'پیشنهاد اصلاح',    c:'st-prop', s:1},
+  planned:  {t:'برنامه‌ریزی‌شده',  c:'st-pln',  s:2},
+  running:  {t:'در حال اجرا',      c:'st-run2', s:3},
+  finished: {t:'منتظر تأیید ناظر', c:'st-fin',  s:3},
+  approved: {t:'تأییدشده',         c:'st-okk',  s:4},
+  rejected: {t:'برگشتی',           c:'st-rej',  s:3}
+};
+const FLOW = ['ابلاغ','برنامه‌ریزی','اجرا','تأیید'];
+const INBOX = { manager:['proposed'], exec:['ordered'], crew:['planned','running','rejected'], sup:['finished'] };
+const INBOX_T = { manager:'پیشنهاد منتظر تصمیم تو', exec:'دستور منتظر برنامه‌ریزی', crew:'کار منتظر اقدام تو', sup:'کار منتظر تأیید تو' };
+const PRIO = {
+  normal:   {t:'عادی',   c:'prio-normal',   r:0},
+  urgent:   {t:'فوری',   c:'prio-urgent',   r:1},
+  critical: {t:'بحرانی', c:'prio-critical', r:2}
+};
+const ROLE_KEY = 'ops32_role';
+const NAME_KEY = 'ops32_names';
+const FILT = [{k:'active',t:'در جریان'},{k:'late',t:'تأخیردار'},{k:'done',t:'تأییدشده'},{k:'all',t:'همه'}];
+
+/* ---------- تاریخ شمسی ---------- */
+function jParts(d){
+  const a = new Intl.DateTimeFormat('fa-IR-u-ca-persian-nu-latn',{year:'numeric',month:'numeric',day:'numeric'}).formatToParts(d);
+  const o = {}; a.forEach(x => o[x.type] = +x.value);
+  return {y:o.year, m:o.month, d:o.day};
+}
+function jToday(){ return jParts(new Date()); }
+function jDoy(m,d){ return (m <= 6 ? (m-1)*31 : 186 + (m-7)*30) + d; }
+function jToDate(jy,jm,jd){
+  let g = new Date(Date.UTC(jy + 621, 2, 21, 12, 0, 0));
+  for (let i = 0; i < 8; i++){
+    const p = jParts(g);
+    if (p.y === jy && p.m === jm && p.d === jd) return g;
+    const delta = (jy - p.y) * 365 + (jDoy(jm,jd) - jDoy(p.m,p.d));
+    if (delta === 0) break;
+    g = new Date(g.getTime() + delta * 86400000);
+  }
+  for (let k = -4; k <= 4; k++){
+    const t = new Date(g.getTime() + k * 86400000), p = jParts(t);
+    if (p.y === jy && p.m === jm && p.d === jd) return t;
+  }
+  return null;
+}
+function jMonthLen(jy,jm){
+  if (jm <= 6) return 31;
+  if (jm <= 11) return 30;
+  return jToDate(jy,12,30) ? 30 : 29;
+}
+function jFmt(jy,jm,jd){ return fd(jy + '/' + pad2(jm) + '/' + pad2(jd)); }
+function nowFa(){
+  return new Intl.DateTimeFormat('fa-IR-u-ca-persian',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).format(new Date());
+}
+
+/* ---------- ذخیره محلی ---------- */
+function load(){ try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch(e){ return []; } }
+function save(a){
+  try { localStorage.setItem(KEY, JSON.stringify(a)); return true; }
+  catch(e){ alert('حافظه مرورگر پر شده است. چند عکس کمتر بگذار یا داده‌های آزمایشی را پاک کن.'); return false; }
+}
+function toast(t){ const m = $('#msg'); m.textContent = t; m.classList.add('show'); clearTimeout(window._t); window._t = setTimeout(() => m.classList.remove('show'), 2300); }
+function makeCode(jy,jm,jd){
+  const base = jy + '-' + pad2(jm) + '-' + pad2(jd);
+  return base + '-' + (load().filter(o => (o.code || '').startsWith(base)).length + 1);
+}
+
+/* ---------- وضعیت ویزارد ---------- */
+let step = 1, draft = {}, photos = [];
+const LAST = 7;
+const TITLES = {1:'نوع عملیات',2:'تاریخ دستور',3:'منطقه و موقعیت',4:'آدرس دقیق',5:'شرح عملیات',6:'اولویت و مهلت',7:'بازبینی و صدور'};
+
+function show(sec){
+  ['roleGate','home','wizard','act','done'].forEach(x => $('#'+x).classList.toggle('hidden', x !== sec));
+  window.scrollTo(0,0);
+}
+function err(t){
+  const e = $('#err');
+  if (!t){ e.classList.remove('show'); return; }
+  e.textContent = '⛔ ' + t;
+  e.classList.add('show');
+  e.scrollIntoView({block:'center', behavior:'smooth'});
+}
+function paintStep(){
+  $$('.step').forEach(s => s.classList.toggle('hidden', +s.dataset.step !== step));
+  $('#wizBar').style.width = Math.round(step / LAST * 100) + '%';
+  $('#wizTitle').textContent = TITLES[step];
+  $('#wizStep').textContent = step === LAST ? 'بازبینی نهایی' : 'گام ' + fd(step) + ' از ۶';
+  $('#prev').disabled = step === 1;
+  $('#next').textContent = step === LAST ? '✅ صدور دستور' : 'بعدی ▶';
+  $('#next').classList.toggle('ok', step === LAST);
+  err('');
+  if (step === LAST){ paintReview(); paintPhotos(); }
+  pending();
+  window.scrollTo(0,0);
+}
+/* نشانگر «هنوز انتخاب نشده» */
+function pending(){
+  const set = (id, bad) => { const el = $(id); if (el) el.classList.toggle('hidden', !bad); };
+  set('#p1', !draft.typeId);
+  set('#p2', !draft.date);
+  set('#p3', !$('#region').value || !draft.place || (draft.place === 'onsite' && !draft.gps));
+  set('#p6', !draft.prio);
+  $('#dateBtn').classList.toggle('empty', !draft.date);
+  $('#region').classList.toggle('empty', !$('#region').value);
+}
+
+/* ---------- گام ۱ ---------- */
+function paintTypes(){
+  $('#typeGrid').innerHTML = TYPES.map(t =>
+    `<button type="button" class="type${draft.typeId===t.id?' sel':''}" data-id="${t.id}"><b>${esc(t.name)}</b><small>واحد: ${esc(t.u1)}${t.u2?' + '+esc(t.u2):''}</small></button>`
+  ).join('');
+}
+$('#typeGrid').addEventListener('click', e => {
+  const b = e.target.closest('.type'); if (!b) return;
+  draft.typeId = b.dataset.id; paintTypes(); err(''); pending();
+});
+
+/* ---------- گام ۲ (بدون هیچ پیش‌فرض) ---------- */
+/* ---------- گام ۲: تقویم شمسی ---------- */
+let calY = 0, calM = 0;
+let calCtx = 'wizard';
+const calDate = () => calCtx === 'act' ? actDraft.date : (calCtx === 'due' ? draft.due : draft.date);
+function fillDate(b, t, u, d){
+  $(b).classList.toggle('empty', !d);
+  if (d){
+    const g = jToDate(d.y, d.m, d.d);
+    $(t).textContent = fd(d.d) + ' ' + MONTHS[d.m-1] + ' ' + fd(d.y);
+    $(u).textContent = WEEK[(g.getUTCDay() + 1) % 7] + ' • معادل میلادی ' +
+      new Intl.DateTimeFormat('en-GB',{day:'2-digit',month:'short',year:'numeric',timeZone:'UTC'}).format(g);
+  } else {
+    $(t).textContent = 'تاریخی انتخاب نشده';
+    $(u).textContent = 'برای باز شدن تقویم شمسی بزن';
+  }
+}
+function paintDateBtn(){ fillDate('#dateBtn','#dateTxt','#dateSub', draft.date); }
+function openCal(ctx){
+  calCtx = (ctx === 'act' || ctx === 'due') ? ctx : 'wizard';
+  const t = jToday(), d = calDate();
+  calY = d ? d.y : t.y; calM = d ? d.m : t.m;
+  $('#calPick').classList.add('hidden');
+  paintCal(); $('#calOvl').classList.remove('hidden');
+}
+function closeCal(){ $('#calOvl').classList.add('hidden'); }
+function paintCal(){
+  const t = jToday(), d = calDate(), len = jMonthLen(calY, calM);
+  const first = jToDate(calY, calM, 1), off = (first.getUTCDay() + 1) % 7;
+  $('#calTitle').textContent = MONTHS[calM-1] + ' ' + fd(calY) + '  ▾';
+  let h = '';
+  for (let k = 0; k < off; k++) h += '<button type="button" class="d off"></button>';
+  for (let n = 1; n <= len; n++){
+    const g = new Date(first.getTime() + (n-1) * 86400000);
+    const fri = ((g.getUTCDay() + 1) % 7) === 6;
+    const isT = t.y === calY && t.m === calM && t.d === n;
+    const isS = d && d.y === calY && d.m === calM && d.d === n;
+    h += `<button type="button" class="d${fri?' fri':''}${isT?' today':''}${isS?' sel':''}" data-d="${n}"><b>${fd(n)}</b><i>${g.getUTCDate()}</i></button>`;
+  }
+  $('#calGrid').innerHTML = h;
+}
+function pickDate(y,m,d){
+  if (calCtx === 'act'){
+    actDraft.date = {y,m,d};
+    fillDate('#aDateBtn','#aDateTxt','#aDateSub', actDraft.date); aerr(''); closeCal();
+  } else if (calCtx === 'due'){
+    draft.due = {y,m,d};
+    paintDue(); err(''); closeCal();
+  } else {
+    draft.date = {y,m,d};
+    paintDateBtn(); pending(); err(''); closeCal();
+  }
+  toast('تاریخ ' + jFmt(y,m,d) + ' انتخاب شد');
+}
+$('#dateBtn').addEventListener('click', () => openCal('wizard'));
+$('#calClose').addEventListener('click', closeCal);
+$('#calOvl').addEventListener('click', e => { if (e.target.id === 'calOvl') closeCal(); });
+$('#calPrev').addEventListener('click', () => { calM--; if (calM < 1){ calM = 12; calY--; } paintCal(); });
+$('#calNext').addEventListener('click', () => { calM++; if (calM > 12){ calM = 1; calY++; } paintCal(); });
+$('#calGrid').addEventListener('click', e => {
+  const b = e.target.closest('.d'); if (!b || !b.dataset.d) return;
+  pickDate(calY, calM, +b.dataset.d);
+});
+$('.cal-quick').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const p = jParts(new Date(Date.now() + (+b.dataset.q) * 86400000));
+  pickDate(p.y, p.m, p.d);
+});
+$('#calTitle').addEventListener('click', () => {
+  const el = $('#calPick');
+  if (!el.classList.contains('hidden')) return el.classList.add('hidden');
+  const t = jToday();
+  let h = '<p class="ttl">ماه</p><div class="grid">';
+  MONTHS.forEach((n,i) => h += `<button type="button" data-m="${i+1}" class="${calM===i+1?'on':''}">${n}</button>`);
+  h += '</div><p class="ttl">سال</p><div class="grid">';
+  for (let y = t.y - 2; y <= t.y + 2; y++) h += `<button type="button" data-y="${y}" class="${calY===y?'on':''}">${fd(y)}</button>`;
+  h += '</div>';
+  el.innerHTML = h; el.classList.remove('hidden');
+});
+$('#calPick').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.m) calM = +b.dataset.m;
+  if (b.dataset.y) calY = +b.dataset.y;
+  paintCal();
+  $('#calPick').innerHTML = ''; $('#calPick').classList.add('hidden');
+});
+
+/* ---------- گام ۳ (بدون پیش‌فرض) ---------- */
+function buildRegions(){
+  const r = $('#region'); r.innerHTML = '';
+  r.add(new Option('— منطقه را انتخاب کن —', ''));
+  REGIONS.forEach(x => r.add(new Option(x, x)));
+  r.value = '';
+}
+$('#region').addEventListener('change', () => {
+  $('#regionOtherWrap').classList.toggle('hidden', $('#region').value !== 'سایر');
+  pending(); err('');
+});
+$('#placeMode').addEventListener('click', e => {
+  const b = e.target.closest('.type'); if (!b) return;
+  draft.place = b.dataset.place;
+  $$('#placeMode .type').forEach(x => x.classList.toggle('sel', x.dataset.place === draft.place));
+  $('#gpsWrap').classList.toggle('hidden', draft.place !== 'onsite');
+  if (draft.place === 'office') draft.gps = null;
+  paintGps(); pending(); err('');
+});
+$('#gpsBtn').addEventListener('click', () => {
+  if (!navigator.geolocation) return toast('مرورگر از موقعیت‌یابی پشتیبانی نمی‌کند');
+  const b = $('#gpsBtn'); b.disabled = true; b.textContent = '⏳ در حال دریافت موقعیت…';
+  navigator.geolocation.getCurrentPosition(p => {
+    draft.gps = {lat:p.coords.latitude, lng:p.coords.longitude, acc:Math.round(p.coords.accuracy||0), at:new Date().toISOString()};
+    paintGps(); pending(); b.disabled = false; b.textContent = '🔄 دریافت دوباره موقعیت'; toast('موقعیت ثبت شد');
+  }, e => {
+    b.disabled = false; b.textContent = '📍 ثبت موقعیت فعلی';
+    toast(e.code === 1 ? 'اجازه دسترسی به موقعیت داده نشد' : 'دریافت موقعیت ناموفق بود');
+  }, {enableHighAccuracy:true, timeout:15000, maximumAge:0});
+});
+function paintGps(){
+  const g = draft.gps;
+  $('#gpsBox').innerHTML = g
+    ? `طول و عرض جغرافیایی: <b>${g.lat.toFixed(6)}, ${g.lng.toFixed(6)}</b><br>دقت تقریبی: <span class="${g.acc<=50?'acc-ok':'acc-bad'}">${fd(g.acc)} متر</span>${g.acc>50?' — بهتر است زیر آسمان باز دوباره بگیری':''}` + routeBtns(g.lat, g.lng)
+    : 'موقعیتی ثبت نشده است.';
+}
+/* ---------- مسیریابی ---------- */
+function routeBtns(lat,lng){
+  return `<div class="actions"><button type="button" class="btn primary" data-route="g" data-lat="${lat}" data-lng="${lng}">🧭 مسیریابی گوگل</button><button type="button" class="btn" data-route="n" data-lat="${lat}" data-lng="${lng}">🗺️ مسیریابی نشان</button></div>`;
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-route]'); if (!b) return;
+  const lat = +b.dataset.lat, lng = +b.dataset.lng;
+  if (b.dataset.route === 'g'){
+    window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`, '_blank', 'noopener');
+    return;
+  }
+  const point = `https://nshn.ir/?lat=${lat}&lng=${lng}&zoom=16`;
+  if (!navigator.geolocation){ location.href = point; return; }
+  toast('در حال گرفتن موقعیت فعلی برای مسیریابی…');
+  navigator.geolocation.getCurrentPosition(
+    p => { location.href = `https://nshn.ir?origin=${p.coords.latitude},${p.coords.longitude}&destination=${lat},${lng}&vehicle=d`; },
+    () => { location.href = point; },
+    {enableHighAccuracy:true, timeout:8000, maximumAge:60000}
+  );
+});
+
+/* ---------- گام ۶ ---------- */
+function curType(){ return TYPES.find(t => t.id === draft.typeId) || null; }
+
+/* ---------- گام ۶: اولویت و مهلت ---------- */
+function paintPrio(){
+  $$('#prioBox .type').forEach(x => x.classList.toggle('sel', x.dataset.p === draft.prio));
+}
+function paintDue(){
+  fillDate('#dueBtn','#dueTxt','#dueSub', draft.due);
+  if (!draft.due){ $('#dueTxt').textContent = 'مهلتی تعیین نشده'; $('#dueSub').textContent = 'برای تعیین مهلت، تقویم شمسی را باز کن'; }
+  $('#dueClear').classList.toggle('hidden', !draft.due);
+}
+$('#prioBox').addEventListener('click', e => {
+  const b = e.target.closest('.type'); if (!b) return;
+  draft.prio = b.dataset.p; paintPrio(); pending(); err('');
+});
+$('#dueBtn').addEventListener('click', () => openCal('due'));
+$('#dueClear').addEventListener('click', () => { draft.due = null; paintDue(); toast('مهلت حذف شد'); });
+
+let wizSrc = 'camera';
+$('#camBtn').addEventListener('click', () => { wizSrc = 'camera'; $('#camInput').click(); });
+$('#galBtn').addEventListener('click', () => { wizSrc = 'gallery'; $('#galInput').click(); });
+async function addPhotos(e){
+  const files = Array.from(e.target.files || []);
+  e.target.value = '';
+  for (const f of files){
+    if (photos.length >= 3){ toast('حداکثر ۳ عکس'); break; }
+    try { photos.push(await shrink(f)); draft.photoSrc = wizSrc; } catch(x){ toast('خواندن عکس ناموفق بود'); }
+  }
+  paintPhotos();
+  if (photos.length && !draft.gps){
+    toast('در حال ثبت موقعیت عکس…');
+    try { draft.gps = await getGeo(); draft.photoGeo = true; paintGps(); pending(); toast('موقعیت عکس ثبت شد'); }
+    catch(e){ toast('موقعیت ثبت نشد — در صورت نیاز دستی ثبت کن'); }
+  }
+}
+$('#camInput').addEventListener('change', addPhotos);
+let actPhotos = [], actGeo = null, actGeoReq = false, actSrc = 'camera';
+function paintActPhotos(){
+  const b = $('#aPhotoBox'); if (!b) return;
+  b.innerHTML = actPhotos.map((p,i) => `<div class="ph"><img src="${pdata(p)}" alt="عکس"><button type="button" data-ap="${i}">×</button></div>`).join('');
+}
+async function addActPhotos(e){
+  const files = Array.from(e.target.files || []); e.target.value = '';
+  for (const f of files){
+    if (actPhotos.length >= 3){ toast('حداکثر ۳ عکس'); break; }
+    try { actPhotos.push({ d: await shrink(f), src: actSrc }); } catch(x){ toast('خواندن عکس ناموفق بود'); }
+  }
+  paintActPhotos(); aerr('');
+  if (actGeoReq && !actGeo && actPhotos.length){
+    toast('در حال ثبت موقعیت عکس…');
+    try { actGeo = await getGeo(); paintActGeo(); toast('موقعیت ثبت شد'); }
+    catch(e){ paintActGeo(); toast('موقعیت خودکار نگرفت — دکمه ثبت موقعیت را بزن'); }
+  }
+}
+function paintActGeo(){
+  const b = $('#aGeoBox'); if (!b) return;
+  b.innerHTML = actGeo
+    ? `طول و عرض: <b style="direction:ltr;display:inline-block">${actGeo.lat.toFixed(6)}, ${actGeo.lng.toFixed(6)}</b><br>دقت تقریبی: <span class="${actGeo.acc<=50?'acc-ok':'acc-bad'}">${fd(actGeo.acc)} متر</span>${actGeo.acc>50?' — بهتر است زیر آسمان باز دوباره بگیری':''}<br>🕒 ${esc(actGeo.fa)}`
+    : 'موقعیتی ثبت نشده است.';
+}
+$('#aCamInput').addEventListener('change', addActPhotos);
+$('#aGalInput').addEventListener('change', addActPhotos);
+$('#galInput').addEventListener('change', addPhotos);
+function shrink(file){
+  return new Promise((res, rej) => {
+    const fr = new FileReader();
+    fr.onerror = rej;
+    fr.onload = () => {
+      const img = new Image();
+      img.onerror = rej;
+      img.onload = () => {
+        const max = 1000, s = Math.min(1, max / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        res(c.toDataURL('image/jpeg', 0.6));
+      };
+      img.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+function paintPhotos(){
+  $('#photoBox').innerHTML = photos.map((p,i) =>
+    `<div class="ph"><img src="${p}" alt="عکس ${i+1}"><button type="button" data-i="${i}">×</button></div>`).join('');
+}
+$('#photoBox').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  photos.splice(+b.dataset.i, 1); paintPhotos();
+});
+
+/* ---------- بازبینی ---------- */
+function collect(){
+  const t = curType();
+  const region = $('#region').value === 'سایر' ? $('#regionOther').value.trim() : $('#region').value;
+  return {
+    typeId: draft.typeId, typeName: t ? t.name : '',
+    jy: draft.date ? draft.date.y : 0, jm: draft.date ? draft.date.m : 0, jd: draft.date ? draft.date.d : 0,
+    region, address: $('#address').value.trim(), descr: $('#descr').value.trim(),
+    u1: t ? t.u1 : '', u2: t ? t.u2 : '',
+    prio: draft.prio, due: draft.due || null,
+    photoSrc: draft.photoSrc || '', photoGeo: !!draft.photoGeo,
+    place: draft.place, gps: draft.gps || null, photos: photos.slice()
+  };
+}
+function paintReview(){
+  const o = collect();
+  const rows = [
+    ['نوع عملیات', o.typeName],
+    ['تاریخ عملیات', jFmt(o.jy,o.jm,o.jd)],
+    ['منطقه', o.region],
+    ['آدرس دقیق', o.address],
+    ['شرح', o.descr],
+    ['اولویت', PRIO[o.prio] ? PRIO[o.prio].t : '—'],
+    ['مهلت انجام', o.due ? jFmt(o.due.y,o.due.m,o.due.d) : 'تعیین نشده'],
+    ['محل ثبت', o.place === 'onsite' ? 'در محل عملیات' : 'از دفتر'],
+    ['موقعیت', o.gps ? o.gps.lat.toFixed(5) + ', ' + o.gps.lng.toFixed(5) + ' (±' + fd(o.gps.acc) + ' متر)' : 'ثبت نشده']
+  ];
+  $('#review').innerHTML = rows.map(r => `<div><i>${esc(r[0])}</i><b>${esc(r[1])}</b></div>`).join('');
+}
+
+/* ---------- اعتبارسنجی ---------- */
+function validate(){
+  if (step === 1 && !draft.typeId) return 'نوع عملیات اجباری است. یکی از کارت‌ها را انتخاب کن.';
+  if (step === 2 && !draft.date) return 'تاریخ عملیات انتخاب نشده است. روی کادر تاریخ بزن و از تقویم یک روز را انتخاب کن.';
+  if (step === 3){
+    if (!$('#region').value) return 'منطقه اجباری است و هیچ پیش‌فرضی ندارد.';
+    if ($('#region').value === 'سایر' && !$('#regionOther').value.trim()) return 'نام منطقه را بنویس.';
+    if (!draft.place) return 'مشخص کن در محل هستی یا از دفتر ثبت می‌کنی.';
+    if (draft.place === 'onsite' && !draft.gps) return 'چون «در محل هستم» را انتخاب کردی، ثبت موقعیت اجباری است. دکمه ثبت موقعیت را بزن.';
+  }
+  if (step === 4 && $('#address').value.trim().length < 3) return 'آدرس دقیق اجباری است.';
+  if (step === 5 && $('#descr').value.trim().length < 3) return 'شرح عملیات اجباری است.';
+  if (step === 6 && !draft.prio) return 'اولویت کار اجباری است و پیش‌فرضی ندارد. یکی از سه گزینه را انتخاب کن.';
+  return '';
+}
+
+/* ---------- ناوبری ---------- */
+$('#next').addEventListener('click', () => {
+  const e = validate(); if (e){ pending(); return err(e); }
+  if (step === LAST) return submit();
+  step++; paintStep();
+});
+$('#prev').addEventListener('click', () => { if (step > 1){ step--; paintStep(); } });
+$('#cancel').addEventListener('click', () => { if (confirm('ثبت این عملیات لغو شود؟')){ render(); show('home'); } });
+$('#homeBtn').addEventListener('click', () => {
+  if (!$('#wizard').classList.contains('hidden') && !confirm('ثبت این عملیات لغو شود؟')) return;
+  render(); show(role ? 'home' : 'roleGate');
+});
+$('#doneHome').addEventListener('click', () => { render(); show('home'); });
+
+function submit(){
+  const o = collect();
+  o.code = makeCode(o.jy, o.jm, o.jd);
+  o.createdAt = new Date().toISOString();
+  o.createdFa = nowFa();
+  o.status = 'ordered';
+  o.origin = (role === 'exec') ? wizOrigin : 'manager';
+  o.orderBy = me();
+  o.log = [];
+  addLog(o, role, o.origin === 'exec' ? 'کار مستقل توسط مدیر اجرایی ثبت شد'
+    : (role === 'exec' ? 'دستور مدیر اصلی توسط مدیر اجرایی ثبت شد' : 'دستور عملیات صادر و ابلاغ شد'));
+  const all = load(); all.unshift(o);
+  if (!save(all)) return;
+  $('#doneCode').textContent = fd(o.code);
+  $('#doneTitle').textContent = o.origin === 'exec' ? 'کار مستقل ثبت شد'
+    : (role === 'exec' ? 'دستور مدیر اصلی ثبت شد' : 'دستور عملیات صادر شد');
+  $('#doneHint').textContent = o.origin === 'exec'
+    ? 'گام بعدی: همین کار را با دکمه «برنامه‌ریزی و ارجاع» به اکیپ بسپار.'
+    : 'گام بعدی: مدیر اجرایی این دستور را برنامه‌ریزی و به اکیپ ارجاع می‌دهد.';
+  show('done');
+}
+
+/* ---------- شروع ---------- */
+let wizOrigin = 'manager';
+$('#newOrder').addEventListener('click', () => { wizOrigin = 'manager'; $('#newOp').click(); });
+$('#newOp').addEventListener('click', () => {
+  if (role !== 'manager' && role !== 'exec') return toast('فقط مدیر اصلی یا مدیر اجرایی می‌تواند کار ثبت کند');
+  if (role === 'manager') wizOrigin = 'manager';
+  draft = {}; photos = []; step = 1;
+  draft.date = null; paintTypes(); paintDateBtn(); buildRegions();
+  $('#regionOtherWrap').classList.add('hidden'); $('#regionOther').value = '';
+  $('#address').value = ''; $('#descr').value = '';
+  draft.prio = null; draft.due = null; draft.photoSrc = ''; draft.photoGeo = false; paintPrio(); paintDue();
+  $$('#placeMode .type').forEach(x => x.classList.remove('sel'));
+  $('#gpsWrap').classList.add('hidden'); draft.gps = null; draft.place = null;
+  $('#gpsBtn').disabled = false; $('#gpsBtn').textContent = '📍 ثبت موقعیت فعلی';
+  paintGps(); paintPhotos(); paintStep(); show('wizard');
+});
+$('#wipe').addEventListener('click', () => {
+  if (!confirm('همه داده‌های آزمایشی این صفحه پاک شود؟')) return;
+  localStorage.removeItem(KEY); render(); toast('پاک شد');
+});
+
+/* ---------- نقش‌ها و گردش کار (مرحله ۳.۲.۱) ---------- */
+let role = null, actId = null, actKind = null, actDraft = {}, inboxOnly = false, filt = 'active';
+let names = {}; try { names = JSON.parse(localStorage.getItem(NAME_KEY) || '{}'); } catch(e){ names = {}; }
+const me = () => (names[role] || (ROLES[role] ? ROLES[role].t : '—'));
+const norm = x => String(x == null ? '' : x).replace(/\u200c/g,' ').replace(/\s+/g,' ').trim().toLowerCase();
+function sameName(a, b){
+  a = norm(a); b = norm(b);
+  return !!a && !!b && (a === b || a.indexOf(b) > -1 || b.indexOf(a) > -1);
+}
+function knownNames(){
+  const set = [];
+  load().forEach(o => { if (o.assignee && !set.some(x => norm(x) === norm(o.assignee))) set.push(o.assignee); });
+  return set.slice(0, 8);
+}
+function knownSups(){
+  const set = [];
+  load().forEach(o => { [o.supervisor, o.reviewBy].forEach(n => {
+    if (n && !set.some(x => norm(x) === norm(n))) set.push(n); }); });
+  if (names.sup && !set.some(x => norm(x) === norm(names.sup))) set.push(names.sup);
+  return set.slice(0, 8);
+}
+let src = 'mine';
+const SRC = {
+  manager: [['mine','فقط دستورهای خودم'], ['exec','فقط کارهای مستقل مدیر اجرایی'], ['all','همه کارها']],
+  exec:    [['all','همه کارها'], ['mine','فقط دستورهای مدیر اصلی'], ['exec','فقط کارهای مستقل خودم']]
+};
+function srcPass(o){
+  if (role !== 'manager' && role !== 'exec') return true;
+  if (src === 'all') return true;
+  if (role === 'manager') return src === 'mine' ? o.origin !== 'exec' : o.origin === 'exec';
+  return src === 'mine' ? o.origin !== 'exec' : o.origin === 'exec';
+}
+const pdata = x => (typeof x === 'string' ? x : (x && x.d) || '');
+const psrc  = x => (typeof x === 'string' ? '' : (x && x.src) || '');
+function getGeo(){
+  return new Promise((res, rej) => {
+    if (!navigator.geolocation) return rej(new Error('nogeo'));
+    navigator.geolocation.getCurrentPosition(
+      p => res({lat:p.coords.latitude, lng:p.coords.longitude, acc:Math.round(p.coords.accuracy||0), fa:nowFa(), at:new Date().toISOString()}),
+      e => rej(e), {enableHighAccuracy:true, timeout:15000, maximumAge:0});
+  });
+}
+function geoStamp(g, srcs){
+  if (!g) return '';
+  return `<div class="geostamp">📍 موقعیت ثبت‌شده: <b>${g.lat.toFixed(6)}, ${g.lng.toFixed(6)}</b>
+    • دقت <span class="${g.acc<=50?'':'bad'}">${fd(g.acc)} متر</span><br>🕒 ${esc(g.fa||'')}
+    ${srcs ? '<br>📷 منبع: ' + srcs : ''}${routeBtns(g.lat, g.lng)}</div>`;
+}
+function srcTags(list){
+  return (list||[]).map(x => {
+    const sc = psrc(x);
+    return sc ? `<span class="srctag ${sc==='camera'?'src-cam':'src-gal'}">${sc==='camera'?'دوربین':'گالری'}</span>` : '';
+  }).join('');
+}
+
+function aerr(t){
+  $$('#actBody .bad').forEach(x => x.classList.remove('bad'));
+  const e = $('#actErr');
+  if (!t){ e.textContent = ''; e.classList.remove('show'); return; }
+  let id = '', msg = t;
+  const i = t.indexOf('|');
+  if (i > 0){ id = t.slice(0, i); msg = t.slice(i + 1); }
+  e.textContent = '⛔ ' + msg; e.classList.add('show');
+  if (id && $('#' + id)){ $('#' + id).classList.add('bad'); $('#' + id).scrollIntoView({block:'center', behavior:'smooth'}); }
+}
+function addLog(o, r, text, sc){ o.log = o.log || []; o.log.push({ fa: nowFa(), role: r, text, sc: sc || 'work' }); }
+const num = d => d ? d.y*10000 + d.m*100 + d.d : 0;
+
+function migrate(all){
+  let ch = false;
+  all.forEach(o => {
+    if (!o.status || o.status === 'registered'){ o.status = 'ordered'; ch = true; }
+    if (o.status === 'inprogress'){ o.status = 'running'; ch = true; }
+    if (!o.prio){ o.prio = 'normal'; ch = true; }
+    if (o.amend && !o.decision){ o.decision = { ok:true, prop:o.amend.text, note:'', fa:o.amend.fa||'' }; delete o.amend; ch = true; }
+    if (!o.origin){ o.origin = 'manager'; ch = true; }
+    if (!o.log){ o.log = [{ fa: o.createdFa || '', role: 'manager', text: 'دستور عملیات صادر و ابلاغ شد' }]; ch = true; }
+  });
+  if (ch) save(all);
+  return all;
+}
+function isLate(o){
+  if (o.status === 'approved') return false;
+  const now = num(jToday());
+  if (o.due && num(o.due) < now) return true;
+  if (o.status === 'planned' && o.planDate && num(o.planDate) < now) return true;
+  return false;
+}
+function needsMe(o){ return (INBOX[role] || []).includes(o.status); }
+
+/* ---------- انتخاب نقش ---------- */
+function buildRoleCards(){
+  $('#roleCards').innerHTML = Object.keys(ROLES).map(k => {
+    const r = ROLES[k];
+    return `<button type="button" class="role${role===k?' on':''}" data-role="${k}">
+      <span class="ic">${r.ic}</span><span class="tx"><b>${esc(r.t)}</b><i>${esc(r.d)}</i></span></button>`;
+  }).join('');
+}
+function setRole(k){
+  role = k; inboxOnly = false; filt = 'active'; $('#q').value = '';
+  src = (k === 'manager') ? 'mine' : 'all';
+  try { localStorage.setItem(ROLE_KEY, k); } catch(e){}
+  closeName(); buildRoleCards(); render(); show('home');
+  toast(ROLES[k].t + ' • ' + me());
+}
+let pendingRole = null;
+function openName(k){
+  pendingRole = k;
+  $('#nameTitle').textContent = ROLES[k].ic + ' ' + ROLES[k].t;
+  $('#myName').value = names[k] || '';
+  $('#nameErr').classList.remove('show');
+  $('#nameOvl').classList.remove('hidden');
+}
+function closeName(){ $('#nameOvl').classList.add('hidden'); }
+$('#roleCards').addEventListener('click', e => {
+  const b = e.target.closest('[data-role]'); if (!b) return;
+  const k = b.dataset.role;
+  pendingRole = k;
+  $$('#roleCards .role').forEach(x => x.classList.toggle('on', x.dataset.role === k));
+  if (names[k]) setRole(k); else openName(k);
+});
+$('#editName').addEventListener('click', () => { if (role) openName(role); });
+$('#nameCancel').addEventListener('click', closeName);
+$('#nameOvl').addEventListener('click', e => { if (e.target.id === 'nameOvl') closeName(); });
+$('#nameGo').addEventListener('click', () => {
+  const n = $('#myName').value.trim();
+  if (n.length < 3){ const e = $('#nameErr'); e.textContent = '⛔ نام و نام خانوادگی را کامل بنویس.'; e.classList.add('show'); return; }
+  if (!pendingRole) return;
+  names[pendingRole] = n;
+  try { localStorage.setItem(NAME_KEY, JSON.stringify(names)); } catch(e){}
+  closeName();
+  setRole(pendingRole);
+});
+$('#roleChip').addEventListener('click', () => {
+  buildRoleCards(); closeName();
+  $('#editName').classList.toggle('hidden', !role);
+  if (role) $('#editName').textContent = '✏️ تغییر نام من در نقش ' + ROLES[role].t + ' (' + me() + ')';
+  show('roleGate');
+});
+$('#fchips').addEventListener('click', e => {
+  const b = e.target.closest('[data-f]'); if (!b) return;
+  filt = b.dataset.f; render();
+});
+$('#srcSel').addEventListener('change', () => { src = $('#srcSel').value; render(); });
+$('#inboxBtn').addEventListener('click', () => {
+  const cnt = () => ($('#list').innerHTML.match(/<div class="op[" ]/g) || []).length;
+  const n0 = cnt();
+  inboxOnly = !inboxOnly; render();
+  if (inboxOnly && cnt() === n0) toast('همه کارهای این فهرست منتظر اقدام تو هستند');
+});
+const lat = x => String(x == null ? '' : x).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+$('#q').addEventListener('input', () => render());
+$('#qClear').addEventListener('click', () => { $('#q').value = ''; render(); });
+function matches(o, qq){
+  if (!qq) return true;
+  const hay = lat([o.code, o.typeName, o.region, o.address, o.descr, o.assignee,
+    PRIO[o.prio] ? PRIO[o.prio].t : '', ST[o.status] ? ST[o.status].t : ''].join(' ')).toLowerCase();
+  return lat(qq).toLowerCase().split(/\s+/).filter(Boolean).every(w => hay.includes(w));
+}
+
+/* ---------- برگه اقدام ---------- */
+const DATEBTN = (lb, req) => `<span class="lb" style="display:block;margin:12px 0 5px">${lb}${req?' <span class="req">*</span>':''}</span>
+  <button type="button" class="datebtn empty" id="aDateBtn">
+    <span><b id="aDateTxt">تاریخی انتخاب نشده</b><small id="aDateSub">برای باز شدن تقویم شمسی بزن</small></span>
+    <span class="ico">📅</span></button>`;
+const TA = (id, lb, ph, req) => `<label class="field"><span class="lb">${lb}${req?' <span class="req">*</span>':''}</span>
+  <textarea id="${id}" placeholder="${ph}"></textarea></label>`;
+const IN = (id, lb, ph, req, type) => `<label class="field"><span class="lb">${lb}${req?' <span class="req">*</span>':''}</span>
+  <input id="${id}" ${type||''} placeholder="${ph}"></label>`;
+
+const ACTS = {
+  plan: {
+    t: '🗂 برنامه‌ریزی و ارجاع', btn: '✅ ثبت ارجاع',
+    body: o => `<span class="lb">نحوه اجرا <span class="req">*</span></span>
+      <div class="typegrid" id="aMode">
+        <button type="button" class="type${o.mode==='amani'?' sel':''}" data-mode="amani"><b>👷 اکیپ امانی</b><small>با نیروی داخلی</small></button>
+        <button type="button" class="type${o.mode==='contractor'?' sel':''}" data-mode="contractor"><b>🏢 پیمانکار</b><small>واگذاری به پیمانکار</small></button>
+      </div>
+      ${IN('aName','نام اکیپ یا پیمانکار','مثلاً اکیپ ۳ یا شرکت آریا',1)}
+      ${knownNames().length ? `<div class="nm" id="aNames">${knownNames().map(n => `<button type="button" data-nm="${esc(n)}">${esc(n)}</button>`).join('')}</div>
+        <p class="muted">برای اینکه کار در کارتابل اکیپ دیده شود، نام باید دقیقاً همان نامی باشد که اکیپ با آن وارد می‌شود.</p>` : ''}
+      ${DATEBTN('تاریخ شروع برنامه‌ریزی‌شده',1)}
+      ${IN('aSup','ناظر این عملیات (اختیاری)','اگر خالی بماند، همه ناظران آن را می‌بینند',0)}
+      ${knownSups().length ? `<div class="nm" id="aSups">${knownSups().map(n => `<button type="button" data-sp="${esc(n)}">${esc(n)}</button>`).join('')}</div>` : ''}
+      ${TA('aNote','یادداشت برای اکیپ (اختیاری)','هماهنگی با ترافیک، ساعت شروع، تجهیزات لازم')}`,
+    fill: o => { actDraft.mode = o.mode || null; actDraft.date = o.planDate || null; $('#aName').value = o.assignee || ''; if ($('#aSup')) $('#aSup').value = o.supervisor || ''; $('#aNote').value = o.planNote || ''; },
+    check: () => !actDraft.mode ? 'نحوه اجرا را انتخاب کن: اکیپ امانی یا پیمانکار.'
+      : !$('#aName').value.trim() ? 'aName|نام اکیپ یا پیمانکار اجباری است و پیش‌فرضی ندارد.'
+      : !actDraft.date ? 'تاریخ شروع انتخاب نشده است. روی کادر تاریخ بزن.' : '',
+    apply: o => {
+      const again = o.status === 'planned';
+      o.mode = actDraft.mode; o.assignee = $('#aName').value.trim();
+      o.planDate = actDraft.date; o.planNote = $('#aNote').value.trim(); o.status = 'planned'; o.planBy = me();
+      o.supervisor = $('#aSup') ? $('#aSup').value.trim() : '';
+      addLog(o,'exec',(again?'ویرایش ارجاع: ':'ارجاع به ') + o.assignee + ' — شروع ' + jFmt(actDraft.date.y,actDraft.date.m,actDraft.date.d));
+      addLog(o,'exec','ناظر این عملیات: ' + (o.supervisor || 'تعیین‌نشده — همه ناظران'), 'sup');
+      return 'ارجاع ثبت شد';
+    }
+  },
+  propose: {
+    t: '💡 پیشنهاد اصلاح به مدیر', btn: '📨 ارسال پیشنهاد',
+    body: () => `<p class="muted" style="margin:0 0 10px">اگر فکر می‌کنی این دستور بهتر است به شکل دیگری اجرا شود، پیشنهادت را بنویس. تا تصمیم مدیر، کار به اکیپ ارجاع نمی‌شود.</p>
+      ${TA('aText','متن پیشنهاد','مثلاً: با توجه به ترافیک، بهتر است شب‌کاری انجام شود و محدوده به دو فاز تقسیم گردد.',1)}`,
+    fill: o => { $('#aText').value = o.proposal ? o.proposal.text : ''; },
+    check: () => $('#aText').value.trim().length < 5 ? 'aText|متن پیشنهاد اجباری است و باید روشن نوشته شود.' : '',
+    apply: o => {
+      o.proposal = { text: $('#aText').value.trim(), fa: nowFa() };
+      o.status = 'proposed';
+      addLog(o,'exec','پیشنهاد اصلاح به مدیر ارسال شد','talk');
+      return 'پیشنهاد برای مدیر ارسال شد';
+    }
+  },
+  accept: {
+    t: '✅ موافقت با پیشنهاد', btn: '✅ تأیید می‌کنم',
+    body: o => `<div class="pbox"><b>پیشنهاد مدیر اجرایی:</b><br>${esc(o.proposal ? o.proposal.text : '—')}</div>
+      ${TA('aNote','توضیح مدیر (اختیاری)','مثلاً: موافقم، فقط ایمنی معبر رعایت شود.')}`,
+    fill: () => {},
+    check: () => '',
+    apply: o => {
+      const n = $('#aNote').value.trim();
+      o.decision = { ok:true, prop: o.proposal ? o.proposal.text : '', note:n, fa: nowFa() };
+      o.proposal = null; o.status = 'ordered';
+      addLog(o,'manager','با پیشنهاد مدیر اجرایی موافقت شد' + (n ? ' — ' + n : ''),'talk');
+      return 'موافقت ثبت شد؛ کار به مدیر اجرایی برگشت';
+    }
+  },
+  keep: {
+    t: '❌ اجرا طبق دستور اولیه', btn: '📌 ثبت تصمیم',
+    body: o => `<div class="pbox"><b>پیشنهاد مدیر اجرایی:</b><br>${esc(o.proposal ? o.proposal.text : '—')}</div>
+      ${TA('aText','دلیل رد پیشنهاد','چرا دستور اولیه باید اجرا شود؟',1)}`,
+    fill: () => {},
+    check: () => $('#aText').value.trim().length < 3 ? 'aText|نوشتن دلیل اجباری است تا تصمیم مستند بماند.' : '',
+    apply: o => {
+      const n = $('#aText').value.trim();
+      o.decision = { ok:false, prop: o.proposal ? o.proposal.text : '', note:n, fa: nowFa() };
+      o.proposal = null; o.status = 'ordered';
+      addLog(o,'manager','پیشنهاد رد شد — ' + n,'talk');
+      return 'تصمیم ثبت شد؛ دستور اولیه معتبر است';
+    }
+  },
+  approve: {
+    t: '✅ تأیید نهایی کار', btn: '✅ تأیید می‌کنم',
+    body: o => `<div class="abox"><b>مقدار ثبت‌شده اکیپ:</b> ${esc(fd(o.q1 || '—'))} ${esc(o.u1 || '')}${o.q2 ? ' — ' + esc(fd(o.q2)) + ' ' + esc(o.u2) : ''}</div>
+      ${(o.phases && o.phases.end && o.phases.end.note) ? `<p class="muted">گزارش پایان کار اکیپ: ${esc(o.phases.end.note)}</p>` : ''}
+      ${TA('aNote','یادداشت ناظر (اختیاری)','کیفیت کار، نکات تحویل')}`,
+    fill: () => {},
+    check: () => '',
+    apply: o => {
+      o.reviewNote = $('#aNote').value.trim(); o.reviewFa = nowFa(); o.reviewBy = me(); o.status = 'approved'; o.rejectReason = '';
+      addLog(o,'sup','کار توسط ' + me() + ' بازدید و تأیید نهایی شد' + (o.reviewNote ? ' — ' + o.reviewNote : ''));
+      return 'کار تأیید شد';
+    }
+  },
+  reject: {
+    t: '↩️ برگشت کار برای اصلاح', btn: '↩️ برگشت به اکیپ',
+    body: () => `<p class="muted" style="margin:0 0 10px">دلیل برگشت باید روشن باشد تا اکیپ بداند دقیقاً چه چیزی را اصلاح کند.</p>
+      ${TA('aText','دلیل برگشت','مثلاً: ضخامت آسفالت کمتر از حد مجاز است و لبه‌ها تراز نیست.',1)}${PHOTOBLOCK}`,
+    fill: () => { actPhotos = []; paintActPhotos(); },
+    check: () => $('#aText').value.trim().length < 5 ? 'aText|نوشتن دلیل برگشت اجباری است.' : '',
+    apply: o => {
+      o.rejectReason = $('#aText').value.trim(); o.rejectPhotos = actPhotos.slice();
+      o.status = 'rejected'; o.reviewFa = nowFa(); o.reviewBy = me();
+      addLog(o,'sup','کار توسط ' + me() + ' برگشت داده شد — ' + o.rejectReason);
+      return 'کار برای اصلاح به اکیپ برگشت';
+    }
+  },
+  fixdone: {
+    t: '🔧 ثبت اصلاح انجام‌شده', btn: '🏁 ارسال دوباره به ناظر',
+    body: o => `<div class="rbox"><b>دلیل برگشت ناظر:</b><br>${esc(o.rejectReason || '—')}</div>
+      ${TA('aText','شرح اصلاح انجام‌شده','چه کاری برای رفع ایراد انجام شد؟',1)}${PHOTOBLOCK}`,
+    fill: () => { actPhotos = []; paintActPhotos(); },
+    check: () => $('#aText').value.trim().length < 3 ? 'aText|شرح اصلاح اجباری است.' : '',
+    apply: o => {
+      o.fixes = o.fixes || [];
+      o.fixes.push({ fa: nowFa(), text: $('#aText').value.trim(), photos: actPhotos.slice(), by: me() });
+      o.status = 'finished'; o.finishedFa = nowFa();
+      addLog(o,'crew','اصلاح توسط ' + me() + ' انجام شد — ' + $('#aText').value.trim());
+      return 'دوباره برای تأیید ناظر ارسال شد';
+    }
+  }
+};
+
+const PH = [
+  {k:'before', n:'قبل از اجرا', req:true,  hint:'وضعیت محل را پیش از شروع کار با عکس و موقعیت ثبت کن. این مدرک، اصالت محل عملیات را تثبیت می‌کند.', ph:'مثلاً: محل تحویل گرفته شد، معبر بسته و علائم ایمنی نصب شد.'},
+  {k:'during', n:'حین اجرا',    req:false, hint:'وضعیت کار را در میانه اجرا ثبت کن.',     ph:'مثلاً: تخریب و زیرسازی انجام شد، آسفالت در حال پخش است.'},
+  {k:'end',    n:'پایان کار',   req:true,  hint:'پایان کار را با عکس و موقعیت ثبت کن و مقدار واقعی اجراشده را بنویس.', ph:'مثلاً: کار تمام شد، معبر نظافت و تحویل داده شد.'}
+];
+function photoBlock(req){
+  return `<span class="lb" style="display:block;margin:14px 0 5px">عکس این مرحله ${req ? '<span class="req">*</span> (حداقل ۱، حداکثر ۳)' : '(اختیاری، حداکثر ۳)'}</span>
+  <div class="actions"><button type="button" class="btn primary" id="aCamBtn">📷 گرفتن عکس</button><button type="button" class="btn" id="aGalBtn">🖼 انتخاب از گالری</button></div>
+  <div class="photos" id="aPhotoBox"></div>` +
+  (req ? `<div class="needgeo">برای اصالت مدرک، همراه عکس باید <b>موقعیت جغرافیایی</b> ثبت شود. با گرفتن اولین عکس، موقعیت خودکار ثبت می‌شود؛ اگر نشد دکمه زیر را بزن.</div>
+  <div class="gpsbox" id="aGeoBox" style="margin-top:8px">موقعیتی ثبت نشده است.</div>
+  <button type="button" class="btn block" id="aGeoBtn">📍 ثبت / به‌روزرسانی موقعیت</button>` : '');
+}
+const PHOTOBLOCK = photoBlock(false);
+function phOpen(o, i){
+  const ph = o.phases || {};
+  if (i === 0) return o.status === 'planned' || o.status === 'running';
+  if (i === 1) return o.status === 'running' && !!ph.before;
+  return o.status === 'running' && !!ph.before && !!ph.during;
+}
+PH.forEach((p, i) => {
+  const last = i === 2;
+  ACTS['ph_' + p.k] = {
+    t: ['①','②','③'][i] + ' ثبت مرحله «' + p.n + '»',
+    btn: last ? '🏁 پایان کار و تحویل به ناظر' : '✅ ثبت این مرحله',
+    body: o => `<p class="muted" style="margin:0 0 10px">${p.hint}</p>` +
+      TA('aText','شرح این مرحله', p.ph, 1) +
+      (last ? `<label class="field"><span class="lb">مقدار واقعی اجراشده بر حسب ${esc(o.u1 || '')} <span class="req">*</span></span>
+        <div class="qrow"><input id="aQ1" type="number" inputmode="decimal" min="0" step="any" placeholder="مثلاً ۱۲٫۵"><span class="unit">${esc(o.u1 || '—')}</span></div></label>` +
+        (o.u2 ? `<label class="field"><span class="lb">مقدار بر حسب ${esc(o.u2)} (اختیاری)</span>
+        <div class="qrow"><input id="aQ2" type="number" inputmode="decimal" min="0" step="any" placeholder="اختیاری"><span class="unit">${esc(o.u2)}</span></div></label>` : '') : '') +
+      photoBlock(p.req),
+    fill: o => {
+      const cur = (o.phases || {})[p.k];
+      $('#aText').value = cur ? cur.note : '';
+      if (last){ $('#aQ1').value = o.q1 || ''; if ($('#aQ2')) $('#aQ2').value = o.q2 || ''; }
+      actPhotos = (cur && cur.photos) ? cur.photos.slice() : [];
+      actGeoReq = !!p.req;
+      actGeo = (cur && cur.geo) ? cur.geo : null;
+      paintActPhotos(); paintActGeo();
+    },
+    check: () => {
+      if ($('#aText').value.trim().length < 3) return 'aText|شرح این مرحله اجباری است و باید حداقل ۳ حرف باشد.';
+      if (p.req && !actPhotos.length) return 'برای این مرحله حداقل یک عکس اجباری است. دکمه «📷 گرفتن عکس» را بزن.';
+      if (p.req && !actGeo) return 'ثبت موقعیت جغرافیایی برای این مرحله اجباری است. دکمه «📍 ثبت موقعیت» را بزن.';
+      if (last){
+        const v = $('#aQ1').value.trim();
+        if (!v) return 'aQ1|ثبت مقدار واقعی اجراشده اجباری است.';
+        if (!(parseFloat(v) > 0)) return 'aQ1|مقدار باید عددی بزرگ‌تر از صفر باشد.';
+      }
+      return '';
+    },
+    apply: o => {
+      o.phases = o.phases || {};
+      o.phases[p.k] = { fa: nowFa(), note: $('#aText').value.trim(), photos: actPhotos.slice(), geo: actGeo, by: me() };
+      if (i === 0 && o.status === 'planned'){ o.status = 'running'; o.startedFa = nowFa(); }
+      if (last){
+        o.q1 = $('#aQ1').value.trim(); o.q2 = $('#aQ2') ? $('#aQ2').value.trim() : '';
+        o.status = 'finished'; o.finishedFa = nowFa();
+      }
+      addLog(o,'crew','مرحله «' + p.n + '» توسط ' + me() + ' ثبت شد' + (last ? ' — مقدار واقعی: ' + fd(o.q1) + ' ' + o.u1 : ''));
+      return last ? 'کار برای تأیید ناظر ارسال شد' : 'مرحله «' + p.n + '» ثبت شد';
+    }
+  };
+});
+
+function openAct(kind, code){
+  const o = load().find(x => x.code === code); if (!o || !ACTS[kind]) return;
+  actId = code; actKind = kind; actDraft = {};
+  const A = ACTS[kind];
+  $('#actTitle').textContent = A.t;
+  $('#actSum').innerHTML = [
+    ['کد', fd(o.code)], ['نوع عملیات', o.typeName],
+    ['اولویت', PRIO[o.prio] ? PRIO[o.prio].t : '—'],
+    ['منطقه', o.region], ['آدرس', o.address], ['شرح', o.descr]
+  ].map(r => `<div><i>${esc(r[0])}</i><b>${esc(r[1])}</b></div>`).join('');
+  actPhotos = []; actGeo = null; actGeoReq = false;
+  $('#actBody').innerHTML = A.body(o);
+  A.fill(o);
+  if ($('#aDateBtn')) fillDate('#aDateBtn','#aDateTxt','#aDateSub', actDraft.date);
+  $('#actSave').textContent = A.btn;
+  aerr(''); show('act');
+}
+$('#actBody').addEventListener('input', e => { if (e.target && e.target.classList) e.target.classList.remove('bad'); });
+$('#actBody').addEventListener('click', e => {
+  const nmb = e.target.closest('[data-nm]');
+  if (nmb){ $('#aName').value = nmb.dataset.nm; aerr(''); return; }
+  const spb = e.target.closest('[data-sp]');
+  if (spb){ $('#aSup').value = spb.dataset.sp; aerr(''); return; }
+  if (e.target.closest('#aCamBtn')){ actSrc = 'camera'; return $('#aCamInput').click(); }
+  if (e.target.closest('#aGalBtn')){ actSrc = 'gallery'; return $('#aGalInput').click(); }
+  if (e.target.closest('#aGeoBtn')){
+    const btn = $('#aGeoBtn'); btn.disabled = true; btn.textContent = '⏳ در حال دریافت موقعیت…';
+    getGeo().then(g => { actGeo = g; paintActGeo(); aerr(''); toast('موقعیت ثبت شد'); })
+      .catch(() => toast('دریافت موقعیت ناموفق بود'))
+      .then(() => { btn.disabled = false; btn.textContent = '📍 ثبت / به‌روزرسانی موقعیت'; });
+    return;
+  }
+  const dp = e.target.closest('[data-ap]');
+  if (dp){ actPhotos.splice(+dp.dataset.ap, 1); paintActPhotos(); return; }
+  const m = e.target.closest('[data-mode]');
+  if (m){ actDraft.mode = m.dataset.mode; $$('#aMode .type').forEach(x => x.classList.toggle('sel', x.dataset.mode === actDraft.mode)); aerr(''); return; }
+  if (e.target.closest('#aDateBtn')) openCal('act');
+});
+$('#actCancel').addEventListener('click', () => { render(); show('home'); });
+$('#actSave').addEventListener('click', () => {
+  const A = ACTS[actKind]; if (!A) return;
+  const bad = A.check(); if (bad) return aerr(bad);
+  const all = load(), o = all.find(x => x.code === actId); if (!o) return;
+  const msg = A.apply(o);
+  if (!save(all)) return;
+  toast(msg); render(); show('home');
+});
+$('#list').addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  openAct(b.dataset.act, b.dataset.code);
+});
+
+/* ---------- نمایش ---------- */
+function flowBar(st){
+  const cur = (ST[st] || ST.ordered).s;
+  return '<div class="flow">' + FLOW.map((n,i) =>
+    `<i class="${i+1 < cur ? 'done' : (i+1 === cur ? 'on' : '')}">${n}</i>`
+  ).join('<span style="color:#cbd5e1">‹</span>') + '</div>';
+}
+function actionsFor(o){
+  const B = (k,t,c) => `<button class="btn ${c||''}" data-act="${k}" data-code="${esc(o.code)}">${t}</button>`;
+  let a = [];
+  if (role === 'exec'  && o.status === 'ordered'){ a.push(B('plan','🗂 برنامه‌ریزی و ارجاع','primary')); a.push(B('propose','💡 پیشنهاد به مدیر','ghost')); }
+  if (role === 'exec'  && o.status === 'planned')  a.push(B('plan','✏️ ویرایش ارجاع','ghost'));
+  if (role === 'manager' && o.status === 'proposed'){ a.push(B('accept','✅ موافقم','ok')); a.push(B('keep','❌ طبق دستور اولیه','ghost')); }
+  if (role === 'crew'){
+    const ph = o.phases || {};
+    if (o.status === 'planned')  a.push(B('ph_before','▶️ شروع کار (ثبت مرحله قبل از اجرا)','primary'));
+    else if (o.status === 'running' && !ph.during) a.push(B('ph_during','⏩ ادامه کار — ثبت حین اجرا','primary'));
+    else if (o.status === 'running') a.push(B('ph_end','🏁 ثبت پایان کار و مقدار','primary'));
+    else if (o.status === 'rejected') a.push(B('fixdone','🔧 اصلاح شد','primary'));
+  }
+  if (role === 'sup'   && o.status === 'finished'){ a.push(B('approve','✅ تأیید نهایی','ok')); a.push(B('reject','↩️ برگشت','danger')); }
+  return a.length ? `<div class="actions">${a.join('')}</div>` : '';
+}
+function phasesBlock(o){
+  if (role === 'manager') return '';
+  if (!['planned','running','finished','approved','rejected'].includes(o.status)) return '';
+  const ph = o.phases || {};
+  const rows = PH.map((p,i) => {
+    const d = ph[p.k], done = !!d, can = role === 'crew' && phOpen(o,i) && !done;
+    const edit = role === 'crew' && done && o.status === 'running';
+    const pics = (done && d.photos && d.photos.length)
+      ? `<div class="phpics">${d.photos.map(x => `<img src="${pdata(x)}" alt="عکس">`).join('')}</div>` : '';
+    const stamp = done ? geoStamp(d.geo, srcTags(d.photos)) : '';
+    return `<div class="phrow ${done ? 'done' : (can ? 'now' : '')}">
+      <span class="ic">${done ? '✓' : fd(i+1)}</span>
+      <span class="tx"><b>${esc(p.n)}${p.req ? ' <span style="color:#dc2626">*</span>' : ''}</b>
+        <i>${done ? esc(d.fa) + (d.by ? ' — ' + esc(d.by) : '') + '<br>' + esc(d.note)
+          : (can ? (p.req ? 'آماده ثبت — عکس و موقعیت اجباری' : 'آماده ثبت') : 'قفل تا تکمیل مرحله قبل')}</i></span>
+      ${can ? `<button class="btn primary" data-act="ph_${p.k}" data-code="${esc(o.code)}">ثبت</button>`
+        : (edit ? `<button class="btn ghost" data-act="ph_${p.k}" data-code="${esc(o.code)}">ویرایش</button>`
+        : (done ? '' : '<span class="lock">🔒</span>'))}
+    </div>${pics}${stamp ? `<div style="padding:0 11px 10px">${stamp}</div>` : ''}`;
+  }).join('');
+  return `<div class="phases"><div class="ttl">🧭 روند عملیات</div>${rows}</div>`;
+}
+function decBox(o){
+  if (!o.decision) return '';
+  const d = o.decision;
+  return `<div class="dbox ${d.ok ? 'ok' : 'no'}">
+    <b>${d.ok ? '✅ تصمیم مدیر: با پیشنهاد موافقت شد' : '❌ تصمیم مدیر: پیشنهاد پذیرفته نشد — طبق دستور اولیه اجرا شود'}</b>
+    <br>پیشنهاد مدیر اجرایی: ${esc(d.prop || '—')}
+    ${d.note ? `<br>${d.ok ? 'توضیح مدیر' : 'دلیل مدیر'}: ${esc(d.note)}` : ''}
+    <br><span style="font-size:10.5px">${esc(d.fa || '')}</span></div>`;
+}
+function beforeAfter(o){
+  const ph = o.phases || {};
+  const b = (ph.before && ph.before.photos && ph.before.photos.length) ? pdata(ph.before.photos[0]) : (o.photos && o.photos.length ? pdata(o.photos[0]) : '');
+  const a = (ph.end && ph.end.photos && ph.end.photos.length) ? pdata(ph.end.photos[0]) : '';
+  if (!b && !a) return '';
+  return `<div class="minip">
+    ${b ? `<figure><img src="${b}" alt="قبل"><figcaption>قبل</figcaption></figure>` : ''}
+    ${a ? `<figure><img src="${a}" alt="بعد"><figcaption>بعد</figcaption></figure>` : ''}</div>`;
+}
+function badges(o){
+  const pr = PRIO[o.prio] || PRIO.normal;
+  return `<div class="badges"><span class="prio ${pr.c}">${esc(pr.t)}</span>
+    ${o.due ? `<span class="prio prio-normal">مهلت ${esc(jFmt(o.due.y,o.due.m,o.due.d))}</span>` : ''}
+    ${isLate(o) ? '<span class="late">⏰ تأخیر</span>' : ''}
+    ${o.origin === 'exec' ? '<span class="srcbadge">کار مستقل مدیر اجرایی</span>' : ''}
+    ${needsMe(o) ? '<span class="late" style="background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe">منتظر اقدام تو</span>' : ''}</div>`;
+}
+function head(o){
+  const st = ST[o.status] || ST.ordered;
+  return `<div class="op-top">
+    <div><span class="code">${esc(fd(o.code))}</span><p style="margin:4px 0 0"><b>${esc(o.typeName)}</b></p></div>
+    <span class="st ${st.c}">${esc(st.t)}</span></div>`;
+}
+function histBlock(o){
+  const lg = (o.log || []).filter(l => {
+    const sc = l.sc || 'work';
+    if (role === 'crew') return sc === 'work';
+    if (role === 'sup')  return sc !== 'talk';
+    return true;
+  });
+  if (!lg.length) return '';
+  return `<details class="log"><summary>تاریخچه (${fd(lg.length)} رویداد)</summary><ul>` +
+    lg.map(l => `<li>${esc(l.text)}<br><span style="font-size:10.5px">${esc(l.fa)}</span></li>`).join('') + '</ul></details>';
+}
+function fixBlock(o){
+  if (!o.fixes || !o.fixes.length) return '';
+  return o.fixes.map(f => `<div class="abox"><b>🔧 اصلاح اکیپ:</b> ${esc(f.text)}<br><span style="font-size:10.5px">${esc(f.fa)}${f.by ? ' — ' + esc(f.by) : ''}</span>` +
+    (f.photos && f.photos.length ? `<div class="phpics" style="padding:6px 0 0">${f.photos.map(x => `<img src="${pdata(x)}" alt="عکس">`).join('')}</div>` : '') + '</div>').join('');
+}
+function opCard(o){
+  const late = isLate(o), talk = (role === 'manager' || role === 'exec');
+  const prop = (talk && o.proposal) ? `<div class="pbox"><b>💡 پیشنهاد مدیر اجرایی:</b><br>${esc(o.proposal.text)}<br><span style="font-size:10.5px">${esc(o.proposal.fa)}</span></div>` : '';
+  const dec  = talk ? decBox(o) : '';
+  const asg  = o.assignee ? `<div class="assignbox">${o.mode === 'contractor' ? '🏢 پیمانکار' : '👷 اکیپ'}: <b>${esc(o.assignee)}</b>` +
+    (o.planDate ? ` • شروع: <b>${esc(jFmt(o.planDate.y,o.planDate.m,o.planDate.d))}</b>` : '') +
+    ((role !== 'crew') ? `<br>🦺 ناظر: <b>${esc(o.supervisor || 'تعیین‌نشده — همه ناظران')}</b>` : '') +
+    (o.planNote ? `<br>📝 ${esc(o.planNote)}` : '') + '</div>' : '';
+  const rej  = (o.status === 'rejected' && o.rejectReason) ? `<div class="rbox"><b>↩️ دلیل برگشت ناظر:</b><br>${esc(o.rejectReason)}` +
+    ((o.rejectPhotos && o.rejectPhotos.length) ? `<div class="phpics" style="padding:6px 0 0">${o.rejectPhotos.map(x => `<img src="${pdata(x)}" alt="عکس">`).join('')}</div>` : '') +
+    ((o.reviewBy && role !== 'crew') ? `<br><span style="font-size:10.5px">ناظر: ${esc(o.reviewBy)}</span>` : '') + '</div>' : '';
+  const qty  = o.q1 ? `<p>📦 مقدار واقعی: <b>${esc(fd(o.q1))} ${esc(o.u1)}</b>${o.q2 ? ' — ' + esc(fd(o.q2)) + ' ' + esc(o.u2) : ''}</p>` : '';
+
+  if (role === 'manager'){
+    const brief = (o.descr || '').length > 90 ? o.descr.slice(0,90) + '…' : (o.descr || '');
+    const okl = (o.status === 'approved')
+      ? `<div class="okline">✅ تأیید نهایی توسط <b>${esc(o.reviewBy || 'ناظر — نام ثبت نشده')}</b>${o.reviewFa ? ' • ' + esc(o.reviewFa) : ''}${o.reviewNote ? '<br>' + esc(o.reviewNote) : ''}</div>` : '';
+    return `<div class="op${late ? ' islate' : ''}">
+      ${head(o)}${badges(o)}${flowBar(o.status)}
+      <p>📍 ${esc(o.region)} — 📝 ${esc(brief)}</p>
+      ${beforeAfter(o)}
+      ${okl}
+      ${o.status === 'proposed' ? prop : ''}
+      ${actionsFor(o)}
+      <details class="more"><summary>جزئیات کامل</summary>
+        <p>📅 ${esc(jFmt(o.jy,o.jm,o.jd))} • 📍 ${esc(o.address)}</p>
+        <p>📝 ${esc(o.descr)}</p>
+        ${qty}${asg}${o.status !== 'proposed' ? prop : ''}${dec}${rej}
+        <div class="meta">ثبت: ${esc(o.createdFa || '')}${o.orderBy ? ' — ' + esc(o.orderBy) : ''}${o.finishedFa ? ' • پایان: ' + esc(o.finishedFa) : ''}</div>
+        ${histBlock(o)}
+      </details>
+    </div>`;
+  }
+  return `<div class="op${late ? ' islate' : ''}">
+    ${head(o)}${badges(o)}${flowBar(o.status)}
+    <p>📅 ${esc(jFmt(o.jy,o.jm,o.jd))} • 📍 ${esc(o.region)} — ${esc(o.address)}</p>
+    <p>📝 ${esc(o.descr)}</p>
+    ${qty}${asg}${prop}${dec}${rej}${fixBlock(o)}
+    ${(o.status === 'approved' && role !== 'crew') ? `<div class="okline">✅ تأیید نهایی توسط <b>${esc(o.reviewBy || 'ناظر — نام ثبت نشده')}</b>${o.reviewFa ? ' • ' + esc(o.reviewFa) : ''}${o.reviewNote ? '<br>' + esc(o.reviewNote) : ''}</div>` : ''}
+    ${(o.status === 'approved' && role === 'crew') ? `<div class="okline">✅ این کار تأیید نهایی شد${o.reviewFa ? ' • ' + esc(o.reviewFa) : ''}</div>` : ''}
+    ${(o.photos && o.photos.length) ? `<div class="photos">${o.photos.map(x => `<div class="ph"><img src="${pdata(x)}" alt="عکس"></div>`).join('')}</div>` : ''}
+    ${(o.photos && o.photos.length && o.gps && o.photoGeo) ? geoStamp(o.gps, '') : ''}
+    ${phasesBlock(o)}
+    <div class="meta">ثبت: ${esc(o.createdFa || '')}${o.finishedFa ? ' • پایان: ' + esc(o.finishedFa) : ''}</div>
+    ${o.gps ? routeBtns(o.gps.lat, o.gps.lng) : ''}
+    ${actionsFor(o)}
+    ${histBlock(o)}
+  </div>`;
+}
+const VIS = {
+  manager: ['ordered','proposed','planned','running','finished','approved','rejected'],
+  exec:    ['ordered','proposed','planned','running','finished','approved','rejected'],
+  crew:    ['planned','running','finished','rejected','approved'],
+  sup:     ['finished','approved','rejected']
+};
+function render(){
+  if (!role){ buildRoleCards(); show('roleGate'); return; }
+  const all = migrate(load());
+  const by = k => all.filter(o => o.status === k).length;
+  const r = ROLES[role];
+  $('#roleChip').classList.remove('hidden');
+  $('#roleChip').textContent = r.ic + ' ' + r.t + ' • تغییر نقش';
+
+  const qq = $('#q').value.trim();
+  $('#qClear').classList.toggle('hidden', !qq);
+  const sw = $('#srcSel');
+  if (SRC[role]){
+    sw.classList.remove('hidden');
+    sw.innerHTML = SRC[role].map(x => `<option value="${x[0]}"${src===x[0]?' selected':''}>${esc(x[1])}</option>`).join('');
+    sw.value = src;
+  } else sw.classList.add('hidden');
+
+  const base = all.filter(o => VIS[role].includes(o.status) && srcPass(o)
+    && (role !== 'crew' || sameName(o.assignee, me()))
+    && (role !== 'sup'  || !o.supervisor || sameName(o.supervisor, me())));
+  const mine = base.filter(needsMe);
+  const FN = {
+    all:    () => true,
+    active: o => o.status !== 'approved',
+    done:   o => o.status === 'approved',
+    late:   o => isLate(o)
+  };
+  const counts = {}; FILT.forEach(f => counts[f.k] = base.filter(FN[f.k]).length);
+  $('#fchips').innerHTML = FILT.map(f =>
+    `<button type="button" class="chip${filt===f.k?' sel':''}" data-f="${f.k}">${esc(f.t)} ${fd(counts[f.k])}</button>`).join('');
+  let items = (inboxOnly ? mine : base).filter(FN[filt] || FN.all);
+  if (qq) items = items.filter(o => matches(o, qq));
+  items = items.slice().sort((a,b) =>
+    (isLate(b) - isLate(a)) || (PRIO[b.prio]||PRIO.normal).r - (PRIO[a.prio]||PRIO.normal).r ||
+    (b.createdAt || '').localeCompare(a.createdAt || ''));
+  $('#qInfo').textContent = qq ? 'نتیجه جست‌وجو: ' + fd(items.length) + ' مورد از ' + fd(base.length) : '';
+  $('#qInfo').classList.toggle('hidden', !qq);
+
+  const ib = $('#inboxBtn');
+  ib.classList.remove('hidden');
+  ib.classList.toggle('off', mine.length === 0);
+  ib.classList.toggle('on-filter', inboxOnly);
+  ib.innerHTML = `<span class="n">${fd(mine.length)}</span><span class="tx"><b>کارتابل من</b><i>${esc(INBOX_T[role])}</i></span>` +
+    `<span class="go">${inboxOnly ? '✖ نمایش همه' : 'فقط همین‌ها'}</span>`;
+
+  let stats, hint = '', empty = '';
+  if (role === 'manager'){
+    stats = [[all.length,'کل دستورها'], [by('proposed'),'منتظر تصمیم تو'], [by('approved'),'تأییدشده']];
+    hint = 'به‌طور پیش‌فرض فقط دستورهای خودت را می‌بینی. برای دیدن کارهای مستقل مدیر اجرایی، از کادر بالا انتخاب کن.';
+    empty = 'هنوز دستوری صادر نشده است.<br>با دکمه بالا اولین دستور عملیات را صادر کن.';
+  } else if (role === 'exec'){
+    stats = [[by('ordered'),'منتظر برنامه‌ریزی'], [by('planned')+by('running')+by('finished')+by('rejected'),'در جریان'], [by('approved'),'تأییدشده']];
+    hint = 'دستور شفاهی مدیر را با دکمه سبز ثبت کن، و کار ابتکاری خودت را با دکمه آبی. با کادر بالا می‌توانی فقط دستورهای مدیر اصلی را ببینی.';
+    empty = 'فعلاً کاری وجود ندارد.';
+  } else if (role === 'crew'){
+    stats = [[by('planned'),'ارجاع‌شده به اکیپ'], [by('running'),'در حال اجرا'], [by('rejected'),'برگشتی برای اصلاح']];
+    hint = 'فقط کارهای ارجاع‌شده به «' + esc(me()) + '» را می‌بینی. روی هر کارت دکمه آبی «شروع کار» یا «ادامه کار» را بزن.';
+    const others = all.filter(o => o.assignee && !sameName(o.assignee, me())).length;
+    empty = others
+      ? 'کاری به نام «' + esc(me()) + '» ارجاع نشده است.<br>' + fd(others) + ' کار به اکیپ‌های دیگر سپرده شده.<br><span style="font-size:11.5px">اگر مطمئنی کار مال توست، نام ورودت باید دقیقاً همان نامی باشد که مدیر اجرایی وارد کرده است. از «تغییر نقش ← ✏️ تغییر نام» اصلاحش کن.</span>'
+      : 'هنوز کاری به اکیپ ارجاع نشده است.';
+  } else {
+    stats = [[by('finished'),'منتظر تأیید تو'], [by('approved'),'تأییدشده'], [by('rejected'),'برگشتی']];
+    hint = 'کارهایی که ناظرشان تو هستی، به‌علاوه کارهای بدون ناظر تعیین‌شده. روند و عکس‌ها را ببین، بعد تأیید یا با ذکر دلیل برگشت بده.';
+    empty = 'فعلاً کاری برای تأیید وجود ندارد.';
+  }
+  $('#statWrap').innerHTML = stats.map(x => `<div class="stat"><b>${fd(x[0])}</b><span>${esc(x[1])}</span></div>`).join('');
+  const canAdd = role === 'manager' || role === 'exec';
+  $('#newOp').classList.toggle('hidden', !canAdd);
+  $('#newOp').textContent = role === 'exec' ? '➕ ثبت کار مستقل (بدون دستور مدیر)' : '➕ صدور دستور عملیات جدید';
+  $('#newOrder').classList.toggle('hidden', role !== 'exec');
+  if (role === 'exec') wizOrigin = 'exec';
+  $('#roleHint').textContent = hint;
+  $('#roleHint').classList.remove('hidden');
+  $('#list').innerHTML = items.length ? items.map(opCard).join('')
+    : `<div class="card empty">${qq ? 'چیزی با این جست‌وجو پیدا نشد.'
+        : (inboxOnly ? 'کارتابل تو خالی است. 👌'
+        : (filt !== 'all' ? 'در این فیلتر چیزی نیست. روی «همه» بزن.' : empty))}</div>`;
+}
+
+try { const sv = localStorage.getItem(ROLE_KEY); if (sv && ROLES[sv]) role = sv; } catch(e){}
+buildRegions(); paintDateBtn(); paintDue(); buildRoleCards();
+if (role){ render(); show('home'); } else { show('roleGate'); }
+console.log('Bazdid Ops ' + APP_VERSION);
+</script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a46ac3060b594c4d',t:'MTc5MTM1MzYyNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
