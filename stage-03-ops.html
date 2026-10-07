@@ -214,6 +214,21 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
   border:1.5px solid #93c5fd;background:#f5f9ff;color:#1e3a8a;margin-top:8px;transition:box-shadow 1s ease-in-out}
 .demoflash.breathe{box-shadow:0 0 0 8px rgba(37,99,235,.28)}
 
+.sigpad{display:block;width:100%;height:180px;border:2px dashed #94a3b8;border-radius:12px;background:#fff;touch-action:none}
+.sigslot{display:flex;align-items:center;gap:10px;border:1.5px dashed #cbd5e1;border-radius:12px;padding:10px;background:#f8fafc;margin-top:6px}
+.sigslot img{height:54px;background:#fff;border:1px solid var(--line);border-radius:8px}
+.sigslot .ph{color:var(--muted);font-size:12px;flex:1}
+.sigbox{border:1px solid #d9e2ec;border-radius:12px;padding:10px 12px;margin-top:8px;background:#fcfdff}
+.sigbox h5{margin:0 0 7px;font-size:12.5px;color:var(--p)}
+.sigrow{display:flex;gap:10px;align-items:center;padding:6px 0;border-top:1px dashed #e8eef6}
+.sigrow:first-of-type{border-top:0}
+.sigrow img{height:46px;background:#fff;border:1px solid var(--line);border-radius:8px}
+.sigrow .m{flex:1;font-size:11.5px;line-height:1.9}
+.sigrow .m b{display:block;font-size:12.5px}
+.sigdead{filter:grayscale(1);opacity:.45}
+.verbadge{background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;border-radius:999px;padding:3px 9px;font-size:10.5px;font-weight:800}
+.vernote{background:#fff7ed;border:1px dashed #fdba74;color:#7c2d12;border-radius:11px;padding:8px 10px;font-size:11.5px;line-height:1.9;margin-top:8px}
+
 /* ---------- تقویم شمسی ---------- */
 .datebtn{width:100%;text-align:right;padding:15px;border:1.5px solid var(--line);border-radius:14px;background:#fbfdff;font:inherit;display:flex;justify-content:space-between;align-items:center;gap:8px;transition:transform .08s}
 .datebtn:active{transform:scale(.99)}
@@ -260,15 +275,15 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
   <header class="head">
     <div>
       <h1>🏗️ ثبت عملیات</h1>
-      <small>نسخه آزمایشی • v3.3.8-CALM2</small>
+      <small>نسخه آزمایشی • v3.4.0-SIGN</small>
       <button type="button" id="roleChip" class="rolechip hidden"></button>
     </div>
     <button class="btn ghost" id="homeBtn">خانه</button>
   </header>
 
   <div class="note">
-    <b>فایل آزمایشی مرحله ۳.۳</b><br>
-    چرخه چهارنقشی با شواهد قفل‌دار: مدیر اصلی دستور می‌دهد ← مدیر اجرایی برنامه‌ریزی می‌کند یا پیشنهاد اصلاح می‌دهد ← اکیپ با عکس و موقعیت اجرا را ثبت می‌کند ← ناظر تأیید می‌کند. داده‌ها فقط در حافظه همین مرورگر ذخیره می‌شود و هیچ ارتباطی با سامانه اصلی، سرور و داده‌های واقعی ندارد.
+    <b>فایل آزمایشی مرحله ۳.۴</b><br>
+    چرخه چهارنقشی با شواهد قفل‌دار: مدیر اصلی دستور می‌دهد ← مدیر اجرایی برنامه‌ریزی می‌کند یا پیشنهاد اصلاح می‌دهد ← اکیپ با عکس و موقعیت اجرا را ثبت و امضا می‌کند ← ناظر بازدید و امضا می‌کند. هر اصلاح پس از امضا، نسخه جدید می‌سازد و امضای دوباره می‌خواهد. داده‌ها فقط در حافظه همین مرورگر ذخیره می‌شود و هیچ ارتباطی با سامانه اصلی، سرور و داده‌های واقعی ندارد.
   </div>
 
   <section id="roleGate" class="hidden">
@@ -443,6 +458,25 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
   </section>
 
 </div>
+<div class="ovl hidden" id="sigOvl">
+  <div class="cal">
+    <div class="cal-head">
+      <span style="flex:1;font-size:15px;font-weight:700">✍️ امضای شما</span>
+      <button type="button" id="sigClose">✕</button>
+    </div>
+    <div style="padding:13px">
+      <p class="muted" id="sigWho" style="margin:0 0 8px"></p>
+      <canvas id="sigPad" class="sigpad"></canvas>
+      <p class="muted">با انگشت داخل کادر سفید امضا کن. امضا با نام، تاریخ و شماره نسخه ذخیره می‌شود.</p>
+      <p class="err" id="sigErr"></p>
+      <div class="row" style="margin-top:8px">
+        <button class="btn ghost" id="sigClear">🧹 پاک کن</button>
+        <button class="btn primary" id="sigOk">✅ ثبت امضا</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="ovl hidden" id="nameOvl">
   <div class="cal">
     <div class="cal-head">
@@ -484,7 +518,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 <div class="msg" id="msg"></div>
 
 <script>
-const APP_VERSION = 'v3.3.8-CALM2';
+const APP_VERSION = 'v3.4.0-SIGN';
 const KEY = 'ops31_local_v1';
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
@@ -815,6 +849,60 @@ async function addPhotos(e){
 }
 $('#camInput').addEventListener('change', addPhotos);
 let actPhotos = [], actGeo = null, actGeoReq = false, actSrc = 'camera';
+let actSign = null, sigNeed = false, sigCtx = null, sigDrawn = false, sigLast = null;
+function serr(t){ const e = $('#sigErr'); e.textContent = t || ''; e.classList.toggle('show', !!t); }
+function sigPos(e){
+  const c = $('#sigPad'), r = c.getBoundingClientRect ? c.getBoundingClientRect() : {left:0,top:0,width:1,height:1};
+  const t = (e.touches && e.touches[0]) || e;
+  return { x: (t.clientX - r.left) * (c.width / (r.width || 1)), y: (t.clientY - r.top) * (c.height / (r.height || 1)) };
+}
+function openSig(){
+  const c = $('#sigPad');
+  if (!c || !c.getContext){ toast('مرورگر از امضا پشتیبانی نمی‌کند'); return; }
+  const w = Math.min(460, (window.innerWidth || 360) - 76);
+  c.width = Math.round(w * 2); c.height = 360;
+  c.style.width = w + 'px'; c.style.height = '180px';
+  sigCtx = c.getContext('2d');
+  sigCtx.fillStyle = '#ffffff'; sigCtx.fillRect(0, 0, c.width, c.height);
+  sigCtx.strokeStyle = '#0f172a'; sigCtx.lineWidth = 5; sigCtx.lineCap = 'round'; sigCtx.lineJoin = 'round';
+  sigDrawn = false; sigLast = null; serr('');
+  $('#sigWho').textContent = 'امضاکننده: ' + me() + ' • ' + nowFa();
+  $('#sigOvl').classList.remove('hidden');
+}
+function closeSig(){ $('#sigOvl').classList.add('hidden'); }
+function sigStart(e){ if (!sigCtx) return; e.preventDefault && e.preventDefault(); sigLast = sigPos(e); sigDrawn = true; serr(''); }
+function sigMove(e){
+  if (!sigCtx || !sigLast) return;
+  e.preventDefault && e.preventDefault();
+  const p = sigPos(e);
+  sigCtx.beginPath(); sigCtx.moveTo(sigLast.x, sigLast.y); sigCtx.lineTo(p.x, p.y); sigCtx.stroke();
+  sigLast = p;
+}
+function sigEnd(){ sigLast = null; }
+['#sigPad'].forEach(() => {
+  const c = $('#sigPad'); if (!c || !c.addEventListener) return;
+  c.addEventListener('touchstart', sigStart); c.addEventListener('touchmove', sigMove); c.addEventListener('touchend', sigEnd);
+  c.addEventListener('mousedown', sigStart);  c.addEventListener('mousemove', sigMove);  c.addEventListener('mouseup', sigEnd);
+  c.addEventListener('mouseleave', sigEnd);
+});
+$('#sigClear').addEventListener('click', () => { if (sigCtx){ const c = $('#sigPad'); sigCtx.fillStyle = '#ffffff'; sigCtx.fillRect(0,0,c.width,c.height); sigCtx.strokeStyle = '#0f172a'; } sigDrawn = false; sigLast = null; serr(''); });
+$('#sigClose').addEventListener('click', closeSig);
+$('#sigOvl').addEventListener('click', e => { if (e.target.id === 'sigOvl') closeSig(); });
+$('#sigOk').addEventListener('click', () => {
+  if (!sigDrawn) return serr('⛔ هنوز امضا نکرده‌ای. داخل کادر سفید با انگشت امضا کن.');
+  const c = $('#sigPad');
+  try { actSign = c.toDataURL('image/jpeg', 0.85); } catch(e){ return serr('⛔ ثبت امضا ناموفق بود.'); }
+  closeSig(); paintActSign(); aerr(''); toast('امضا ثبت شد');
+});
+function paintActSign(){
+  const b = $('#aSigBox'); if (!b) return;
+  b.innerHTML = actSign
+    ? `<img src="${actSign}" alt="امضا"><span class="ph">امضاشده توسط <b>${esc(me())}</b></span>`
+    : '<span class="ph">هنوز امضا نشده است</span>';
+}
+const SIGBLOCK = `<span class="lb" style="display:block;margin:14px 0 5px">امضای شما <span class="req">*</span></span>
+  <div class="sigslot" id="aSigBox"><span class="ph">هنوز امضا نشده است</span></div>
+  <button type="button" class="btn block" id="aSigBtn">✍️ امضا کردن</button>`;
 function paintActPhotos(){
   const b = $('#aPhotoBox'); if (!b) return;
   b.innerHTML = actPhotos.map((p,i) => `<div class="ph"><img src="${pdata(p)}" alt="عکس"><button type="button" data-ap="${i}">×</button></div>`).join('');
@@ -1065,6 +1153,12 @@ function aerr(t){
 }
 function addLog(o, r, text, sc){ o.log = o.log || []; o.log.push({ fa: nowFa(), role: r, text, sc: sc || 'work' }); }
 const num = d => d ? d.y*10000 + d.m*100 + d.d : 0;
+const verOf = o => o.ver || 1;
+function signValid(o, k){ const g = (o.sign || {})[k]; return !!g && (g.ver || 1) === verOf(o); }
+function putSign(o, k){
+  o.sign = o.sign || {};
+  o.sign[k] = { img: actSign, by: me(), fa: nowFa(), ver: verOf(o) };
+}
 
 function migrate(all){
   let ch = false;
@@ -1074,6 +1168,7 @@ function migrate(all){
     if (!o.prio){ o.prio = 'normal'; ch = true; }
     if (o.amend && !o.decision){ o.decision = { ok:true, prop:o.amend.text, note:'', fa:o.amend.fa||'' }; delete o.amend; ch = true; }
     if (!o.origin){ o.origin = 'manager'; ch = true; }
+    if (!o.ver){ o.ver = 1; ch = true; }
     if (!o.log){ o.log = [{ fa: o.createdFa || '', role: 'manager', text: 'دستور عملیات صادر و ابلاغ شد' }]; ch = true; }
   });
   if (ch) save(all);
@@ -1285,39 +1380,47 @@ const ACTS = {
     t: '✅ تأیید نهایی کار', btn: '✅ تأیید می‌کنم',
     body: o => `<div class="abox"><b>مقدار ثبت‌شده اکیپ:</b> ${esc(fd(o.q1 || '—'))} ${esc(o.u1 || '')}${o.q2 ? ' — ' + esc(fd(o.q2)) + ' ' + esc(o.u2) : ''}</div>
       ${(o.phases && o.phases.end && o.phases.end.note) ? `<p class="muted">گزارش پایان کار اکیپ: ${esc(o.phases.end.note)}</p>` : ''}
-      ${TA('aNote','یادداشت ناظر (اختیاری)','کیفیت کار، نکات تحویل')}`,
+      ${TA('aNote','یادداشت ناظر (اختیاری)','کیفیت کار، نکات تحویل')}${SIGBLOCK}`,
     fill: () => {},
-    check: () => '',
+    check: () => actSign ? '' : 'تأیید نهایی بدون امضای ناظر ممکن نیست. دکمه «✍️ امضا کردن» را بزن.',
     apply: o => {
       o.reviewNote = $('#aNote').value.trim(); o.reviewFa = nowFa(); o.reviewBy = me(); o.status = 'approved'; o.rejectReason = '';
-      addLog(o,'sup','کار توسط ' + me() + ' بازدید و تأیید نهایی شد' + (o.reviewNote ? ' — ' + o.reviewNote : ''));
+      putSign(o, 'sup');
+      addLog(o,'sup','کار توسط ' + me() + ' بازدید، تأیید و امضا شد — نسخه ' + fd(verOf(o)) + '؛' + (o.reviewNote ? ' — ' + o.reviewNote : ''));
       return 'کار تأیید شد';
     }
   },
   reject: {
     t: '↩️ برگشت کار برای اصلاح', btn: '↩️ برگشت به اکیپ',
     body: () => `<p class="muted" style="margin:0 0 10px">دلیل برگشت باید روشن باشد تا اکیپ بداند دقیقاً چه چیزی را اصلاح کند.</p>
-      ${TA('aText','دلیل برگشت','مثلاً: ضخامت آسفالت کمتر از حد مجاز است و لبه‌ها تراز نیست.',1)}${PHOTOBLOCK}`,
+      ${TA('aText','دلیل برگشت','مثلاً: ضخامت آسفالت کمتر از حد مجاز است و لبه‌ها تراز نیست.',1)}${PHOTOBLOCK}${SIGBLOCK}`,
     fill: () => { actPhotos = []; paintActPhotos(); },
-    check: () => $('#aText').value.trim().length < 5 ? 'aText|نوشتن دلیل برگشت اجباری است.' : '',
+    check: () => $('#aText').value.trim().length < 5 ? 'aText|نوشتن دلیل برگشت اجباری است.'
+      : (!actSign ? 'برگشت دادن کار بدون امضای ناظر ممکن نیست.' : ''),
     apply: o => {
       o.rejectReason = $('#aText').value.trim(); o.rejectPhotos = actPhotos.slice();
       o.status = 'rejected'; o.reviewFa = nowFa(); o.reviewBy = me();
-      addLog(o,'sup','کار توسط ' + me() + ' برگشت داده شد — ' + o.rejectReason);
+      putSign(o, 'supReject');
+      addLog(o,'sup','کار توسط ' + me() + ' برگشت داده و امضا شد — ' + o.rejectReason);
       return 'کار برای اصلاح به اکیپ برگشت';
     }
   },
   fixdone: {
     t: '🔧 ثبت اصلاح انجام‌شده', btn: '🏁 ارسال دوباره به ناظر',
     body: o => `<div class="rbox"><b>دلیل برگشت ناظر:</b><br>${esc(o.rejectReason || '—')}</div>
-      ${TA('aText','شرح اصلاح انجام‌شده','چه کاری برای رفع ایراد انجام شد؟',1)}${PHOTOBLOCK}`,
+      ${TA('aText','شرح اصلاح انجام‌شده','چه کاری برای رفع ایراد انجام شد؟',1)}${PHOTOBLOCK}
+      <div class="vernote">با ثبت اصلاح، <b>نسخه ${fd(verOf(o) + 1)}</b> ساخته می‌شود و امضاهای نسخه قبلی باطل می‌شوند. برای تحویل دوباره باید امضا کنی و ناظر هم دوباره امضا خواهد کرد.</div>${SIGBLOCK}`,
     fill: () => { actPhotos = []; paintActPhotos(); },
-    check: () => $('#aText').value.trim().length < 3 ? 'aText|شرح اصلاح اجباری است.' : '',
+    check: () => $('#aText').value.trim().length < 3 ? 'aText|شرح اصلاح اجباری است.'
+      : (!actSign ? 'تحویل دوباره بدون امضا ممکن نیست. دکمه «✍️ امضا کردن» را بزن.' : ''),
     apply: o => {
+      o.ver = verOf(o) + 1;
       o.fixes = o.fixes || [];
-      o.fixes.push({ fa: nowFa(), text: $('#aText').value.trim(), photos: actPhotos.slice(), by: me() });
+      o.fixes.push({ fa: nowFa(), text: $('#aText').value.trim(), photos: actPhotos.slice(), by: me(), ver: o.ver });
       o.status = 'finished'; o.finishedFa = nowFa();
-      addLog(o,'crew','اصلاح توسط ' + me() + ' انجام شد — ' + $('#aText').value.trim());
+      putSign(o, 'crew');
+      addLog(o,'crew','نسخه ' + fd(o.ver) + ' ساخته شد؛ امضاهای نسخه قبل باطل شد','work');
+      addLog(o,'crew','اصلاح توسط ' + me() + ' انجام و امضا شد — ' + $('#aText').value.trim());
       return 'دوباره برای تأیید ناظر ارسال شد';
     }
   }
@@ -1354,7 +1457,7 @@ PH.forEach((p, i) => {
         <div class="qrow"><input id="aQ1" type="number" inputmode="decimal" min="0" step="any" placeholder="مثلاً ۱۲٫۵"><span class="unit">${esc(o.u1 || '—')}</span></div></label>` +
         (o.u2 ? `<label class="field"><span class="lb">مقدار بر حسب ${esc(o.u2)} (اختیاری)</span>
         <div class="qrow"><input id="aQ2" type="number" inputmode="decimal" min="0" step="any" placeholder="اختیاری"><span class="unit">${esc(o.u2)}</span></div></label>` : '') : '') +
-      photoBlock(p.req),
+      photoBlock(p.req) + (last ? SIGBLOCK : ''),
     fill: o => {
       const cur = (o.phases || {})[p.k];
       $('#aText').value = cur ? cur.note : '';
@@ -1372,6 +1475,7 @@ PH.forEach((p, i) => {
         const v = $('#aQ1').value.trim();
         if (!v) return 'aQ1|ثبت مقدار واقعی اجراشده اجباری است.';
         if (!(parseFloat(v) > 0)) return 'aQ1|مقدار باید عددی بزرگ‌تر از صفر باشد.';
+        if (!actSign) return 'تحویل کار بدون امضا ممکن نیست. دکمه «✍️ امضا کردن» را بزن.';
       }
       return '';
     },
@@ -1382,6 +1486,8 @@ PH.forEach((p, i) => {
       if (last){
         o.q1 = $('#aQ1').value.trim(); o.q2 = $('#aQ2') ? $('#aQ2').value.trim() : '';
         o.status = 'finished'; o.finishedFa = nowFa();
+        putSign(o, 'crew');
+        addLog(o,'crew','امضای تحویل اکیپ توسط ' + me() + ' ثبت شد — نسخه ' + fd(verOf(o)));
       }
       addLog(o,'crew','مرحله «' + p.n + '» توسط ' + me() + ' ثبت شد' + (last ? ' — مقدار واقعی: ' + fd(o.q1) + ' ' + o.u1 : ''));
       return last ? 'کار برای تأیید ناظر ارسال شد' : 'مرحله «' + p.n + '» ثبت شد';
@@ -1399,10 +1505,11 @@ function openAct(kind, code){
     ['اولویت', PRIO[o.prio] ? PRIO[o.prio].t : '—'],
     ['منطقه', o.region], ['آدرس', o.address], ['شرح', o.descr]
   ].map(r => `<div><i>${esc(r[0])}</i><b>${esc(r[1])}</b></div>`).join('');
-  actPhotos = []; actGeo = null; actGeoReq = false;
+  actPhotos = []; actGeo = null; actGeoReq = false; actSign = null; sigNeed = false;
   $('#actBody').innerHTML = A.body(o);
   A.fill(o);
   if ($('#aDateBtn')) fillDate('#aDateBtn','#aDateTxt','#aDateSub', actDraft.date);
+  paintActSign();
   $('#actSave').textContent = A.btn;
   aerr(''); show('act');
 }
@@ -1414,6 +1521,7 @@ $('#actBody').addEventListener('click', e => {
   if (spb){ $('#aSup').value = spb.dataset.sp; aerr(''); return; }
   if (e.target.closest('#aCamBtn')){ actSrc = 'camera'; return $('#aCamInput').click(); }
   if (e.target.closest('#aGalBtn')){ actSrc = 'gallery'; return $('#aGalInput').click(); }
+  if (e.target.closest('#aSigBtn')) return openSig();
   if (e.target.closest('#aGeoBtn')){
     const btn = $('#aGeoBtn'); btn.disabled = true; btn.textContent = '⏳ در حال دریافت موقعیت…';
     getGeo().then(g => { actGeo = g; paintActGeo(); aerr(''); toast('موقعیت ثبت شد'); })
@@ -1514,6 +1622,7 @@ function badges(o){
     ${o.due ? `<span class="prio prio-normal">مهلت ${esc(jFmt(o.due.y,o.due.m,o.due.d))}</span>` : ''}
     ${(isLate(o) && !(blinkOf(o) && blinkOf(o).c === 'r')) ? '<span class="late">⏰ تأخیر</span>' : ''}
     ${o.origin === 'exec' ? '<span class="srcbadge">کار مستقل مدیر اجرایی</span>' : ''}
+    ${verOf(o) > 1 ? '<span class="verbadge">نسخه ' + fd(verOf(o)) + '</span>' : ''}
     ${needsMe(o) ? '<span class="late" style="background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe">منتظر اقدام تو</span>' : ''}</div>`;
 }
 function head(o){
@@ -1532,6 +1641,19 @@ function histBlock(o){
   if (!lg.length) return '';
   return `<details class="log"><summary>تاریخچه (${fd(lg.length)} رویداد)</summary><ul>` +
     lg.map(l => `<li>${esc(l.text)}<br><span style="font-size:10.5px">${esc(l.fa)}</span></li>`).join('') + '</ul></details>';
+}
+function signBlock(o){
+  const g = o.sign || {};
+  const rows = [['crew','✍️ امضای تحویل اکیپ'], ['sup','✅ امضای تأیید ناظر'], ['supReject','↩️ امضای برگشت ناظر']]
+    .filter(x => g[x[0]]);
+  if (!rows.length) return '';
+  return `<div class="sigbox"><h5>امضاها — نسخه فعلی ${fd(verOf(o))}</h5>` + rows.map(x => {
+    const sg = g[x[0]], dead = (sg.ver || 1) !== verOf(o);
+    return `<div class="sigrow"><img class="${dead ? 'sigdead' : ''}" src="${sg.img}" alt="امضا">
+      <span class="m"><b>${esc(x[1])}</b>${esc(sg.by || '')} • ${esc(sg.fa || '')}<br>` +
+      (dead ? `<span style="color:#b91c1c;font-weight:800">⚠️ باطل — مربوط به نسخه ${fd(sg.ver || 1)}</span>`
+            : `<span style="color:#15803d;font-weight:800">معتبر</span>`) + `</span></div>`;
+  }).join('') + '</div>';
 }
 function fixBlock(o){
   if (!o.fixes || !o.fixes.length) return '';
@@ -1566,7 +1688,7 @@ function opCard(o){
       <details class="more"><summary>جزئیات کامل</summary>
         <p>📅 ${esc(jFmt(o.jy,o.jm,o.jd))} • 📍 ${esc(o.address)}</p>
         <p>📝 ${esc(o.descr)}</p>
-        ${qty}${asg}${o.status !== 'proposed' ? prop : ''}${dec}${rej}
+        ${qty}${asg}${o.status !== 'proposed' ? prop : ''}${dec}${rej}${signBlock(o)}
         <div class="meta">ثبت: ${esc(o.createdFa || '')}${o.orderBy ? ' — ' + esc(o.orderBy) : ''}${o.finishedFa ? ' • پایان: ' + esc(o.finishedFa) : ''}</div>
         ${histBlock(o)}
       </details>
@@ -1577,7 +1699,7 @@ function opCard(o){
     ${head(o)}${badges(o)}${flowBar(o.status)}
     <p>📅 ${esc(jFmt(o.jy,o.jm,o.jd))} • 📍 ${esc(o.region)} — ${esc(o.address)}</p>
     <p>📝 ${esc(o.descr)}</p>
-    ${qty}${asg}${prop}${dec}${rej}${fixBlock(o)}
+    ${qty}${asg}${prop}${dec}${rej}${fixBlock(o)}${signBlock(o)}
     ${(o.status === 'approved' && role !== 'crew') ? `<div class="okline">✅ تأیید نهایی توسط <b>${esc(o.reviewBy || 'ناظر — نام ثبت نشده')}</b>${o.reviewFa ? ' • ' + esc(o.reviewFa) : ''}${o.reviewNote ? '<br>' + esc(o.reviewNote) : ''}</div>` : ''}
     ${(o.status === 'approved' && role === 'crew') ? `<div class="okline">✅ این کار تأیید نهایی شد${o.reviewFa ? ' • ' + esc(o.reviewFa) : ''}</div>` : ''}
     ${(o.photos && o.photos.length) ? `<div class="photos">${o.photos.map(x => `<div class="ph"><img src="${pdata(x)}" alt="عکس"></div>`).join('')}</div>` : ''}
@@ -1684,5 +1806,5 @@ buildRegions(); paintDateBtn(); paintDue(); buildRoleCards();
 if (role){ render(); show('home'); } else { show('roleGate'); }
 console.log('Bazdid Ops ' + APP_VERSION);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a46cd2867eaa66a3',t:'MTc5MTM3NTIzMw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a46fe5867ca39d31',t:'MTc5MTQwNzQ2OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
