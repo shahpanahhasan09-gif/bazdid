@@ -190,6 +190,21 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 .nm button{border:1.5px solid var(--line);background:#fff;border-radius:18px;padding:6px 11px;font:700 12px Tahoma;color:#334155}
 .nm button:active{background:#eff6ff}
 
+@keyframes pulseRed { 0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.40)} 50%{box-shadow:0 0 0 7px rgba(220,38,38,0)} }
+@keyframes pulseBlue{ 0%,100%{box-shadow:0 0 0 0 rgba(37,99,235,.38)} 50%{box-shadow:0 0 0 7px rgba(37,99,235,0)} }
+@keyframes dotFade { 0%,100%{opacity:1} 50%{opacity:.15} }
+.op.bk-red {animation:pulseRed 1.9s ease-in-out infinite;border-color:#fca5a5}
+.op.bk-blue{animation:pulseBlue 1.9s ease-in-out infinite;border-color:#93c5fd}
+.bkbadge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:3px 10px;font-size:10.5px;font-weight:800}
+.bkbadge.r{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
+.bkbadge.b{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+.bkbadge i{width:7px;height:7px;border-radius:50%;display:inline-block;animation:dotFade 1.2s ease-in-out infinite}
+.bkbadge.r i{background:#dc2626}
+.bkbadge.b i{background:#2563eb}
+@media (prefers-reduced-motion: reduce){
+  .op.bk-red,.op.bk-blue,.bkbadge i{animation:none}
+}
+
 /* ---------- تقویم شمسی ---------- */
 .datebtn{width:100%;text-align:right;padding:15px;border:1.5px solid var(--line);border-radius:14px;background:#fbfdff;font:inherit;display:flex;justify-content:space-between;align-items:center;gap:8px;transition:transform .08s}
 .datebtn:active{transform:scale(.99)}
@@ -236,7 +251,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
   <header class="head">
     <div>
       <h1>🏗️ ثبت عملیات</h1>
-      <small>نسخه آزمایشی • v3.3.3-ASSIGN</small>
+      <small>نسخه آزمایشی • v3.3.4-PULSE</small>
       <button type="button" id="roleChip" class="rolechip hidden"></button>
     </div>
     <button class="btn ghost" id="homeBtn">خانه</button>
@@ -457,7 +472,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 <div class="msg" id="msg"></div>
 
 <script>
-const APP_VERSION = 'v3.3.3-ASSIGN';
+const APP_VERSION = 'v3.3.4-PULSE';
 const KEY = 'ops31_local_v1';
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
@@ -1034,6 +1049,24 @@ function isLate(o){
   return false;
 }
 function needsMe(o){ return (INBOX[role] || []).includes(o.status); }
+const PRE_RUN = ['ordered','proposed','planned','rejected'];
+function seenBy(o, r){ return !!(o.seen && o.seen[r] === o.status); }
+/* چشمک: {c:'r'|'b', t:'متن', ack:true اگر با دکمه «دیدم» خاموش شود} */
+function blinkOf(o){
+  if (isLate(o) && PRE_RUN.includes(o.status)) return {c:'r', t:'تأخیر — هنوز شروع نشده'};
+  if (role === 'crew'    && o.status === 'planned')  return {c:'b', t:'کار تازه ارجاع شد'};
+  if (role === 'sup'     && o.status === 'finished') return {c:'b', t:'منتظر بازدید تو'};
+  if (role === 'manager' && o.status === 'proposed') return {c:'b', t:'پیشنهاد منتظر تصمیم تو'};
+  if ((role === 'exec' || role === 'manager') && o.status === 'approved' && !seenBy(o, role))
+    return {c:'b', t:'تازه تأیید شد', ack:true};
+  return null;
+}
+function markSeen(code){
+  const all = load(), o = all.find(x => x.code === code); if (!o) return;
+  o.seen = o.seen || {}; o.seen[role] = o.status;
+  if (!save(all)) return;
+  render();
+}
 
 /* ---------- انتخاب نقش ---------- */
 function buildRoleCards(){
@@ -1341,6 +1374,8 @@ $('#actSave').addEventListener('click', () => {
   toast(msg); render(); show('home');
 });
 $('#list').addEventListener('click', e => {
+  const ak = e.target.closest('[data-ack]');
+  if (ak){ markSeen(ak.dataset.ack); return toast('علامت‌گذاری شد'); }
   const b = e.target.closest('[data-act]'); if (!b) return;
   openAct(b.dataset.act, b.dataset.code);
 });
@@ -1366,6 +1401,8 @@ function actionsFor(o){
     else if (o.status === 'rejected') a.push(B('fixdone','🔧 اصلاح شد','primary'));
   }
   if (role === 'sup'   && o.status === 'finished'){ a.push(B('approve','✅ تأیید نهایی','ok')); a.push(B('reject','↩️ برگشت','danger')); }
+  const bk = blinkOf(o);
+  if (bk && bk.ack) a.push(`<button class="btn ghost" data-ack="${esc(o.code)}">✔ دیدم</button>`);
   return a.length ? `<div class="actions">${a.join('')}</div>` : '';
 }
 function phasesBlock(o){
@@ -1409,10 +1446,10 @@ function beforeAfter(o){
     ${a ? `<figure><img src="${a}" alt="بعد"><figcaption>بعد</figcaption></figure>` : ''}</div>`;
 }
 function badges(o){
-  const pr = PRIO[o.prio] || PRIO.normal;
-  return `<div class="badges"><span class="prio ${pr.c}">${esc(pr.t)}</span>
+  const pr = PRIO[o.prio] || PRIO.normal, bk = blinkOf(o);
+  return `<div class="badges">${bk ? `<span class="bkbadge ${bk.c}"><i></i>${esc(bk.t)}</span>` : ''}<span class="prio ${pr.c}">${esc(pr.t)}</span>
     ${o.due ? `<span class="prio prio-normal">مهلت ${esc(jFmt(o.due.y,o.due.m,o.due.d))}</span>` : ''}
-    ${isLate(o) ? '<span class="late">⏰ تأخیر</span>' : ''}
+    ${(isLate(o) && !(blinkOf(o) && blinkOf(o).c === 'r')) ? '<span class="late">⏰ تأخیر</span>' : ''}
     ${o.origin === 'exec' ? '<span class="srcbadge">کار مستقل مدیر اجرایی</span>' : ''}
     ${needsMe(o) ? '<span class="late" style="background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe">منتظر اقدام تو</span>' : ''}</div>`;
 }
@@ -1455,7 +1492,8 @@ function opCard(o){
     const brief = (o.descr || '').length > 90 ? o.descr.slice(0,90) + '…' : (o.descr || '');
     const okl = (o.status === 'approved')
       ? `<div class="okline">✅ تأیید نهایی توسط <b>${esc(o.reviewBy || 'ناظر — نام ثبت نشده')}</b>${o.reviewFa ? ' • ' + esc(o.reviewFa) : ''}${o.reviewNote ? '<br>' + esc(o.reviewNote) : ''}</div>` : '';
-    return `<div class="op${late ? ' islate' : ''}">
+    const bk = blinkOf(o);
+    return `<div class="op${late ? ' islate' : ''}${bk ? ' bk-' + (bk.c === 'r' ? 'red' : 'blue') : ''}">
       ${head(o)}${badges(o)}${flowBar(o.status)}
       <p>📍 ${esc(o.region)} — 📝 ${esc(brief)}</p>
       ${beforeAfter(o)}
@@ -1471,7 +1509,8 @@ function opCard(o){
       </details>
     </div>`;
   }
-  return `<div class="op${late ? ' islate' : ''}">
+  const bk2 = blinkOf(o);
+  return `<div class="op${late ? ' islate' : ''}${bk2 ? ' bk-' + (bk2.c === 'r' ? 'red' : 'blue') : ''}">
     ${head(o)}${badges(o)}${flowBar(o.status)}
     <p>📅 ${esc(jFmt(o.jy,o.jm,o.jd))} • 📍 ${esc(o.region)} — ${esc(o.address)}</p>
     <p>📝 ${esc(o.descr)}</p>
@@ -1541,22 +1580,22 @@ function render(){
   let stats, hint = '', empty = '';
   if (role === 'manager'){
     stats = [[all.length,'کل دستورها'], [by('proposed'),'منتظر تصمیم تو'], [by('approved'),'تأییدشده']];
-    hint = 'به‌طور پیش‌فرض فقط دستورهای خودت را می‌بینی. برای دیدن کارهای مستقل مدیر اجرایی، از کادر بالا انتخاب کن.';
+    hint = 'پیش‌فرض: فقط دستورهای خودت. کارهای مستقل مدیر اجرایی از کادر بالا.';
     empty = 'هنوز دستوری صادر نشده است.<br>با دکمه بالا اولین دستور عملیات را صادر کن.';
   } else if (role === 'exec'){
     stats = [[by('ordered'),'منتظر برنامه‌ریزی'], [by('planned')+by('running')+by('finished')+by('rejected'),'در جریان'], [by('approved'),'تأییدشده']];
-    hint = 'دستور شفاهی مدیر را با دکمه سبز ثبت کن، و کار ابتکاری خودت را با دکمه آبی. با کادر بالا می‌توانی فقط دستورهای مدیر اصلی را ببینی.';
+    hint = 'دکمه سبز: دستور شفاهی مدیر • دکمه آبی: کار ابتکاری خودت.';
     empty = 'فعلاً کاری وجود ندارد.';
   } else if (role === 'crew'){
     stats = [[by('planned'),'ارجاع‌شده به اکیپ'], [by('running'),'در حال اجرا'], [by('rejected'),'برگشتی برای اصلاح']];
-    hint = 'فقط کارهای ارجاع‌شده به «' + esc(me()) + '» را می‌بینی. روی هر کارت دکمه آبی «شروع کار» یا «ادامه کار» را بزن.';
+    hint = 'کارهای «' + esc(me()) + '». روی هر کارت دکمه آبی را بزن.';
     const others = all.filter(o => o.assignee && !sameName(o.assignee, me())).length;
     empty = others
       ? 'کاری به نام «' + esc(me()) + '» ارجاع نشده است.<br>' + fd(others) + ' کار به اکیپ‌های دیگر سپرده شده.<br><span style="font-size:11.5px">اگر مطمئنی کار مال توست، نام ورودت باید دقیقاً همان نامی باشد که مدیر اجرایی وارد کرده است. از «تغییر نقش ← ✏️ تغییر نام» اصلاحش کن.</span>'
       : 'هنوز کاری به اکیپ ارجاع نشده است.';
   } else {
     stats = [[by('finished'),'منتظر تأیید تو'], [by('approved'),'تأییدشده'], [by('rejected'),'برگشتی']];
-    hint = 'کارهایی که ناظرشان تو هستی، به‌علاوه کارهای بدون ناظر تعیین‌شده. روند و عکس‌ها را ببین، بعد تأیید یا با ذکر دلیل برگشت بده.';
+    hint = 'کارهای تو و کارهای بدون ناظر. روند و عکس‌ها را ببین، بعد تأیید یا برگشت.';
     empty = 'فعلاً کاری برای تأیید وجود ندارد.';
   }
   $('#statWrap').innerHTML = stats.map(x => `<div class="stat"><b>${fd(x[0])}</b><span>${esc(x[1])}</span></div>`).join('');
@@ -1578,5 +1617,5 @@ buildRegions(); paintDateBtn(); paintDue(); buildRoleCards();
 if (role){ render(); show('home'); } else { show('roleGate'); }
 console.log('Bazdid Ops ' + APP_VERSION);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a46ac3060b594c4d',t:'MTc5MTM1MzYyNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a46b3ccbef45aba7',t:'MTc5MTM1ODYxNA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
