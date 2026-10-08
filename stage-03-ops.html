@@ -128,6 +128,7 @@ details.log ul{margin:7px 0 0;padding-right:17px;font-size:11.5px;color:var(--mu
 .st-fin{background:#fdf4ff;color:#a21caf;border:1px solid #f5d0fe}
 .st-okk{background:#ecfdf5;color:#047857;border:1px solid #a7f3d0}
 .st-rej{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
+.st-na{background:#fdf2f8;color:#9d174d;border:1px solid #fbcfe8}
 .late{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;border-radius:999px;padding:3px 9px;font-size:10.5px;font-weight:800}
 .op.islate{border-color:#fca5a5;box-shadow:0 0 0 3px #fee2e2}
 .prio{border-radius:999px;padding:3px 9px;font-size:10.5px;font-weight:800;white-space:nowrap}
@@ -229,6 +230,31 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 .verbadge{background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;border-radius:999px;padding:3px 9px;font-size:10.5px;font-weight:800}
 .vernote{background:#fff7ed;border:1px dashed #fdba74;color:#7c2d12;border-radius:11px;padding:8px 10px;font-size:11.5px;line-height:1.9;margin-top:8px}
 
+.vtoggle{display:flex;gap:7px;margin-bottom:10px}
+.vtoggle button{flex:1;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:9px 6px;font:700 12.5px Tahoma;color:#475569}
+.vtoggle button.on{border-color:#1d4ed8;background:#eff6ff;color:#1d4ed8}
+.crow{width:100%;display:flex;align-items:center;gap:10px;text-align:right;border:1px solid var(--line);
+  background:#fff;border-radius:13px;padding:11px 12px;margin-bottom:7px;font:inherit;transition:transform .07s,background-color .3s}
+.crow:active{transform:scale(.99);background:#f8fafc}
+.crow .cdot{width:11px;height:11px;border-radius:50%;flex:0 0 auto}
+.crow .ct{flex:1;min-width:0}
+.crow .ct b{display:block;font-size:12px;color:var(--p);direction:ltr;text-align:right}
+.crow .ct i{font-style:normal;display:block;font-size:13px;color:#0f172a;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crow .ct u{text-decoration:none;display:block;font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crow .cgo{color:#94a3b8;font-size:19px;flex:0 0 auto}
+.crow .rowgo{flex:0 0 auto;background:#1d4ed8;color:#fff;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:800;white-space:nowrap}
+.crow.rowred .rowgo{background:#dc2626}
+.crow.rowred{border-color:#fca5a5;background:#fff7f7}
+.crow.rowblue{border-color:#93c5fd;background:#f7fbff}
+.dtop{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.dtop span{font-size:12.5px;color:var(--muted)}
+.nabox{background:#fdf2f8;border:1px dashed #f9a8d4;border-radius:12px;padding:9px 11px;font-size:12px;line-height:2;margin-top:8px;color:#9d174d}
+.statbtn{text-align:center;background:#f8fafc;border:0;border-radius:13px;padding:10px 3px;font:inherit;transition:transform .08s}
+.statbtn:active{transform:scale(.96);background:#eff6ff}
+.statbtn b{display:block;font-size:22px;color:var(--p)}
+.statbtn span{font-size:11px;color:var(--muted)}
+.statbtn.on{background:#eff6ff;box-shadow:inset 0 0 0 2px #93c5fd}
+
 /* ---------- تقویم شمسی ---------- */
 .datebtn{width:100%;text-align:right;padding:15px;border:1.5px solid var(--line);border-radius:14px;background:#fbfdff;font:inherit;display:flex;justify-content:space-between;align-items:center;gap:8px;transition:transform .08s}
 .datebtn:active{transform:scale(.99)}
@@ -275,7 +301,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
   <header class="head">
     <div>
       <h1>🏗️ ثبت عملیات</h1>
-      <small>نسخه آزمایشی • v3.4.0-SIGN</small>
+      <small>نسخه آزمایشی • v3.4.2-COMPACT</small>
       <button type="button" id="roleChip" class="rolechip hidden"></button>
     </div>
     <button class="btn ghost" id="homeBtn">خانه</button>
@@ -303,7 +329,11 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
     <div class="searchbar"><input id="q" placeholder="🔎 جست‌وجو: کد، نوع، منطقه، آدرس، شرح، مجری"><button type="button" id="qClear" class="hidden">✖</button></div>
     <p class="muted hidden" id="qInfo" style="margin:0 2px 10px"></p>
     <select id="srcSel" class="hidden srcsel"></select>
-    <div class="chips" id="fchips" style="margin-bottom:12px"></div>
+    <div class="chips" id="fchips" style="margin-bottom:10px"></div>
+    <div class="vtoggle hidden" id="vtoggle">
+      <button type="button" data-v="compact">☰ فهرست فشرده</button>
+      <button type="button" data-v="full">▤ نمای کامل</button>
+    </div>
     <div class="card stats" id="statWrap"></div>
     <button class="btn primary block hidden" id="newOp">➕ صدور دستور عملیات جدید</button>
     <button class="btn ok block hidden" id="newOrder">➕ ثبت دستور مدیر اصلی (ابلاغ شفاهی)</button>
@@ -429,6 +459,14 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
     </div>
   </section>
 
+  <section id="detail" class="hidden">
+    <div class="dtop">
+      <button class="btn ghost" id="dBack">◀ بازگشت به فهرست</button>
+      <span id="dInfo"></span>
+    </div>
+    <div id="dBody"></div>
+  </section>
+
   <section id="act" class="hidden">
     <div class="card">
       <h3 id="actTitle" style="margin:0 0 10px;font-size:16px"></h3>
@@ -518,7 +556,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 <div class="msg" id="msg"></div>
 
 <script>
-const APP_VERSION = 'v3.4.0-SIGN';
+const APP_VERSION = 'v3.4.2-COMPACT';
 const KEY = 'ops31_local_v1';
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
@@ -557,11 +595,12 @@ const ST = {
   running:  {t:'در حال اجرا',      c:'st-run2', s:3},
   finished: {t:'منتظر تأیید ناظر', c:'st-fin',  s:3},
   approved: {t:'تأییدشده',         c:'st-okk',  s:4},
-  rejected: {t:'برگشتی',           c:'st-rej',  s:3}
+  rejected: {t:'برگشتی',           c:'st-rej',  s:3},
+  notapproved: {t:'عدم تأیید ناظر', c:'st-na',   s:4}
 };
 const FLOW = ['ابلاغ','برنامه‌ریزی','اجرا','تأیید'];
-const INBOX = { manager:['proposed'], exec:['ordered'], crew:['planned','running','rejected'], sup:['finished'] };
-const INBOX_T = { manager:'پیشنهاد منتظر تصمیم تو', exec:'دستور منتظر برنامه‌ریزی', crew:'کار منتظر اقدام تو', sup:'کار منتظر تأیید تو' };
+const INBOX = { manager:['proposed','notapproved'], exec:['ordered','notapproved'], crew:['planned','running','rejected'], sup:['finished'] };
+const INBOX_T = { manager:'منتظر تصمیم یا اطلاع تو', exec:'منتظر اقدام تو', crew:'کار منتظر اقدام تو', sup:'کار منتظر تأیید تو' };
 const PRIO = {
   normal:   {t:'عادی',   c:'prio-normal',   r:0},
   urgent:   {t:'فوری',   c:'prio-urgent',   r:1},
@@ -569,6 +608,8 @@ const PRIO = {
 };
 const ROLE_KEY = 'ops32_role';
 const NAME_KEY = 'ops32_names';
+const VIEW_KEY = 'ops34_views';
+const VIEW_DEF = { manager:'compact', exec:'compact', sup:'compact', crew:'full' };
 const FILT = [{k:'active',t:'در جریان'},{k:'late',t:'تأخیردار'},{k:'done',t:'تأییدشده'},{k:'all',t:'همه'}];
 
 /* ---------- تاریخ شمسی ---------- */
@@ -622,7 +663,7 @@ const LAST = 7;
 const TITLES = {1:'نوع عملیات',2:'تاریخ دستور',3:'منطقه و موقعیت',4:'آدرس دقیق',5:'شرح عملیات',6:'اولویت و مهلت',7:'بازبینی و صدور'};
 
 function show(sec){
-  ['roleGate','home','wizard','act','done'].forEach(x => $('#'+x).classList.toggle('hidden', x !== sec));
+  ['roleGate','home','wizard','detail','act','done'].forEach(x => $('#'+x).classList.toggle('hidden', x !== sec));
   window.scrollTo(0,0);
 }
 function err(t){
@@ -1088,7 +1129,19 @@ $('#wipe').addEventListener('click', () => {
 
 /* ---------- نقش‌ها و گردش کار (مرحله ۳.۲.۱) ---------- */
 let role = null, actId = null, actKind = null, actDraft = {}, inboxOnly = false, filt = 'active';
+let viewMode = 'compact', detailCode = null;
+const STC = {ordered:'#f97316', proposed:'#8b5cf6', planned:'#3b82f6', running:'#eab308',
+             finished:'#a855f7', approved:'#22c55e', rejected:'#ef4444', notapproved:'#db2777'};
+function passFilt(o){
+  if (filt === 'active') return o.status !== 'approved';
+  if (filt === 'done')   return o.status === 'approved';
+  if (filt === 'late')   return isLate(o);
+  if (filt === 'inbox')  return needsMe(o);
+  if (filt.indexOf('st:') === 0) return o.status === filt.slice(3);
+  return true;
+}
 let names = {}; try { names = JSON.parse(localStorage.getItem(NAME_KEY) || '{}'); } catch(e){ names = {}; }
+let views = {}; try { views = JSON.parse(localStorage.getItem(VIEW_KEY) || '{}'); } catch(e){ views = {}; }
 const me = () => (names[role] || (ROLES[role] ? ROLES[role].t : '—'));
 const norm = x => String(x == null ? '' : x).replace(/\u200c/g,' ').replace(/\s+/g,' ').trim().toLowerCase();
 function sameName(a, b){
@@ -1189,6 +1242,8 @@ function blinkOf(o){
   if (isLate(o) && PRE_RUN.includes(o.status)) return {c:'r', t:'تأخیر — هنوز شروع نشده'};
   if (role === 'crew'    && o.status === 'planned')  return {c:'b', t:'کار تازه ارجاع شد'};
   if (role === 'sup'     && o.status === 'finished') return {c:'b', t:'منتظر بازدید تو'};
+  if (role === 'exec' && o.status === 'notapproved') return {c:'r', t:'عدم تأیید ناظر — تصمیم با توست'};
+  if (role === 'manager' && o.status === 'notapproved') return {c:'r', t:'ناظر تأیید نکرد — ببین چرا'};
   if (role === 'manager' && o.status === 'proposed') return {c:'b', t:'پیشنهاد منتظر تصمیم تو'};
   if ((role === 'exec' || role === 'manager') && o.status === 'approved' && !seenBy(o, role))
     return {c:'b', t:'تازه تأیید شد', ack:true};
@@ -1223,7 +1278,7 @@ function markSeen(code){
   const all = load(), o = all.find(x => x.code === code); if (!o) return;
   o.seen = o.seen || {}; o.seen[role] = o.status;
   if (!save(all)) return;
-  render();
+  render(); if (detailCode) openDetail(detailCode);
 }
 
 /* ---------- انتخاب نقش ---------- */
@@ -1235,7 +1290,8 @@ function buildRoleCards(){
   }).join('');
 }
 function setRole(k){
-  role = k; inboxOnly = false; filt = 'active'; $('#q').value = '';
+  role = k; inboxOnly = false; filt = 'active'; $('#q').value = ''; detailCode = null;
+  viewMode = views[k] || VIEW_DEF[k] || 'full';
   src = (k === 'manager') ? 'mine' : 'all';
   try { localStorage.setItem(ROLE_KEY, k); } catch(e){}
   closeName(); buildRoleCards(); render(); show('home');
@@ -1280,6 +1336,17 @@ $('#fchips').addEventListener('click', e => {
   filt = b.dataset.f; render();
 });
 $('#srcSel').addEventListener('change', () => { src = $('#srcSel').value; render(); });
+$('#statWrap').addEventListener('click', e => {
+  const b = e.target.closest('[data-f]'); if (!b) return;
+  filt = (filt === b.dataset.f) ? 'all' : b.dataset.f; inboxOnly = false; render();
+});
+$('#vtoggle').addEventListener('click', e => {
+  const b = e.target.closest('[data-v]'); if (!b) return;
+  viewMode = b.dataset.v;
+  if (role){ views[role] = viewMode; try { localStorage.setItem(VIEW_KEY, JSON.stringify(views)); } catch(x){} }
+  render();
+});
+$('#dBack').addEventListener('click', () => { detailCode = null; render(); show('home'); });
 $('#inboxBtn').addEventListener('click', () => {
   const cnt = () => ($('#list').innerHTML.match(/<div class="op[" ]/g) || []).length;
   const n0 = cnt();
@@ -1405,6 +1472,35 @@ const ACTS = {
       return 'کار برای اصلاح به اکیپ برگشت';
     }
   },
+  notapprove: {
+    t: '⛔ عدم تأیید و ارجاع به مدیران', btn: '⛔ ثبت عدم تأیید',
+    body: o => `<p class="muted" style="margin:0 0 10px">این کار <b>به اکیپ برنمی‌گردد</b>؛ به مدیر اجرایی و مدیر اصلی ارجاع می‌شود تا خودشان تصمیم بگیرند.</p>` +
+      TA('aText','دلیل عدم تأیید','مثلاً: کار با دستور اولیه مطابقت ندارد و نیاز به تصمیم مدیریتی دارد.',1) + PHOTOBLOCK + SIGBLOCK,
+    fill: () => { actPhotos = []; paintActPhotos(); },
+    check: () => $('#aText').value.trim().length < 5 ? 'aText|نوشتن دلیل عدم تأیید اجباری است.'
+      : (!actSign ? 'ثبت عدم تأیید بدون امضای ناظر ممکن نیست.' : ''),
+    apply: o => {
+      o.naReason = $('#aText').value.trim(); o.naPhotos = actPhotos.slice();
+      o.status = 'notapproved'; o.reviewFa = nowFa(); o.reviewBy = me();
+      putSign(o, 'supNA');
+      addLog(o,'sup','ناظر ' + me() + ' کار را تأیید نکرد و به مدیران ارجاع داد — ' + o.naReason);
+      return 'به مدیر اجرایی و مدیر اصلی ارجاع شد';
+    }
+  },
+  backtocrew: {
+    t: '🔁 ارجاع دوباره به اکیپ', btn: '🔁 ارسال به اکیپ',
+    body: o => `<div class="nabox"><b>⛔ دلیل عدم تأیید ناظر${o.reviewBy ? ' (' + esc(o.reviewBy) + ')' : ''}:</b><br>${esc(o.naReason || '—')}</div>` +
+      TA('aText','دستور مدیر اجرایی به اکیپ','دقیقاً چه چیزی باید اصلاح شود؟',1),
+    fill: () => {},
+    check: () => $('#aText').value.trim().length < 3 ? 'aText|نوشتن دستور اصلاح اجباری است.' : '',
+    apply: o => {
+      const n = $('#aText').value.trim();
+      o.rejectReason = 'عدم تأیید ناظر: ' + (o.naReason || '—') + ' — دستور مدیر اجرایی: ' + n;
+      o.status = 'rejected';
+      addLog(o,'exec','مدیر اجرایی کار را برای اصلاح به اکیپ برگرداند — ' + n);
+      return 'کار برای اصلاح به اکیپ ارجاع شد';
+    }
+  },
   fixdone: {
     t: '🔧 ثبت اصلاح انجام‌شده', btn: '🏁 ارسال دوباره به ناظر',
     body: o => `<div class="rbox"><b>دلیل برگشت ناظر:</b><br>${esc(o.rejectReason || '—')}</div>
@@ -1428,7 +1524,7 @@ const ACTS = {
 
 const PH = [
   {k:'before', n:'قبل از اجرا', req:true,  hint:'وضعیت محل را پیش از شروع کار با عکس و موقعیت ثبت کن. این مدرک، اصالت محل عملیات را تثبیت می‌کند.', ph:'مثلاً: محل تحویل گرفته شد، معبر بسته و علائم ایمنی نصب شد.'},
-  {k:'during', n:'حین اجرا',    req:false, hint:'وضعیت کار را در میانه اجرا ثبت کن.',     ph:'مثلاً: تخریب و زیرسازی انجام شد، آسفالت در حال پخش است.'},
+  {k:'during', n:'حین اجرا',    req:false, photoReq:true, hint:'وضعیت کار را در میانه اجرا با عکس ثبت کن.', ph:'مثلاً: تخریب و زیرسازی انجام شد، آسفالت در حال پخش است.'},
   {k:'end',    n:'پایان کار',   req:true,  hint:'پایان کار را با عکس و موقعیت ثبت کن و مقدار واقعی اجراشده را بنویس.', ph:'مثلاً: کار تمام شد، معبر نظافت و تحویل داده شد.'}
 ];
 function photoBlock(req){
@@ -1457,19 +1553,19 @@ PH.forEach((p, i) => {
         <div class="qrow"><input id="aQ1" type="number" inputmode="decimal" min="0" step="any" placeholder="مثلاً ۱۲٫۵"><span class="unit">${esc(o.u1 || '—')}</span></div></label>` +
         (o.u2 ? `<label class="field"><span class="lb">مقدار بر حسب ${esc(o.u2)} (اختیاری)</span>
         <div class="qrow"><input id="aQ2" type="number" inputmode="decimal" min="0" step="any" placeholder="اختیاری"><span class="unit">${esc(o.u2)}</span></div></label>` : '') : '') +
-      photoBlock(p.req) + (last ? SIGBLOCK : ''),
+      photoBlock(p.req || p.photoReq) + (last ? SIGBLOCK : ''),
     fill: o => {
       const cur = (o.phases || {})[p.k];
       $('#aText').value = cur ? cur.note : '';
       if (last){ $('#aQ1').value = o.q1 || ''; if ($('#aQ2')) $('#aQ2').value = o.q2 || ''; }
       actPhotos = (cur && cur.photos) ? cur.photos.slice() : [];
-      actGeoReq = !!p.req;
+      actGeoReq = !!(p.req || p.photoReq);
       actGeo = (cur && cur.geo) ? cur.geo : null;
       paintActPhotos(); paintActGeo();
     },
     check: () => {
       if ($('#aText').value.trim().length < 3) return 'aText|شرح این مرحله اجباری است و باید حداقل ۳ حرف باشد.';
-      if (p.req && !actPhotos.length) return 'برای این مرحله حداقل یک عکس اجباری است. دکمه «📷 گرفتن عکس» را بزن.';
+      if ((p.req || p.photoReq) && !actPhotos.length) return 'برای این مرحله حداقل یک عکس اجباری است. دکمه «📷 گرفتن عکس» را بزن.';
       if (p.req && !actGeo) return 'ثبت موقعیت جغرافیایی برای این مرحله اجباری است. دکمه «📍 ثبت موقعیت» را بزن.';
       if (last){
         const v = $('#aQ1').value.trim();
@@ -1535,21 +1631,26 @@ $('#actBody').addEventListener('click', e => {
   if (m){ actDraft.mode = m.dataset.mode; $$('#aMode .type').forEach(x => x.classList.toggle('sel', x.dataset.mode === actDraft.mode)); aerr(''); return; }
   if (e.target.closest('#aDateBtn')) openCal('act');
 });
-$('#actCancel').addEventListener('click', () => { render(); show('home'); });
+$('#actCancel').addEventListener('click', () => { render(); if (detailCode) openDetail(detailCode); else show('home'); });
 $('#actSave').addEventListener('click', () => {
   const A = ACTS[actKind]; if (!A) return;
   const bad = A.check(); if (bad) return aerr(bad);
   const all = load(), o = all.find(x => x.code === actId); if (!o) return;
   const msg = A.apply(o);
   if (!save(all)) return;
-  toast(msg); render(); show('home');
+  toast(msg); render();
+  if (detailCode) openDetail(detailCode); else show('home');
 });
-$('#list').addEventListener('click', e => {
+function listClick(e){
+  const op = e.target.closest('[data-open]');
+  if (op) return openDetail(op.dataset.open);
   const ak = e.target.closest('[data-ack]');
   if (ak){ markSeen(ak.dataset.ack); return toast('علامت‌گذاری شد'); }
   const b = e.target.closest('[data-act]'); if (!b) return;
   openAct(b.dataset.act, b.dataset.code);
-});
+}
+$('#list').addEventListener('click', listClick);
+$('#dBody').addEventListener('click', listClick);
 
 /* ---------- نمایش ---------- */
 function flowBar(st){
@@ -1571,7 +1672,15 @@ function actionsFor(o){
     else if (o.status === 'running') a.push(B('ph_end','🏁 ثبت پایان کار و مقدار','primary'));
     else if (o.status === 'rejected') a.push(B('fixdone','🔧 اصلاح شد','primary'));
   }
-  if (role === 'sup'   && o.status === 'finished'){ a.push(B('approve','✅ تأیید نهایی','ok')); a.push(B('reject','↩️ برگشت','danger')); }
+  if (role === 'sup'   && o.status === 'finished'){
+    a.push(B('approve','✅ تأیید نهایی','ok'));
+    a.push(B('reject','↩️ برگشت به اکیپ','danger'));
+    a.push(B('notapprove','⛔ عدم تأیید — ارجاع به مدیران','ghost'));
+  }
+  if (role === 'exec' && o.status === 'notapproved'){
+    a.push(B('backtocrew','🔁 ارجاع دوباره به اکیپ','primary'));
+    a.push(B('plan','🗂 برنامه‌ریزی دوباره','ghost'));
+  }
   const bk = blinkOf(o);
   if (bk && bk.ack) a.push(`<button class="btn ghost" data-ack="${esc(o.code)}">✔ دیدم</button>`);
   return a.length ? `<div class="actions">${a.join('')}</div>` : '';
@@ -1588,9 +1697,9 @@ function phasesBlock(o){
     const stamp = done ? geoStamp(d.geo, srcTags(d.photos)) : '';
     return `<div class="phrow ${done ? 'done' : (can ? 'now' : '')}">
       <span class="ic">${done ? '✓' : fd(i+1)}</span>
-      <span class="tx"><b>${esc(p.n)}${p.req ? ' <span style="color:#dc2626">*</span>' : ''}</b>
+      <span class="tx"><b>${esc(p.n)}${(p.req || p.photoReq) ? ' <span style="color:#dc2626">*</span>' : ''}</b>
         <i>${done ? esc(d.fa) + (d.by ? ' — ' + esc(d.by) : '') + '<br>' + esc(d.note)
-          : (can ? (p.req ? 'آماده ثبت — عکس و موقعیت اجباری' : 'آماده ثبت') : 'قفل تا تکمیل مرحله قبل')}</i></span>
+          : (can ? (p.req ? 'آماده ثبت — عکس و موقعیت اجباری' : (p.photoReq ? 'آماده ثبت — عکس اجباری' : 'آماده ثبت')) : 'قفل تا تکمیل مرحله قبل')}</i></span>
       ${can ? `<button class="btn primary" data-act="ph_${p.k}" data-code="${esc(o.code)}">ثبت</button>`
         : (edit ? `<button class="btn ghost" data-act="ph_${p.k}" data-code="${esc(o.code)}">ویرایش</button>`
         : (done ? '' : '<span class="lock">🔒</span>'))}
@@ -1644,7 +1753,8 @@ function histBlock(o){
 }
 function signBlock(o){
   const g = o.sign || {};
-  const rows = [['crew','✍️ امضای تحویل اکیپ'], ['sup','✅ امضای تأیید ناظر'], ['supReject','↩️ امضای برگشت ناظر']]
+  const rows = [['crew','✍️ امضای تحویل اکیپ'], ['sup','✅ امضای تأیید ناظر'],
+    ['supReject','↩️ امضای برگشت ناظر'], ['supNA','⛔ امضای عدم تأیید ناظر']]
     .filter(x => g[x[0]]);
   if (!rows.length) return '';
   return `<div class="sigbox"><h5>امضاها — نسخه فعلی ${fd(verOf(o))}</h5>` + rows.map(x => {
@@ -1660,6 +1770,36 @@ function fixBlock(o){
   return o.fixes.map(f => `<div class="abox"><b>🔧 اصلاح اکیپ:</b> ${esc(f.text)}<br><span style="font-size:10.5px">${esc(f.fa)}${f.by ? ' — ' + esc(f.by) : ''}</span>` +
     (f.photos && f.photos.length ? `<div class="phpics" style="padding:6px 0 0">${f.photos.map(x => `<img src="${pdata(x)}" alt="عکس">`).join('')}</div>` : '') + '</div>').join('');
 }
+function nextLabel(o){
+  if (role === 'crew'){
+    const ph = o.phases || {};
+    if (o.status === 'planned')  return '▶️ شروع';
+    if (o.status === 'running')  return ph.during ? '🏁 پایان' : '⏩ ادامه';
+    if (o.status === 'rejected') return '🔧 اصلاح';
+  }
+  if (role === 'sup'     && o.status === 'finished')    return '👁 بازدید';
+  if (role === 'exec'    && o.status === 'ordered')     return '🗂 برنامه‌ریزی';
+  if (role === 'exec'    && o.status === 'notapproved') return '⚖️ تصمیم';
+  if (role === 'manager' && (o.status === 'proposed' || o.status === 'notapproved')) return '⚖️ تصمیم';
+  return '';
+}
+function opRow(o){
+  const st = ST[o.status] || ST.ordered, bk = blinkOf(o), nx = nextLabel(o);
+  return `<button type="button" class="crow${bk ? (bk.c === 'r' ? ' rowred' : ' rowblue') : ''}" data-open="${esc(o.code)}">
+    <span class="cdot" style="background:${STC[o.status] || '#94a3b8'}"></span>
+    <span class="ct"><b>${esc(fd(o.code))}</b>
+      <i>${esc(o.typeName)} — ${esc(o.address)}</i>
+      <u>${esc(o.region)} • ${esc(st.t)}${o.assignee ? ' • ' + esc(o.assignee) : ''}${isLate(o) ? ' • ⏰ تأخیر' : ''}${verOf(o) > 1 ? ' • نسخه ' + fd(verOf(o)) : ''}</u></span>
+    ${nx ? `<span class="rowgo">${esc(nx)}</span>` : ''}
+    <span class="cgo">‹</span></button>`;
+}
+function openDetail(code){
+  const o = migrate(load()).find(x => x.code === code); if (!o) return;
+  detailCode = code;
+  $('#dInfo').textContent = 'کد ' + fd(o.code);
+  $('#dBody').innerHTML = opCard(o);
+  show('detail'); paintFlashSoon();
+}
 function opCard(o){
   const late = isLate(o), talk = (role === 'manager' || role === 'exec');
   const prop = (talk && o.proposal) ? `<div class="pbox"><b>💡 پیشنهاد مدیر اجرایی:</b><br>${esc(o.proposal.text)}<br><span style="font-size:10.5px">${esc(o.proposal.fa)}</span></div>` : '';
@@ -1668,6 +1808,10 @@ function opCard(o){
     (o.planDate ? ` • شروع: <b>${esc(jFmt(o.planDate.y,o.planDate.m,o.planDate.d))}</b>` : '') +
     ((role !== 'crew') ? `<br>🦺 ناظر: <b>${esc(o.supervisor || 'تعیین‌نشده — همه ناظران')}</b>` : '') +
     (o.planNote ? `<br>📝 ${esc(o.planNote)}` : '') + '</div>' : '';
+  const nabx = (o.status === 'notapproved' && role !== 'crew')
+    ? `<div class="nabox"><b>⛔ ناظر${o.reviewBy ? ' (' + esc(o.reviewBy) + ')' : ''} این کار را تأیید نکرد:</b><br>${esc(o.naReason || '—')}` +
+      ((o.naPhotos && o.naPhotos.length) ? `<div class="phpics" style="padding:6px 0 0">${o.naPhotos.map(x => `<img src="${pdata(x)}" alt="عکس">`).join('')}</div>` : '') +
+      `<br><span style="font-size:10.5px">${esc(o.reviewFa || '')}</span></div>` : '';
   const rej  = (o.status === 'rejected' && o.rejectReason) ? `<div class="rbox"><b>↩️ دلیل برگشت ناظر:</b><br>${esc(o.rejectReason)}` +
     ((o.rejectPhotos && o.rejectPhotos.length) ? `<div class="phpics" style="padding:6px 0 0">${o.rejectPhotos.map(x => `<img src="${pdata(x)}" alt="عکس">`).join('')}</div>` : '') +
     ((o.reviewBy && role !== 'crew') ? `<br><span style="font-size:10.5px">ناظر: ${esc(o.reviewBy)}</span>` : '') + '</div>' : '';
@@ -1688,7 +1832,7 @@ function opCard(o){
       <details class="more"><summary>جزئیات کامل</summary>
         <p>📅 ${esc(jFmt(o.jy,o.jm,o.jd))} • 📍 ${esc(o.address)}</p>
         <p>📝 ${esc(o.descr)}</p>
-        ${qty}${asg}${o.status !== 'proposed' ? prop : ''}${dec}${rej}${signBlock(o)}
+        ${qty}${asg}${o.status !== 'proposed' ? prop : ''}${dec}${nabx}${rej}${signBlock(o)}
         <div class="meta">ثبت: ${esc(o.createdFa || '')}${o.orderBy ? ' — ' + esc(o.orderBy) : ''}${o.finishedFa ? ' • پایان: ' + esc(o.finishedFa) : ''}</div>
         ${histBlock(o)}
       </details>
@@ -1699,7 +1843,7 @@ function opCard(o){
     ${head(o)}${badges(o)}${flowBar(o.status)}
     <p>📅 ${esc(jFmt(o.jy,o.jm,o.jd))} • 📍 ${esc(o.region)} — ${esc(o.address)}</p>
     <p>📝 ${esc(o.descr)}</p>
-    ${qty}${asg}${prop}${dec}${rej}${fixBlock(o)}${signBlock(o)}
+    ${qty}${asg}${prop}${dec}${nabx}${rej}${fixBlock(o)}${signBlock(o)}
     ${(o.status === 'approved' && role !== 'crew') ? `<div class="okline">✅ تأیید نهایی توسط <b>${esc(o.reviewBy || 'ناظر — نام ثبت نشده')}</b>${o.reviewFa ? ' • ' + esc(o.reviewFa) : ''}${o.reviewNote ? '<br>' + esc(o.reviewNote) : ''}</div>` : ''}
     ${(o.status === 'approved' && role === 'crew') ? `<div class="okline">✅ این کار تأیید نهایی شد${o.reviewFa ? ' • ' + esc(o.reviewFa) : ''}</div>` : ''}
     ${(o.photos && o.photos.length) ? `<div class="photos">${o.photos.map(x => `<div class="ph"><img src="${pdata(x)}" alt="عکس"></div>`).join('')}</div>` : ''}
@@ -1712,10 +1856,10 @@ function opCard(o){
   </div>`;
 }
 const VIS = {
-  manager: ['ordered','proposed','planned','running','finished','approved','rejected'],
-  exec:    ['ordered','proposed','planned','running','finished','approved','rejected'],
+  manager: ['ordered','proposed','planned','running','finished','approved','rejected','notapproved'],
+  exec:    ['ordered','proposed','planned','running','finished','approved','rejected','notapproved'],
   crew:    ['planned','running','finished','rejected','approved'],
-  sup:     ['finished','approved','rejected']
+  sup:     ['finished','approved','rejected','notapproved']
 };
 function render(){
   if (!role){ buildRoleCards(); show('roleGate'); return; }
@@ -1738,16 +1882,10 @@ function render(){
     && (role !== 'crew' || sameName(o.assignee, me()))
     && (role !== 'sup'  || !o.supervisor || sameName(o.supervisor, me())));
   const mine = base.filter(needsMe);
-  const FN = {
-    all:    () => true,
-    active: o => o.status !== 'approved',
-    done:   o => o.status === 'approved',
-    late:   o => isLate(o)
-  };
-  const counts = {}; FILT.forEach(f => counts[f.k] = base.filter(FN[f.k]).length);
+  const keep = filt, cnt = k => { filt = k; const n = base.filter(passFilt).length; filt = keep; return n; };
   $('#fchips').innerHTML = FILT.map(f =>
-    `<button type="button" class="chip${filt===f.k?' sel':''}" data-f="${f.k}">${esc(f.t)} ${fd(counts[f.k])}</button>`).join('');
-  let items = (inboxOnly ? mine : base).filter(FN[filt] || FN.all);
+    `<button type="button" class="chip${filt===f.k?' sel':''}" data-f="${f.k}">${esc(f.t)} ${fd(cnt(f.k))}</button>`).join('');
+  let items = (inboxOnly ? mine : base).filter(passFilt);
   if (qq) items = items.filter(o => matches(o, qq));
   items = items.slice().sort((a,b) =>
     (isLate(b) - isLate(a)) || (PRIO[b.prio]||PRIO.normal).r - (PRIO[a.prio]||PRIO.normal).r ||
@@ -1767,26 +1905,29 @@ function render(){
 
   let stats, hint = '', empty = '';
   if (role === 'manager'){
-    stats = [[all.length,'کل دستورها'], [by('proposed'),'منتظر تصمیم تو'], [by('approved'),'تأییدشده']];
-    hint = 'پیش‌فرض: فقط دستورهای خودت. کارهای مستقل مدیر اجرایی از کادر بالا.';
+    stats = [[base.length,'کل دستورها','all'], [mine.length,'منتظر تصمیم تو','inbox'], [by('approved'),'تأییدشده','done']];
+    hint = 'روی هر عدد یا فیلتر بزن تا فهرست همان را ببینی؛ بعد روی هر ردیف بزن تا جزئیاتش باز شود.';
     empty = 'هنوز دستوری صادر نشده است.<br>با دکمه بالا اولین دستور عملیات را صادر کن.';
   } else if (role === 'exec'){
-    stats = [[by('ordered'),'منتظر برنامه‌ریزی'], [by('planned')+by('running')+by('finished')+by('rejected'),'در جریان'], [by('approved'),'تأییدشده']];
-    hint = 'دکمه سبز: دستور شفاهی مدیر • دکمه آبی: کار ابتکاری خودت.';
+    stats = [[by('ordered'),'منتظر برنامه‌ریزی','st:ordered'], [by('notapproved'),'عدم تأیید ناظر','st:notapproved'], [by('approved'),'تأییدشده','done']];
+    hint = 'روی هر عدد یا فیلتر بزن تا فهرست همان را ببینی؛ بعد روی ردیف بزن تا جزئیات باز شود.';
     empty = 'فعلاً کاری وجود ندارد.';
   } else if (role === 'crew'){
-    stats = [[by('planned'),'ارجاع‌شده به اکیپ'], [by('running'),'در حال اجرا'], [by('rejected'),'برگشتی برای اصلاح']];
-    hint = 'کارهای «' + esc(me()) + '». روی هر کارت دکمه آبی را بزن.';
+    stats = [[by('planned'),'ارجاع‌شده به اکیپ','st:planned'], [by('running'),'در حال اجرا','st:running'], [by('rejected'),'برگشتی برای اصلاح','st:rejected']];
+    hint = 'کارهای «' + esc(me()) + '». در نمای فشرده روی ردیف بزن، در نمای کامل روی دکمه آبی.';
     const others = all.filter(o => o.assignee && !sameName(o.assignee, me())).length;
     empty = others
       ? 'کاری به نام «' + esc(me()) + '» ارجاع نشده است.<br>' + fd(others) + ' کار به اکیپ‌های دیگر سپرده شده.<br><span style="font-size:11.5px">اگر مطمئنی کار مال توست، نام ورودت باید دقیقاً همان نامی باشد که مدیر اجرایی وارد کرده است. از «تغییر نقش ← ✏️ تغییر نام» اصلاحش کن.</span>'
       : 'هنوز کاری به اکیپ ارجاع نشده است.';
   } else {
-    stats = [[by('finished'),'منتظر تأیید تو'], [by('approved'),'تأییدشده'], [by('rejected'),'برگشتی']];
+    stats = [[by('finished'),'منتظر تأیید تو','st:finished'], [by('approved'),'تأییدشده','done'], [by('notapproved'),'عدم تأیید','st:notapproved']];
     hint = 'کارهای تو و کارهای بدون ناظر. روند و عکس‌ها را ببین، بعد تأیید یا برگشت.';
     empty = 'فعلاً کاری برای تأیید وجود ندارد.';
   }
-  $('#statWrap').innerHTML = stats.map(x => `<div class="stat"><b>${fd(x[0])}</b><span>${esc(x[1])}</span></div>`).join('');
+  $('#statWrap').innerHTML = stats.map(x =>
+    `<button type="button" class="statbtn${filt === x[2] ? ' on' : ''}" data-f="${x[2]}"><b>${fd(x[0])}</b><span>${esc(x[1])}</span></button>`).join('');
+  $('#vtoggle').classList.remove('hidden');
+  $$('#vtoggle button').forEach(b => b.classList.toggle('on', b.dataset.v === viewMode));
   const canAdd = role === 'manager' || role === 'exec';
   $('#newOp').classList.toggle('hidden', !canAdd);
   $('#newOp').textContent = role === 'exec' ? '➕ ثبت کار مستقل (بدون دستور مدیر)' : '➕ صدور دستور عملیات جدید';
@@ -1794,7 +1935,7 @@ function render(){
   if (role === 'exec') wizOrigin = 'exec';
   $('#roleHint').textContent = hint;
   $('#roleHint').classList.remove('hidden');
-  $('#list').innerHTML = items.length ? items.map(opCard).join('')
+  $('#list').innerHTML = items.length ? items.map(viewMode === 'compact' ? opRow : opCard).join('')
     : `<div class="card empty">${qq ? 'چیزی با این جست‌وجو پیدا نشد.'
         : (inboxOnly ? 'کارتابل تو خالی است. 👌'
         : (filt !== 'all' ? 'در این فیلتر چیزی نیست. روی «همه» بزن.' : empty))}</div>`;
@@ -1806,5 +1947,5 @@ buildRegions(); paintDateBtn(); paintDue(); buildRoleCards();
 if (role){ render(); show('home'); } else { show('roleGate'); }
 console.log('Bazdid Ops ' + APP_VERSION);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a46fe5867ca39d31',t:'MTc5MTQwNzQ2OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a47297d3298eaa31',t:'MTc5MTQzNTc0Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
