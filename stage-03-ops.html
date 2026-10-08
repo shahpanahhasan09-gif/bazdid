@@ -240,6 +240,8 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 .crow .cst small{display:block;font-size:9.5px;font-weight:800;margin-top:2px;color:#b91c1c}
 .seenline{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;border-radius:11px;padding:8px 10px;font-size:12px;font-weight:700;margin-top:8px}
 .seenpill{flex:0 0 auto;background:#dcfce7;color:#15803d;border:1px solid #86efac;border-radius:999px;padding:5px 9px;font-size:10px;font-weight:800;white-space:nowrap}
+.seenpill.no{background:#fee2e2;color:#b91c1c;border-color:#fca5a5}
+.seenline.no{background:#fff7ed;border-color:#fdba74;color:#7c2d12}
 .crow .ct{flex:1;min-width:0}
 .crow .ct b{display:block;font-size:12px;color:var(--p);direction:ltr;text-align:right}
 .crow .ct i{font-style:normal;display:block;font-size:13px;color:#0f172a;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -304,7 +306,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
   <header class="head">
     <div>
       <h1>🏗️ ثبت عملیات</h1>
-      <small>نسخه آزمایشی • v3.4.3-LABELS</small>
+      <small>نسخه آزمایشی • v3.4.4-SEEN</small>
       <button type="button" id="roleChip" class="rolechip hidden"></button>
     </div>
     <button class="btn ghost" id="homeBtn">خانه</button>
@@ -559,7 +561,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 <div class="msg" id="msg"></div>
 
 <script>
-const APP_VERSION = 'v3.4.3-LABELS';
+const APP_VERSION = 'v3.4.4-SEEN';
 const KEY = 'ops31_local_v1';
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
@@ -614,6 +616,7 @@ const NAME_KEY = 'ops32_names';
 const VIEW_KEY = 'ops34_views';
 const VIEW_DEF = { manager:'compact', exec:'compact', sup:'compact', crew:'full' };
 const FILT = [{k:'active',t:'در جریان'},{k:'late',t:'تأخیردار'},{k:'done',t:'تأییدشده'},{k:'all',t:'همه'}];
+const FILT_MGR = [{k:'active',t:'در جریان'},{k:'late',t:'تأخیردار'},{k:'done',t:'تأییدشده'},{k:'mynotok',t:'عدم تأیید من'},{k:'all',t:'همه'}];
 const FILT_SUP = [{k:'st:finished',t:'منتظر تأیید'},{k:'done',t:'تأییدشده'},{k:'notok',t:'تأیید نشده'},{k:'all',t:'همه'}];
 
 /* ---------- تاریخ شمسی ---------- */
@@ -1142,6 +1145,7 @@ function passFilt(o){
   if (filt === 'late')   return isLate(o);
   if (filt === 'inbox')  return needsMe(o);
   if (filt === 'notok')  return o.status === 'rejected' || o.status === 'notapproved';
+  if (filt === 'mynotok'){ const g = seenRec(o, role); return !!g && g.st === o.status && g.ok === false; }
   if (filt.indexOf('st:') === 0) return o.status === filt.slice(3);
   return true;
 }
@@ -1244,7 +1248,9 @@ const PRE_RUN = ['ordered','proposed','planned','rejected'];
 function seenRec(o, r){
   const v = o.seen && o.seen[r];
   if (!v) return null;
-  return (typeof v === 'string') ? { st: v } : v;
+  const g = (typeof v === 'string') ? { st: v } : v;
+  if (g.ok === undefined) g.ok = true;       // سازگاری با نسخه قبل
+  return g;
 }
 function seenBy(o, r){ const g = seenRec(o, r); return !!g && g.st === o.status; }
 /* چشمک: {c:'r'|'b', t:'متن', ack:true اگر با دکمه «دیدم» خاموش شود} */
@@ -1286,8 +1292,15 @@ function paintFlashSoon(){ setTimeout(() => { flashNew(); paintBreath(); }, 0); 
 
 function markSeen(code){
   const all = load(), o = all.find(x => x.code === code); if (!o) return;
-  o.seen = o.seen || {}; o.seen[role] = { st: o.status, by: me(), fa: nowFa() };
+  o.seen = o.seen || {}; o.seen[role] = { st: o.status, by: me(), fa: nowFa(), ok: true };
   addLog(o, role, 'ملاحظه و تأیید شد توسط ' + me(), 'talk');
+  if (!save(all)) return;
+  render(); if (detailCode) openDetail(detailCode);
+}
+function clearSeen(code){
+  const all = load(), o = all.find(x => x.code === code); if (!o) return;
+  if (o.seen) delete o.seen[role];
+  addLog(o, role, 'نظر ملاحظه توسط ' + me() + ' بازنگری شد', 'talk');
   if (!save(all)) return;
   render(); if (detailCode) openDetail(detailCode);
 }
@@ -1369,7 +1382,9 @@ $('#q').addEventListener('input', () => render());
 $('#qClear').addEventListener('click', () => { $('#q').value = ''; render(); });
 function matches(o, qq){
   if (!qq) return true;
-  const hay = lat([o.code, o.typeName, o.region, o.address, o.descr, o.assignee,
+  const g = (role === 'manager' || role === 'exec') ? seenRec(o, role) : null;
+  const seenTxt = (g && g.st === o.status) ? (g.ok ? 'ملاحظه و تأیید شد' : 'ملاحظه شد تأیید نشد ' + (g.note || '')) : '';
+  const hay = lat([o.code, o.typeName, o.region, o.address, o.descr, o.assignee, seenTxt,
     PRIO[o.prio] ? PRIO[o.prio].t : '', ST[o.status] ? ST[o.status].t : ''].join(' ')).toLowerCase();
   return lat(qq).toLowerCase().split(/\s+/).filter(Boolean).every(w => hay.includes(w));
 }
@@ -1510,6 +1525,20 @@ const ACTS = {
       o.status = 'rejected';
       addLog(o,'exec','مدیر اجرایی کار را برای اصلاح به اکیپ برگرداند — ' + n);
       return 'کار برای اصلاح به اکیپ ارجاع شد';
+    }
+  },
+  seenno: {
+    t: '✖ ملاحظه شد ولی تأیید نشد', btn: '✖ ثبت عدم تأیید من',
+    body: () => `<p class="muted" style="margin:0 0 10px">این کار را دیدی ولی از نتیجه‌اش راضی نیستی. دلیلت ثبت می‌شود و بعداً در جست‌وجو و فیلتر «عدم تأیید من» پیدا می‌شود.</p>` +
+      TA('aText','دلیل عدم تأیید تو','مثلاً: کیفیت کار در حد انتظار نیست و باید پیگیری شود.',1),
+    fill: () => {},
+    check: () => $('#aText').value.trim().length < 3 ? 'aText|نوشتن دلیل اجباری است تا مستند بماند.' : '',
+    apply: o => {
+      const n = $('#aText').value.trim();
+      o.seen = o.seen || {};
+      o.seen[role] = { st: o.status, by: me(), fa: nowFa(), ok: false, note: n };
+      addLog(o, role, 'ملاحظه شد ولی توسط ' + me() + ' تأیید نشد — ' + n, 'talk');
+      return 'ثبت شد: ملاحظه شد، تأیید نشد';
     }
   },
   fixdone: {
@@ -1656,7 +1685,9 @@ function listClick(e){
   const op = e.target.closest('[data-open]');
   if (op) return openDetail(op.dataset.open);
   const ak = e.target.closest('[data-ack]');
-  if (ak){ markSeen(ak.dataset.ack); return toast('علامت‌گذاری شد'); }
+  if (ak){ markSeen(ak.dataset.ack); return toast('ملاحظه و تأیید شد'); }
+  const uk = e.target.closest('[data-unseen]');
+  if (uk){ clearSeen(uk.dataset.unseen); return toast('نظر پاک شد'); }
   const b = e.target.closest('[data-act]'); if (!b) return;
   openAct(b.dataset.act, b.dataset.code);
 }
@@ -1692,8 +1723,14 @@ function actionsFor(o){
     a.push(B('backtocrew','🔁 ارجاع دوباره به اکیپ','primary'));
     a.push(B('plan','🗂 برنامه‌ریزی دوباره','ghost'));
   }
-  if ((role === 'manager' || role === 'exec') && !seenBy(o, role))
-    a.push(`<button class="btn ghost" data-ack="${esc(o.code)}">✔ ملاحظه شد و تأیید</button>`);
+  if (role === 'manager' || role === 'exec'){
+    if (!seenBy(o, role)){
+      a.push(`<button class="btn ok" data-ack="${esc(o.code)}">✔ ملاحظه و تأیید</button>`);
+      a.push(B('seenno','✖ ملاحظه، تأیید نشد','danger'));
+    } else {
+      a.push(`<button class="btn ghost" data-unseen="${esc(o.code)}">↺ تغییر نظر</button>`);
+    }
+  }
   return a.length ? `<div class="actions">${a.join('')}</div>` : '';
 }
 function phasesBlock(o){
@@ -1797,13 +1834,16 @@ function nextLabel(o){
 function opRow(o){
   const st = ST[o.status] || ST.ordered, bk = blinkOf(o), nx = nextLabel(o);
   const showLate = isLate(o) && role !== 'sup';
-  const seen = (role === 'manager' || role === 'exec') && seenBy(o, role);
+  const sg = (role === 'manager' || role === 'exec') ? seenRec(o, role) : null;
+  const seen = sg && sg.st === o.status;
   return `<button type="button" class="crow${bk ? (bk.c === 'r' ? ' rowred' : ' rowblue') : ''}" data-open="${esc(o.code)}">
     <span class="cst ${st.c}">${esc(st.sh || st.t)}${showLate ? '<small>⏰ تأخیر</small>' : ''}</span>
     <span class="ct"><b>${esc(fd(o.code))}</b>
       <i>${esc(o.typeName)} — ${esc(o.address)}</i>
       <u>${esc(o.region)}${o.assignee ? ' • ' + esc(o.assignee) : ''}${verOf(o) > 1 ? ' • نسخه ' + fd(verOf(o)) : ''}</u></span>
-    ${seen ? '<span class="seenpill">✔ ملاحظه شد</span>' : (nx ? `<span class="rowgo">${esc(nx)}</span>` : '')}
+    ${seen ? (sg.ok ? '<span class="seenpill">✔ ملاحظه و تأیید</span>'
+                    : '<span class="seenpill no">✖ تأیید نشد</span>')
+           : (nx ? `<span class="rowgo">${esc(nx)}</span>` : '')}
     <span class="cgo">‹</span></button>`;
 }
 function openDetail(code){
@@ -1817,7 +1857,10 @@ function seenLine(o){
   if (role !== 'manager' && role !== 'exec') return '';
   const g = seenRec(o, role);
   if (!g || g.st !== o.status) return '';
-  return `<div class="seenline">✔ ملاحظه و تأیید شد${g.by ? ' — ' + esc(g.by) : ''}${g.fa ? ' • ' + esc(g.fa) : ''}</div>`;
+  return g.ok
+    ? `<div class="seenline">✔ ملاحظه و تأیید شد${g.by ? ' — ' + esc(g.by) : ''}${g.fa ? ' • ' + esc(g.fa) : ''}</div>`
+    : `<div class="seenline no">✖ ملاحظه شد ولی تأیید نشد${g.by ? ' — ' + esc(g.by) : ''}${g.fa ? ' • ' + esc(g.fa) : ''}` +
+      (g.note ? `<br>دلیل: ${esc(g.note)}` : '') + '</div>';
 }
 function opCard(o){
   const late = isLate(o), talk = (role === 'manager' || role === 'exec');
@@ -1904,7 +1947,7 @@ function render(){
     && (role !== 'sup'  || !o.supervisor || sameName(o.supervisor, me())));
   const mine = base.filter(needsMe);
   const keep = filt, cnt = k => { filt = k; const n = base.filter(passFilt).length; filt = keep; return n; };
-  const FL = (role === 'sup') ? FILT_SUP : FILT;
+  const FL = (role === 'sup') ? FILT_SUP : ((role === 'manager' || role === 'exec') ? FILT_MGR : FILT);
   $('#fchips').innerHTML = FL.map(f =>
     `<button type="button" class="chip${filt===f.k?' sel':''}" data-f="${f.k}">${esc(f.t)} ${fd(cnt(f.k))}</button>`).join('');
   let items = (inboxOnly ? mine : base).filter(passFilt);
@@ -1969,5 +2012,5 @@ buildRegions(); paintDateBtn(); paintDue(); buildRoleCards();
 if (role){ render(); show('home'); } else { show('roleGate'); }
 console.log('Bazdid Ops ' + APP_VERSION);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a472bed298120cb6',t:'MTc5MTQzNzM0MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a472eacadbbcd919',t:'MTc5MTQzOTE0MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
