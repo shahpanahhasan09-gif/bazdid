@@ -253,6 +253,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 .crow.rowblue{border-color:#93c5fd;background:#f7fbff}
 .dtop{display:flex;gap:8px;align-items:center;margin-bottom:10px}
 .dtop span{font-size:12.5px;color:var(--muted)}
+.fixbanner{background:#eff6ff;border:1.5px dashed #60a5fa;border-radius:12px;padding:10px 12px;font-size:12.5px;line-height:2;margin-top:8px;color:#1e3a8a}
 .nabox{background:#fdf2f8;border:1px dashed #f9a8d4;border-radius:12px;padding:9px 11px;font-size:12px;line-height:2;margin-top:8px;color:#9d174d}
 .statbtn{text-align:center;background:#f8fafc;border:0;border-radius:13px;padding:10px 3px;font:inherit;transition:transform .08s}
 .statbtn:active{transform:scale(.96);background:#eff6ff}
@@ -306,14 +307,14 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
   <header class="head">
     <div>
       <h1>🏗️ ثبت عملیات</h1>
-      <small>نسخه آزمایشی • v3.4.4-SEEN</small>
+      <small>نسخه آزمایشی • v3.5.0-TARGET</small>
       <button type="button" id="roleChip" class="rolechip hidden"></button>
     </div>
     <button class="btn ghost" id="homeBtn">خانه</button>
   </header>
 
   <div class="note">
-    <b>فایل آزمایشی مرحله ۳.۴</b><br>
+    <b>فایل آزمایشی مرحله ۳.۵</b><br>
     چرخه چهارنقشی با شواهد قفل‌دار: مدیر اصلی دستور می‌دهد ← مدیر اجرایی برنامه‌ریزی می‌کند یا پیشنهاد اصلاح می‌دهد ← اکیپ با عکس و موقعیت اجرا را ثبت و امضا می‌کند ← ناظر بازدید و امضا می‌کند. هر اصلاح پس از امضا، نسخه جدید می‌سازد و امضای دوباره می‌خواهد. داده‌ها فقط در حافظه همین مرورگر ذخیره می‌شود و هیچ ارتباطی با سامانه اصلی، سرور و داده‌های واقعی ندارد.
   </div>
 
@@ -561,7 +562,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 <div class="msg" id="msg"></div>
 
 <script>
-const APP_VERSION = 'v3.4.4-SEEN';
+const APP_VERSION = 'v3.5.0-TARGET';
 const KEY = 'ops31_local_v1';
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
@@ -948,6 +949,12 @@ function paintActSign(){
     ? `<img src="${actSign}" alt="امضا"><span class="ph">امضاشده توسط <b>${esc(me())}</b></span>`
     : '<span class="ph">هنوز امضا نشده است</span>';
 }
+const FXBLOCK = `<span class="lb" style="display:block;margin:14px 0 5px">اکیپ از کدام مرحله دوباره شروع کند؟ <span class="req">*</span></span>
+  <div class="typegrid" id="aFx" style="grid-template-columns:1fr">
+    <button type="button" class="type" data-fx="before"><b>① از «قبل از اجرا»</b><small>کل کار از نو — هر سه مرحله دوباره</small></button>
+    <button type="button" class="type" data-fx="during"><b>② از «حین اجرا»</b><small>مرحله میانی و پایان دوباره ثبت شود</small></button>
+    <button type="button" class="type" data-fx="end"><b>③ فقط «پایان کار»</b><small>مثلاً مقدار یا عکس پایان اشتباه بوده</small></button>
+  </div>`;
 const SIGBLOCK = `<span class="lb" style="display:block;margin:14px 0 5px">امضای شما <span class="req">*</span></span>
   <div class="sigslot" id="aSigBox"><span class="ph">هنوز امضا نشده است</span></div>
   <button type="button" class="btn block" id="aSigBtn">✍️ امضا کردن</button>`;
@@ -1217,6 +1224,19 @@ function addLog(o, r, text, sc){ o.log = o.log || []; o.log.push({ fa: nowFa(), 
 const num = d => d ? d.y*10000 + d.m*100 + d.d : 0;
 const verOf = o => o.ver || 1;
 function signValid(o, k){ const g = (o.sign || {})[k]; return !!g && (g.ver || 1) === verOf(o); }
+function applyFixFrom(o, fx){
+  o.fixFrom = fx;
+  const idx = PH.findIndex(p => p.k === fx);
+  const snap = {};
+  PH.forEach((p, i) => {
+    if (i >= idx && o.phases && o.phases[p.k]){ snap[p.k] = o.phases[p.k]; delete o.phases[p.k]; }
+  });
+  if (Object.keys(snap).length){
+    o.prevPhases = o.prevPhases || [];
+    o.prevPhases.push({ ver: verOf(o), fa: nowFa(), from: fx, phases: snap });
+  }
+}
+const fxName = k => { const p = PH.find(x => x.k === k); return p ? p.n : '—'; };
 function putSign(o, k){
   o.sign = o.sign || {};
   o.sign[k] = { img: actSign, by: me(), fa: nowFa(), ver: verOf(o) };
@@ -1486,14 +1506,17 @@ const ACTS = {
   reject: {
     t: '↩️ برگشت کار برای اصلاح', btn: '↩️ برگشت به اکیپ',
     body: () => `<p class="muted" style="margin:0 0 10px">دلیل برگشت باید روشن باشد تا اکیپ بداند دقیقاً چه چیزی را اصلاح کند.</p>
-      ${TA('aText','دلیل برگشت','مثلاً: ضخامت آسفالت کمتر از حد مجاز است و لبه‌ها تراز نیست.',1)}${PHOTOBLOCK}${SIGBLOCK}`,
-    fill: () => { actPhotos = []; paintActPhotos(); },
+      ${TA('aText','دلیل برگشت','مثلاً: ضخامت آسفالت کمتر از حد مجاز است و لبه‌ها تراز نیست.',1)}${FXBLOCK}${PHOTOBLOCK}${SIGBLOCK}`,
+    fill: () => { actPhotos = []; actDraft.fx = null; paintActPhotos(); },
     check: () => $('#aText').value.trim().length < 5 ? 'aText|نوشتن دلیل برگشت اجباری است.'
-      : (!actSign ? 'برگشت دادن کار بدون امضای ناظر ممکن نیست.' : ''),
+      : (!actDraft.fx ? 'مشخص کن اکیپ از کدام مرحله دوباره شروع کند.'
+      : (!actSign ? 'برگشت دادن کار بدون امضای ناظر ممکن نیست.' : '')),
     apply: o => {
       o.rejectReason = $('#aText').value.trim(); o.rejectPhotos = actPhotos.slice();
       o.status = 'rejected'; o.reviewFa = nowFa(); o.reviewBy = me();
       putSign(o, 'supReject');
+      applyFixFrom(o, actDraft.fx);
+      addLog(o,'sup','فاز هدف اصلاح: «' + fxName(actDraft.fx) + '»');
       addLog(o,'sup','کار توسط ' + me() + ' برگشت داده و امضا شد — ' + o.rejectReason);
       return 'کار برای اصلاح به اکیپ برگشت';
     }
@@ -1516,14 +1539,16 @@ const ACTS = {
   backtocrew: {
     t: '🔁 ارجاع دوباره به اکیپ', btn: '🔁 ارسال به اکیپ',
     body: o => `<div class="nabox"><b>⛔ دلیل عدم تأیید ناظر${o.reviewBy ? ' (' + esc(o.reviewBy) + ')' : ''}:</b><br>${esc(o.naReason || '—')}</div>` +
-      TA('aText','دستور مدیر اجرایی به اکیپ','دقیقاً چه چیزی باید اصلاح شود؟',1),
-    fill: () => {},
-    check: () => $('#aText').value.trim().length < 3 ? 'aText|نوشتن دستور اصلاح اجباری است.' : '',
+      TA('aText','دستور مدیر اجرایی به اکیپ','دقیقاً چه چیزی باید اصلاح شود؟',1) + FXBLOCK,
+    fill: () => { actDraft.fx = null; },
+    check: () => $('#aText').value.trim().length < 3 ? 'aText|نوشتن دستور اصلاح اجباری است.'
+      : (!actDraft.fx ? 'مشخص کن اکیپ از کدام مرحله دوباره شروع کند.' : ''),
     apply: o => {
       const n = $('#aText').value.trim();
       o.rejectReason = 'عدم تأیید ناظر: ' + (o.naReason || '—') + ' — دستور مدیر اجرایی: ' + n;
       o.status = 'rejected';
-      addLog(o,'exec','مدیر اجرایی کار را برای اصلاح به اکیپ برگرداند — ' + n);
+      applyFixFrom(o, actDraft.fx);
+      addLog(o,'exec','مدیر اجرایی کار را برای اصلاح به اکیپ برگرداند (از مرحله «' + fxName(actDraft.fx) + '») — ' + n);
       return 'کار برای اصلاح به اکیپ ارجاع شد';
     }
   },
@@ -1578,9 +1603,9 @@ function photoBlock(req){
 const PHOTOBLOCK = photoBlock(false);
 function phOpen(o, i){
   const ph = o.phases || {};
-  if (i === 0) return o.status === 'planned' || o.status === 'running';
-  if (i === 1) return o.status === 'running' && !!ph.before;
-  return o.status === 'running' && !!ph.before && !!ph.during;
+  if (!['planned','running','rejected'].includes(o.status)) return false;
+  if (i === 0) return true;
+  return !!ph[PH[i-1].k];
 }
 PH.forEach((p, i) => {
   const last = i === 2;
@@ -1618,7 +1643,11 @@ PH.forEach((p, i) => {
     apply: o => {
       o.phases = o.phases || {};
       o.phases[p.k] = { fa: nowFa(), note: $('#aText').value.trim(), photos: actPhotos.slice(), geo: actGeo, by: me() };
-      if (i === 0 && o.status === 'planned'){ o.status = 'running'; o.startedFa = nowFa(); }
+      if (o.status === 'planned'){ o.status = 'running'; o.startedFa = nowFa(); }
+      else if (o.status === 'rejected'){
+        o.ver = verOf(o) + 1; o.status = 'running'; o.fixFrom = null;
+        addLog(o,'crew','نسخه ' + fd(o.ver) + ' ساخته شد؛ امضاهای نسخه قبل باطل شد','work');
+      }
       if (last){
         o.q1 = $('#aQ1').value.trim(); o.q2 = $('#aQ2') ? $('#aQ2').value.trim() : '';
         o.status = 'finished'; o.finishedFa = nowFa();
@@ -1651,6 +1680,12 @@ function openAct(kind, code){
 }
 $('#actBody').addEventListener('input', e => { if (e.target && e.target.classList) e.target.classList.remove('bad'); });
 $('#actBody').addEventListener('click', e => {
+  const fxb = e.target.closest('[data-fx]');
+  if (fxb){
+    actDraft.fx = fxb.dataset.fx;
+    $$('#aFx .type').forEach(x => x.classList.toggle('sel', x.dataset.fx === actDraft.fx));
+    aerr(''); return;
+  }
   const nmb = e.target.closest('[data-nm]');
   if (nmb){ $('#aName').value = nmb.dataset.nm; aerr(''); return; }
   const spb = e.target.closest('[data-sp]');
@@ -1709,10 +1744,14 @@ function actionsFor(o){
   if (role === 'manager' && o.status === 'proposed'){ a.push(B('accept','✅ موافقم','ok')); a.push(B('keep','❌ طبق دستور اولیه','ghost')); }
   if (role === 'crew'){
     const ph = o.phases || {};
+    const nxt = PH.findIndex((p, i) => !ph[p.k] && phOpen(o, i));
     if (o.status === 'planned')  a.push(B('ph_before','▶️ شروع کار (ثبت مرحله قبل از اجرا)','primary'));
     else if (o.status === 'running' && !ph.during) a.push(B('ph_during','⏩ ادامه کار — ثبت حین اجرا','primary'));
     else if (o.status === 'running') a.push(B('ph_end','🏁 ثبت پایان کار و مقدار','primary'));
-    else if (o.status === 'rejected') a.push(B('fixdone','🔧 اصلاح شد','primary'));
+    else if (o.status === 'rejected'){
+      if (nxt > -1) a.push(B('ph_' + PH[nxt].k, '🔧 اصلاح — ثبت دوباره «' + PH[nxt].n + '»','primary'));
+      else a.push(B('fixdone','🔧 اصلاح شد','primary'));
+    }
   }
   if (role === 'sup'   && o.status === 'finished'){
     a.push(B('approve','✅ تأیید نهایی','ok'));
@@ -1799,6 +1838,16 @@ function histBlock(o){
   return `<details class="log"><summary>تاریخچه (${fd(lg.length)} رویداد)</summary><ul>` +
     lg.map(l => `<li>${esc(l.text)}<br><span style="font-size:10.5px">${esc(l.fa)}</span></li>`).join('') + '</ul></details>';
 }
+function prevBlock(o){
+  if (!o.prevPhases || !o.prevPhases.length || role === 'manager') return '';
+  const n = o.prevPhases.reduce((a, x) => a + Object.keys(x.phases || {}).length, 0);
+  return `<details class="log"><summary>شواهد نسخه‌های قبل (${fd(n)} مرحله بایگانی‌شده)</summary><ul>` +
+    o.prevPhases.map(g => Object.keys(g.phases).map(k => {
+      const d = g.phases[k];
+      return `<li>نسخه ${fd(g.ver)} — «${esc(fxName(k))}»: ${esc(d.note || '')}<br><span style="font-size:10.5px">${esc(d.fa || '')}${d.by ? ' — ' + esc(d.by) : ''}</span>` +
+        ((d.photos && d.photos.length) ? `<div class="phpics" style="padding:5px 0 0">${d.photos.map(x => `<img src="${pdata(x)}" alt="عکس">`).join('')}</div>` : '') + '</li>';
+    }).join('')).join('') + '</ul></details>';
+}
 function signBlock(o){
   const g = o.sign || {};
   const rows = [['crew','✍️ امضای تحویل اکیپ'], ['sup','✅ امضای تأیید ناظر'],
@@ -1823,7 +1872,7 @@ function nextLabel(o){
     const ph = o.phases || {};
     if (o.status === 'planned')  return '▶️ شروع';
     if (o.status === 'running')  return ph.during ? '🏁 پایان' : '⏩ ادامه';
-    if (o.status === 'rejected') return '🔧 اصلاح';
+    if (o.status === 'rejected') return o.fixFrom ? ('🔧 از «' + fxName(o.fixFrom) + '»') : '🔧 اصلاح';
   }
   if (role === 'sup'     && o.status === 'finished')    return '👁 بازدید';
   if (role === 'exec'    && o.status === 'ordered')     return '🗂 برنامه‌ریزی';
@@ -1874,6 +1923,9 @@ function opCard(o){
     ? `<div class="nabox"><b>⛔ ناظر${o.reviewBy ? ' (' + esc(o.reviewBy) + ')' : ''} این کار را تأیید نکرد:</b><br>${esc(o.naReason || '—')}` +
       ((o.naPhotos && o.naPhotos.length) ? `<div class="phpics" style="padding:6px 0 0">${o.naPhotos.map(x => `<img src="${pdata(x)}" alt="عکس">`).join('')}</div>` : '') +
       `<br><span style="font-size:10.5px">${esc(o.reviewFa || '')}</span></div>` : '';
+  const fxb = (o.status === 'rejected' && o.fixFrom)
+    ? `<div class="fixbanner">🔁 <b>باید از مرحله «${esc(fxName(o.fixFrom))}» دوباره ثبت شود.</b><br>` +
+      `مراحل قبل از آن دست‌نخورده می‌ماند. با ثبت دوباره، <b>نسخه ${fd(verOf(o) + 1)}</b> ساخته می‌شود و امضاهای قبلی باطل می‌شوند.</div>` : '';
   const rej  = (o.status === 'rejected' && o.rejectReason) ? `<div class="rbox"><b>↩️ دلیل برگشت ناظر:</b><br>${esc(o.rejectReason)}` +
     ((o.rejectPhotos && o.rejectPhotos.length) ? `<div class="phpics" style="padding:6px 0 0">${o.rejectPhotos.map(x => `<img src="${pdata(x)}" alt="عکس">`).join('')}</div>` : '') +
     ((o.reviewBy && role !== 'crew') ? `<br><span style="font-size:10.5px">ناظر: ${esc(o.reviewBy)}</span>` : '') + '</div>' : '';
@@ -1895,7 +1947,7 @@ function opCard(o){
       <details class="more"><summary>جزئیات کامل</summary>
         <p>📅 ${esc(jFmt(o.jy,o.jm,o.jd))} • 📍 ${esc(o.address)}</p>
         <p>📝 ${esc(o.descr)}</p>
-        ${qty}${asg}${o.status !== 'proposed' ? prop : ''}${dec}${nabx}${rej}${signBlock(o)}
+        ${qty}${asg}${o.status !== 'proposed' ? prop : ''}${dec}${nabx}${rej}${fxb}${signBlock(o)}
         <div class="meta">ثبت: ${esc(o.createdFa || '')}${o.orderBy ? ' — ' + esc(o.orderBy) : ''}${o.finishedFa ? ' • پایان: ' + esc(o.finishedFa) : ''}</div>
         ${histBlock(o)}
       </details>
@@ -1906,13 +1958,14 @@ function opCard(o){
     ${head(o)}${badges(o)}${flowBar(o.status)}
     <p>📅 ${esc(jFmt(o.jy,o.jm,o.jd))} • 📍 ${esc(o.region)} — ${esc(o.address)}</p>
     <p>📝 ${esc(o.descr)}</p>
-    ${qty}${asg}${prop}${dec}${nabx}${rej}${fixBlock(o)}${signBlock(o)}
+    ${qty}${asg}${prop}${dec}${nabx}${rej}${fxb}${fixBlock(o)}${signBlock(o)}
     ${(o.status === 'approved' && role !== 'crew') ? `<div class="okline">✅ تأیید نهایی توسط <b>${esc(o.reviewBy || 'ناظر — نام ثبت نشده')}</b>${o.reviewFa ? ' • ' + esc(o.reviewFa) : ''}${o.reviewNote ? '<br>' + esc(o.reviewNote) : ''}</div>` : ''}
     ${(o.status === 'approved' && role === 'crew') ? `<div class="okline">✅ این کار تأیید نهایی شد${o.reviewFa ? ' • ' + esc(o.reviewFa) : ''}</div>` : ''}
     ${(o.photos && o.photos.length) ? `<div class="photos">${o.photos.map(x => `<div class="ph"><img src="${pdata(x)}" alt="عکس"></div>`).join('')}</div>` : ''}
     ${(o.photos && o.photos.length && o.gps && o.photoGeo) ? geoStamp(o.gps, '') : ''}
     ${phasesBlock(o)}
     <div class="meta">ثبت: ${esc(o.createdFa || '')}${o.finishedFa ? ' • پایان: ' + esc(o.finishedFa) : ''}</div>
+    ${prevBlock(o)}
     ${o.gps ? routeBtns(o.gps.lat, o.gps.lng) : ''}
     ${seenLine(o)}
     ${actionsFor(o)}
@@ -2012,5 +2065,5 @@ buildRegions(); paintDateBtn(); paintDue(); buildRoleCards();
 if (role){ render(); show('home'); } else { show('roleGate'); }
 console.log('Bazdid Ops ' + APP_VERSION);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a472eacadbbcd919',t:'MTc5MTQzOTE0MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
