@@ -54,6 +54,10 @@ select.empty{color:#94a3b8;border-color:#fcd34d;background:#fffdf5}
 .type.sel{border-color:#1d4ed8;background:#eff6ff;box-shadow:0 0 0 3px #dbeafe}
 .chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px}
 .chip{border:1.5px solid var(--line);background:#fff;border-radius:20px;padding:7px 12px;font:700 12px Tahoma;color:#334155;transition:transform .08s}
+.urows{display:grid;gap:7px;margin-top:6px}
+.urow{display:flex;align-items:center;gap:10px;width:100%;text-align:right;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:11px 12px;font:700 14px Tahoma;color:#0f172a}
+.urow.sel{border-color:#1d4ed8;background:#eff6ff;color:#1d4ed8}
+.ur-dot{font-size:16px;line-height:1}
 .chip:active{transform:scale(.96)}
 .chip.sel{border-color:#1d4ed8;background:#eff6ff;color:#1d4ed8}
 .err{display:none;margin:10px 0 0;background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:12px;padding:9px 11px;font-size:12px;font-weight:700;line-height:1.9}
@@ -676,7 +680,8 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
       </label>
       <div id="unitWrap" class="hidden">
         <span class="lb" style="display:block;margin:4px 0 5px">واحد تو <span class="req">*</span></span>
-        <div class="chips" id="unitSel"></div>
+        <div id="unitSel" class="urows"></div>
+        <p class="muted" id="unitHint" style="margin:6px 0 0"></p>
       </div>
       <p class="muted">نام تو پای هر اقدامی که ثبت می‌کنی می‌نشیند. فقط یک بار پرسیده می‌شود.</p>
       <p class="err" id="nameErr"></p>
@@ -745,7 +750,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 <div class="msg" id="msg"></div>
 
 <script>
-const APP_VERSION = 'v3.7.3-MENU';
+const APP_VERSION = 'v3.7.4-MENU';
 /* ---------- سازمان‌ها: هر سازمان کلیدهای ذخیره‌سازی جدا دارد ---------- */
 const ORGS_KEY = 'ops37_orgs', ACTIVE_KEY = 'ops37_active';
 let ORGS = [];
@@ -1646,14 +1651,21 @@ function paintUnitSel(k){
   if (!need){ pendUnit = ''; return; }
   pendUnit = myUnits[k] || '';
   if (!pendUnit && org.units.length === 1) pendUnit = org.units[0].n;
-  $('#unitSel').innerHTML = org.units.map(u =>
-    `<button type="button" class="chip${norm(u.n)===norm(pendUnit)?' sel':''}" data-u="${esc(u.n)}">${esc(u.n)}</button>`).join('');
+  paintUnitRows();
+}
+function paintUnitRows(){
+  $('#unitSel').innerHTML = org.units.map(u => {
+    const on = norm(u.n) === norm(pendUnit);
+    return `<button type="button" class="urow${on ? ' sel' : ''}" data-u="${esc(u.n)}"><span class="ur-dot">${on ? '◉' : '○'}</span><span>${esc(u.n)}</span></button>`;
+  }).join('');
+  const cur = org.units.find(u => norm(u.n) === norm(pendUnit));
+  $('#unitHint').textContent = !cur ? 'یک واحد را انتخاب کن.'
+    : org.units.length === 1 ? 'فقط یک واحد در این سازمان است. واحدهای بیشتر را در ✏️ ویرایش سازمان‌ها ← 🏢 واحدها اضافه کن.'
+    : 'واحد انتخاب‌شده: ' + cur.n + '. برای تغییر، روی واحد دیگری بزن.';
 }
 $('#unitSel').addEventListener('click', e => {
   const b = e.target.closest('[data-u]'); if (!b) return;
-  pendUnit = b.dataset.u;
-  $$('#unitSel .chip').forEach(x => x.classList.toggle('sel', x.dataset.u === pendUnit));
-  $('#nameErr').classList.remove('show');
+  pendUnit = b.dataset.u; paintUnitRows(); $('#nameErr').classList.remove('show');
 });
 function openName(k){
   pendingRole = k;
@@ -2563,5 +2575,5 @@ try { const nx = sessionStorage.getItem('ops37_next'); sessionStorage.removeItem
   if (nx === 'units' && ACTIVE_ORG) setTimeout(() => $('#orgBtn').click(), 0); } catch(e){}
 console.log('Bazdid Ops ' + APP_VERSION);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a47ace993abb66f8',t:'MTc5MTUyMTg3Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a47ace993abb66f8',t:'MTc5MTUyMTg3Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a480d0b92f1b06bc',t:'MTc5MTU4NDg3NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
