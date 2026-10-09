@@ -53,7 +53,7 @@ select.empty{color:#94a3b8;border-color:#fcd34d;background:#fffdf5}
 .type small{color:var(--muted);font-size:10px}
 .type.sel{border-color:#1d4ed8;background:#eff6ff;box-shadow:0 0 0 3px #dbeafe}
 .chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px}
-.chip{border:1.5px solid var(--line);background:#fff;border-radius:20px;padding:7px 12px;font:700 12px inherit;color:#334155;transition:transform .08s}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:20px;padding:7px 12px;font:700 12px Tahoma;color:#334155;transition:transform .08s}
 .chip:active{transform:scale(.96)}
 .chip.sel{border-color:#1d4ed8;background:#eff6ff;color:#1d4ed8}
 .err{display:none;margin:10px 0 0;background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:12px;padding:9px 11px;font-size:12px;font-weight:700;line-height:1.9}
@@ -373,6 +373,22 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 .dmi{display:block;width:100%;text-align:right;border:1.5px solid var(--line);background:#fff;border-radius:13px;padding:11px 12px;margin-bottom:7px;font:700 13.5px Tahoma;color:#0f172a}
 .dmi.on{border-color:#1d4ed8;background:#eff6ff;color:#1d4ed8}
 .dmi.danger{background:#fff5f5;color:#991b1b;border-color:#fecaca}
+.orgbox{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:8px;margin-bottom:8px}
+.orgbox.active{border-color:#1d4ed8;background:#eff6ff;padding:12px}
+.ob-name{font-size:16px;font-weight:800;color:#1d4ed8;margin-bottom:9px}
+.ob-tools{display:flex;gap:6px}
+.ob-tools button{flex:1;border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 4px;font:700 12px Tahoma;color:#0f172a}
+.ob-del{display:block;width:100%;margin-top:8px;border:1px solid #fecaca;background:#fff5f5;color:#991b1b;border-radius:10px;padding:8px;font:700 12px Tahoma}
+.ob-row{display:flex;align-items:center;gap:8px;width:100%;text-align:right;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 10px;margin-bottom:6px;font:700 13px Tahoma;color:#0f172a}
+.ob-row:last-child{margin-bottom:0}
+.ob-row.on{border-color:#1d4ed8;background:#eff6ff;color:#1d4ed8}
+.ob-num{flex:0 0 26px;height:26px;border-radius:50%;background:#e2e8f0;display:inline-flex;align-items:center;justify-content:center;font-size:12px}
+.ob-row.on .ob-num{background:#1d4ed8;color:#fff}
+.ob-nm{flex:1}
+.ob-st{font-size:11px;font-weight:400;color:var(--muted)}
+.ob-row.on .ob-st{color:#1d4ed8;font-weight:700}
+.rc-who{display:block;font-style:normal;font-size:11.5px;color:#1d4ed8;font-weight:700;margin-top:3px}
+.rc-who.off{color:var(--muted);font-weight:400}
 .dmi small{display:block;font-weight:400;font-size:11px;opacity:.85;margin-top:2px}
 .sheet{background:#fff;border-radius:20px;width:min(94vw,460px);max-height:88vh;overflow:auto;padding:14px}
 .sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-size:15px}
@@ -389,7 +405,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
     <div>
       <h1>🏗️ ثبت عملیات</h1>
       <div id="orgTitle" class="orgtitle hidden"></div>
-      <small>نسخه آزمایشی • v3.7.0-MENU</small>
+      <small id="verTxt" style="white-space:nowrap">نسخه آزمایشی</small>
       <button type="button" id="roleChip" class="rolechip hidden"></button>
     </div>
     <button class="btn ghost" id="homeBtn">خانه</button>
@@ -417,6 +433,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
   <section id="roleGate" class="hidden">
     <div class="card">
       <h3 style="margin:0 0 4px;font-size:16px">نقش خود را انتخاب کن</h3>
+      <p class="muted" id="roleCtx" style="margin:0 0 6px"></p>
       <p class="muted" style="margin:0 0 12px">هر نقش فقط گزینه‌های مربوط به خودش را می‌بیند. برای آزمایش هر وقت خواستی می‌توانی نقش را عوض کنی.</p>
       <div class="rolecards" id="roleCards"></div>
       <button class="btn ghost block hidden" id="editName" style="margin-top:12px">✏️ تغییر نام من در این نقش</button>
@@ -683,13 +700,18 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 <div class="drawer-ovl hidden" id="menuOvl">
   <aside class="drawer">
     <div class="drawer-head"><span>☰ منو</span><button type="button" id="menuClose">✕</button></div>
-    <div class="drawer-sec">🏛 سازمان‌ها — هر سازمان کاملاً جداست</div>
-    <div id="menuOrgs"></div>
+    <div class="drawer-sec">🏛 سازمان فعال — همه کارها داخل این سازمان است</div>
+    <div class="orgbox active">
+      <div class="ob-name" id="mActName">—</div>
+      <div class="ob-tools">
+        <button type="button" id="mRenameOrg">✏️ تغییر نام</button>
+        <button type="button" id="mUnits">🏢 واحدها و افراد</button>
+      </div>
+      <button type="button" class="ob-del" id="mDelOrg">🗑 حذف این سازمان از این مرورگر</button>
+    </div>
+    <div class="drawer-sec">📋 سازمان‌های من (شماره‌وار) — با زدن هر کدام، همان سازمان فعال می‌شود</div>
+    <div class="orgbox" id="menuOrgs"></div>
     <button type="button" class="dmi" id="mAddOrg">➕ افزودن سازمان جدید<small>صفحه انتخاب سازمان باز می‌شود</small></button>
-    <div class="drawer-sec">سازمان فعال</div>
-    <button type="button" class="dmi" id="mRenameOrg">✏️ تغییر نام این سازمان</button>
-    <button type="button" class="dmi" id="mUnits">🏢 واحدها و افراد این سازمان</button>
-    <button type="button" class="dmi danger" id="mDelOrg">🗑 حذف این سازمان از این مرورگر</button>
     <div class="drawer-sec">کاربری</div>
     <button type="button" class="dmi" id="mRole">🔁 تغییر نقش</button>
     <button type="button" class="dmi" id="mTools">⚙️ ابزار آزمایش</button>
@@ -716,7 +738,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 <div class="msg" id="msg"></div>
 
 <script>
-const APP_VERSION = 'v3.7.1-MENU';
+const APP_VERSION = 'v3.7.2-MENU';
 /* ---------- سازمان‌ها: هر سازمان کلیدهای ذخیره‌سازی جدا دارد ---------- */
 const ORGS_KEY = 'ops37_orgs', ACTIVE_KEY = 'ops37_active';
 let ORGS = [];
@@ -1593,10 +1615,12 @@ function clearSeen(code){
 
 /* ---------- انتخاب نقش ---------- */
 function buildRoleCards(){
+  $('#roleCtx').textContent = '🏛 سازمان فعال: ' + (orgName(ACTIVE_ORG) || '—') + ' — هر نقش فقط برای همین سازمان است.';
   $('#roleCards').innerHTML = Object.keys(ROLES).map(k => {
     const r = ROLES[k];
+    const who = names[k] ? `<em class="rc-who">👤 ${esc(names[k])}${k !== 'manager' && myUnits[k] ? ' • 🏢 واحد ' + esc(myUnits[k]) : ''}</em>` : '<em class="rc-who off">هنوز ثبت نشده</em>';
     return `<button type="button" class="role${role===k?' on':''}" data-role="${k}">
-      <span class="ic">${r.ic}</span><span class="tx"><b>${esc(r.t)}</b><i>${esc(r.d)}</i></span></button>`;
+      <span class="ic">${r.ic}</span><span class="tx"><b>${esc(r.t)}</b><i>${esc(r.d)}</i>${who}</span></button>`;
   }).join('');
 }
 function setRole(k){
@@ -1614,6 +1638,7 @@ function paintUnitSel(k){
   $('#unitWrap').classList.toggle('hidden', !need);
   if (!need){ pendUnit = ''; return; }
   pendUnit = myUnits[k] || '';
+  if (!pendUnit && org.units.length === 1) pendUnit = org.units[0].n;
   $('#unitSel').innerHTML = org.units.map(u =>
     `<button type="button" class="chip${norm(u.n)===norm(pendUnit)?' sel':''}" data-u="${esc(u.n)}">${esc(u.n)}</button>`).join('');
 }
@@ -2429,7 +2454,7 @@ function paintOrgHead(){
 }
 function paintOrgPick(){
   $('#orgCards').innerHTML = ORGS.length
-    ? ORGS.map(o => `<button type="button" class="role" data-org="${esc(o.id)}"><span class="ic">🏛</span><span class="tx"><b>${esc(o.n)}</b><i>ورود به این سازمان</i></span></button>`).join('')
+    ? ORGS.map((o, i) => `<button type="button" class="role" data-org="${esc(o.id)}"><span class="ic">🏛</span><span class="tx"><b>${fd(i + 1)}. ${esc(o.n)}</b><i>ورود به این سازمان</i></span></button>`).join('')
     : '<p class="muted" style="margin:0">هنوز سازمانی ساخته نشده است. از کادر پایین اولین سازمان را بساز.</p>';
   $('#orgNewErr').classList.remove('show');
 }
@@ -2443,10 +2468,11 @@ $('#orgNewGo').addEventListener('click', () => {
 $('#orgNewName').addEventListener('keydown', e => { if (e.key === 'Enter') $('#orgNewGo').click(); });
 
 function paintMenu(){
-  $('#menuOrgs').innerHTML = ORGS.map(o => {
+  $('#mActName').textContent = '🏛 ' + (orgName(ACTIVE_ORG) || '—');
+  $('#menuOrgs').innerHTML = ORGS.length ? ORGS.map((o, i) => {
     const on = o.id === ACTIVE_ORG;
-    return `<button type="button" class="dmi${on ? ' on' : ''}" data-org="${esc(o.id)}">🏛 ${esc(o.n)}${on ? '<small>✓ سازمان فعال</small>' : '<small>ورود به این سازمان</small>'}</button>`;
-  }).join('');
+    return `<button type="button" class="ob-row${on ? ' on' : ''}" data-org="${esc(o.id)}"><span class="ob-num">${fd(i + 1)}</span><span class="ob-nm">${esc(o.n)}</span><span class="ob-st">${on ? '✓ فعال' : 'ورود ›'}</span></button>`;
+  }).join('') : '<p class="muted" style="margin:0">سازمانی نیست.</p>';
 }
 function openMenu(){ paintMenu(); $('#menuOvl').classList.remove('hidden'); }
 function closeMenu(){ $('#menuOvl').classList.add('hidden'); }
@@ -2491,11 +2517,12 @@ $('#infoClose').addEventListener('click', () => $('#infoOvl').classList.add('hid
 $('#infoOvl').addEventListener('click', e => { if (e.target.id === 'infoOvl') $('#infoOvl').classList.add('hidden'); });
 
 try { const sv = localStorage.getItem(ROLE_KEY); if (sv && ROLES[sv]) role = sv; } catch(e){}
+$('#verTxt').textContent = 'نسخه آزمایشی • ' + APP_VERSION;
 buildRegions(); paintDateBtn(); paintStart(); paintDue(); paintUnitPick(); buildRoleCards();
 paintOrgHead();
 if (!ACTIVE_ORG){ paintOrgPick(); show('orgPick'); }
 else if (role){ render(); show('home'); } else { show('roleGate'); }
 console.log('Bazdid Ops ' + APP_VERSION);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a47ace993abb66f8',t:'MTc5MTUyMTg3Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a47f4a05ef7e299d',t:'MTc5MTU2ODg3MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a47ace993abb66f8',t:'MTc5MTUyMTg3Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
