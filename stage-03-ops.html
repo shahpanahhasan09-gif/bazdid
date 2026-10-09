@@ -310,7 +310,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
   <header class="head">
     <div>
       <h1>🏗️ ثبت عملیات</h1>
-      <small>نسخه آزمایشی • v3.5.1-FIX</small>
+      <small>نسخه آزمایشی • v3.5.2-ORDER</small>
       <button type="button" id="roleChip" class="rolechip hidden"></button>
     </div>
     <button class="btn ghost" id="homeBtn">خانه</button>
@@ -566,7 +566,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 <div class="msg" id="msg"></div>
 
 <script>
-const APP_VERSION = 'v3.5.1-FIX';
+const APP_VERSION = 'v3.5.2-ORDER';
 const KEY = 'ops31_local_v1';
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
@@ -609,7 +609,7 @@ const ST = {
   notapproved: {t:'عدم تأیید ناظر', c:'st-na',  s:4, sh:'عدم تأیید'}
 };
 const FLOW = ['ابلاغ','برنامه‌ریزی','اجرا','تأیید'];
-const DELIVERED = ['finished','approved','rejected','notapproved'];  // اکیپ حداقل یک‌بار تحویل داده
+const REVIEWED = ['approved','notapproved'];  // ناظر نظر نهایی داده؛ تا پیش از آن مدیران اظهارنظر نمی‌کنند
 const INBOX = { manager:['proposed','notapproved'], exec:['ordered','notapproved'], crew:['planned','running','rejected'], sup:['finished'] };
 const INBOX_T = { manager:'منتظر تصمیم یا اطلاع تو', exec:'منتظر اقدام تو', crew:'کار منتظر اقدام تو', sup:'کار منتظر تأیید تو' };
 const PRIO = {
@@ -1767,7 +1767,7 @@ function actionsFor(o){
     a.push(B('backtocrew','🔁 ارجاع دوباره به اکیپ','primary'));
     a.push(B('plan','🗂 برنامه‌ریزی دوباره','ghost'));
   }
-  if ((role === 'manager' || role === 'exec') && DELIVERED.includes(o.status)){
+  if ((role === 'manager' || role === 'exec') && REVIEWED.includes(o.status)){
     if (!seenBy(o, role)){
       a.push(`<button class="btn ok" data-ack="${esc(o.code)}">✔ ملاحظه و تأیید</button>`);
       a.push(B('seenno','✖ ملاحظه، تأیید نشد','danger'));
@@ -1909,8 +1909,13 @@ function openDetail(code){
 }
 function seenLine(o){
   if (role !== 'manager' && role !== 'exec') return '';
-  if (!DELIVERED.includes(o.status))
-    return `<div class="waitline">⏳ کار هنوز تمام نشده است. پس از تحویل اکیپ می‌توانی «ملاحظه و تأیید» کنی.</div>`;
+  if (!REVIEWED.includes(o.status)){
+    if (o.status === 'finished')
+      return `<div class="waitline">⏳ اکیپ کار را تحویل داده ولی <b>ناظر هنوز نظر نداده است</b>. پس از تأیید یا عدم تأیید ناظر می‌توانی «ملاحظه و تأیید» کنی.</div>`;
+    if (o.status === 'rejected')
+      return `<div class="waitline">⏳ کار برای اصلاح نزد اکیپ است. پس از تحویل دوباره و نظر ناظر می‌توانی اظهارنظر کنی.</div>`;
+    return `<div class="waitline">⏳ کار هنوز تمام نشده است. پس از تحویل اکیپ و نظر ناظر می‌توانی «ملاحظه و تأیید» کنی.</div>`;
+  }
   const g = seenRec(o, role);
   if (!g || g.st !== o.status) return '';
   return g.ok
@@ -2087,5 +2092,5 @@ buildRegions(); paintDateBtn(); paintDue(); buildRoleCards();
 if (role){ render(); show('home'); } else { show('roleGate'); }
 console.log('Bazdid Ops ' + APP_VERSION);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4779efdcf6993be',t:'MTc5MTQ4ODQ2NQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a479b37eaa5c0b3e',t:'MTc5MTUxMDI3Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
