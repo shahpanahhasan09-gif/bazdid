@@ -362,15 +362,34 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 .cal-pick .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:11px}
 .cal-pick .grid button{border:1.5px solid var(--line);background:#fff;border-radius:11px;padding:9px 3px;font:700 12px Tahoma;color:#334155}
 .cal-pick .grid button.on{border-color:#1d4ed8;background:#eff6ff;color:#1d4ed8}
+
+.menubtn{border:1.5px solid #ffffff80;background:#ffffff1f;color:#fff;border-radius:12px;width:42px;height:42px;font:700 20px Tahoma;flex:0 0 auto;padding:0}
+.orgtitle{display:inline-block;margin-top:5px;background:#ffffff26;border:1px solid #ffffff59;border-radius:999px;padding:3px 11px;font-size:12px;font-weight:700;color:#fff}
+.drawer-ovl{position:fixed;inset:0;background:#0f172a99;z-index:65;display:flex;justify-content:flex-start}
+.drawer{width:min(86vw,320px);height:100%;background:#f8fafc;overflow-y:auto;padding:14px 12px 30px;box-shadow:0 0 30px #0f172a40}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;font-size:16px;font-weight:800}
+.drawer-head button,.sheet-head button{border:1px solid var(--line);background:#fff;border-radius:10px;width:34px;height:34px;font:700 15px Tahoma}
+.drawer-sec{font-size:11.5px;color:var(--muted);font-weight:800;margin:14px 2px 6px}
+.dmi{display:block;width:100%;text-align:right;border:1.5px solid var(--line);background:#fff;border-radius:13px;padding:11px 12px;margin-bottom:7px;font:700 13.5px Tahoma;color:#0f172a}
+.dmi.on{border-color:#1d4ed8;background:#eff6ff;color:#1d4ed8}
+.dmi.danger{background:#fff5f5;color:#991b1b;border-color:#fecaca}
+.dmi small{display:block;font-weight:400;font-size:11px;opacity:.85;margin-top:2px}
+.sheet{background:#fff;border-radius:20px;width:min(94vw,460px);max-height:88vh;overflow:auto;padding:14px}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-size:15px}
+.info{font-size:13px;line-height:2}
+.info b{color:var(--p)}
+.info ol{padding-right:18px;margin:6px 0}
 </style>
 </head>
 <body>
 <div class="app">
 
   <header class="head">
+    <button type="button" class="menubtn hidden" id="menuBtn" aria-label="منو">☰</button>
     <div>
       <h1>🏗️ ثبت عملیات</h1>
-      <small>نسخه آزمایشی • v3.6.0-ORG</small>
+      <div id="orgTitle" class="orgtitle hidden"></div>
+      <small>نسخه آزمایشی • v3.7.0-MENU</small>
       <button type="button" id="roleChip" class="rolechip hidden"></button>
     </div>
     <button class="btn ghost" id="homeBtn">خانه</button>
@@ -380,6 +399,20 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
     <summary>ℹ️ فایل آزمایشی مرحله ۳.۶ — برای دیدن توضیح بزن</summary>
     <div style="margin-top:8px">چرخه چهارنقشی با شواهد قفل‌دار: مدیر اصلی دستور می‌دهد ← مدیر اجرایی برنامه‌ریزی می‌کند یا پیشنهاد اصلاح می‌دهد ← اکیپ با عکس و موقعیت ثبت و امضا می‌کند ← ناظر بازدید و امضا می‌کند. داده‌ها فقط در حافظه همین مرورگر ذخیره می‌شود و هیچ ارتباطی با سامانه اصلی ندارد.<br><b>این کادر در نسخه نهایی حذف می‌شود.</b></div>
   </details>
+
+  <section id="orgPick" class="hidden">
+    <div class="card">
+      <h3 style="margin:0 0 4px;font-size:16px">🏛 سازمان خود را انتخاب کن</h3>
+      <p class="muted" style="margin:0 0 12px">هر سازمان داده، واحدها و افراد خودش را دارد و سازمان‌های دیگر را نمی‌بیند. بعد از ورود، از ☰ بالا می‌توانی سازمان را عوض کنی.</p>
+      <div class="rolecards" id="orgCards"></div>
+    </div>
+    <div class="card">
+      <span class="lb" style="display:block;color:var(--muted);font-size:12px;font-weight:700;margin-bottom:5px">➕ سازمان جدید</span>
+      <input id="orgNewName" placeholder="مثلاً شهرداری منطقه ۳ یا شرکت عمران شمال" style="width:100%;padding:12px;border:1.5px solid var(--line);border-radius:12px;font:inherit">
+      <p class="err" id="orgNewErr"></p>
+      <button class="btn primary block" id="orgNewGo">✔ ساخت سازمان و ورود</button>
+    </div>
+  </section>
 
   <section id="roleGate" class="hidden">
     <div class="card">
@@ -410,16 +443,6 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
     <p class="muted hidden" id="roleHint" style="margin:10px 2px 0"></p>
     <div class="crewhint hidden" id="crewHint" style="margin-top:10px"></div>
     <div id="list"></div>
-    <details class="tools">
-      <summary>⚙️ ابزار آزمایش</summary>
-      <div class="card" style="margin-top:10px">
-        <p class="muted">برای شروع دوباره آزمایش می‌توانی همه داده‌های محلی این صفحه را پاک کنی. روی سامانه اصلی هیچ اثری ندارد.</p>
-        <div class="demoflash" id="demoFlash">🫧 نمونه «نفس توجه» — هاله دور این کادر باید آرام کم و زیاد شود.</div>
-        <button class="btn ok block" id="seed">🔔 ساخت ۵ نمونه برای آزمایش چشمک‌زن</button>
-        <p class="muted">پنج کار نمونه می‌سازد تا در هر نقش یک چشمک ببینی. نام اکیپ نمونه، همان نام ورود تو در نقش اکیپ است.</p>
-        <button class="btn danger block" id="wipe">🗑 پاک‌کردن داده‌های آزمایشی</button>
-      </div>
-    </details>
   </section>
 
   <section id="wizard" class="hidden">
@@ -657,11 +680,64 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
     <div class="cal-foot"><button type="button" class="btn ghost" id="calClose">بستن</button></div>
   </div>
 </div>
+<div class="drawer-ovl hidden" id="menuOvl">
+  <aside class="drawer">
+    <div class="drawer-head"><span>☰ منو</span><button type="button" id="menuClose">✕</button></div>
+    <div class="drawer-sec">🏛 سازمان‌ها — هر سازمان کاملاً جداست</div>
+    <div id="menuOrgs"></div>
+    <button type="button" class="dmi" id="mAddOrg">➕ افزودن سازمان جدید<small>صفحه انتخاب سازمان باز می‌شود</small></button>
+    <div class="drawer-sec">سازمان فعال</div>
+    <button type="button" class="dmi" id="mRenameOrg">✏️ تغییر نام این سازمان</button>
+    <button type="button" class="dmi" id="mUnits">🏢 واحدها و افراد این سازمان</button>
+    <button type="button" class="dmi danger" id="mDelOrg">🗑 حذف این سازمان از این مرورگر</button>
+    <div class="drawer-sec">کاربری</div>
+    <button type="button" class="dmi" id="mRole">🔁 تغییر نقش</button>
+    <button type="button" class="dmi" id="mTools">⚙️ ابزار آزمایش</button>
+    <button type="button" class="dmi" id="mHelp">❓ راهنما</button>
+    <button type="button" class="dmi" id="mAbout">ℹ️ درباره برنامه</button>
+  </aside>
+</div>
+<div class="ovl hidden" id="toolsOvl">
+  <div class="sheet">
+    <div class="sheet-head"><b>⚙️ ابزار آزمایش</b><button type="button" id="toolsClose">✕</button></div>
+    <p class="muted">برای شروع دوباره آزمایش می‌توانی داده‌های محلی <b>همین سازمان</b> را پاک کنی. سازمان‌های دیگر و سامانه اصلی دست‌نخورده می‌مانند.</p>
+    <div class="demoflash" id="demoFlash">🫧 نمونه «نفس توجه» — هاله دور این کادر باید آرام کم و زیاد شود.</div>
+    <button class="btn ok block" id="seed">🔔 ساخت ۵ نمونه برای آزمایش چشمک‌زن</button>
+    <p class="muted">پنج کار نمونه می‌سازد تا در هر نقش یک چشمک ببینی. نام اکیپ نمونه، همان نام ورود تو در نقش اکیپ است.</p>
+    <button class="btn danger block" id="wipe">🗑 پاک‌کردن داده‌های آزمایشی این سازمان</button>
+  </div>
+</div>
+<div class="ovl hidden" id="infoOvl">
+  <div class="sheet">
+    <div class="sheet-head"><b id="infoTitle"></b><button type="button" id="infoClose">✕</button></div>
+    <div class="info" id="infoBody"></div>
+  </div>
+</div>
 <div class="msg" id="msg"></div>
 
 <script>
-const APP_VERSION = 'v3.6.0-ORG';
-const KEY = 'ops31_local_v1';
+const APP_VERSION = 'v3.7.1-MENU';
+/* ---------- سازمان‌ها: هر سازمان کلیدهای ذخیره‌سازی جدا دارد ---------- */
+const ORGS_KEY = 'ops37_orgs', ACTIVE_KEY = 'ops37_active';
+let ORGS = [];
+try { ORGS = JSON.parse(localStorage.getItem(ORGS_KEY) || '[]') || []; } catch(e){ ORGS = []; }
+const LEGACY_KEYS = ['ops31_local_v1','ops32_role','ops32_names','ops34_views','ops36_org','ops36_units'];
+if (!ORGS.length && LEGACY_KEYS.some(k => localStorage.getItem(k) !== null)){
+  // داده‌های قبل از این نسخه به «سازمان اصلی» منتقل می‌شوند (همان کلیدهای قبلی)
+  ORGS = [{ id:'main', n:'سازمان اصلی' }];
+  try { localStorage.setItem(ORGS_KEY, JSON.stringify(ORGS)); localStorage.setItem(ACTIVE_KEY, 'main'); } catch(e){}
+}
+let ACTIVE_ORG = '';
+try { ACTIVE_ORG = localStorage.getItem(ACTIVE_KEY) || ''; } catch(e){}
+if (!ORGS.some(o => o.id === ACTIVE_ORG)) ACTIVE_ORG = '';
+const orgSfx = id => (!id || id === 'main') ? '' : '::' + id;
+const SFX = orgSfx(ACTIVE_ORG);
+const KEY = 'ops31_local_v1' + SFX;
+const ROLE_KEY = 'ops32_role' + SFX;
+const NAME_KEY = 'ops32_names' + SFX;
+const VIEW_KEY = 'ops34_views' + SFX;
+const ORG_KEY = 'ops36_org' + SFX;
+const UNIT_KEY = 'ops36_units' + SFX;
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const pad2 = n => String(n).padStart(2, '0');
@@ -711,11 +787,6 @@ const PRIO = {
   urgent:   {t:'فوری',   c:'prio-urgent',   r:1},
   critical: {t:'بحرانی', c:'prio-critical', r:2}
 };
-const ROLE_KEY = 'ops32_role';
-const NAME_KEY = 'ops32_names';
-const VIEW_KEY = 'ops34_views';
-const ORG_KEY = 'ops36_org';
-const UNIT_KEY = 'ops36_units';
 const GRP = [['ex','مدیر اجرایی'], ['cr','سرپرست اکیپ'], ['su','ناظر']];
 const VIEW_DEF = { manager:'compact', exec:'compact', sup:'compact', crew:'full' };
 const FILT = [{k:'active',t:'در جریان'},{k:'late',t:'تأخیردار'},{k:'done',t:'تأییدشده'},{k:'all',t:'همه'}];
@@ -773,7 +844,7 @@ const LAST = 7;
 const TITLES = {1:'واحد و نوع عملیات',2:'تاریخ دستور',3:'منطقه و موقعیت',4:'آدرس دقیق',5:'شرح عملیات',6:'اولویت، شروع و مهلت',7:'بازبینی و صدور'};
 
 function show(sec){
-  ['roleGate','orgPage','home','wizard','detail','act','done'].forEach(x => $('#'+x).classList.toggle('hidden', x !== sec));
+  ['orgPick','roleGate','orgPage','home','wizard','detail','act','done'].forEach(x => $('#'+x).classList.toggle('hidden', x !== sec));
   window.scrollTo(0,0);
 }
 function err(t){
@@ -2057,7 +2128,7 @@ function badges(o){
 function head(o){
   const st = ST[o.status] || ST.ordered;
   return `<div class="op-top">
-    <div><span class="code">${esc(fd(o.code))}</span><p style="margin:4px 0 0"><b>${esc(o.typeName)}</b></p></div>
+    <div><span class="code"><bdi dir="ltr">${esc(fd(o.code))}</bdi></span><p style="margin:4px 0 0"><b>${esc(o.typeName)}</b></p></div>
     <span class="st ${st.c}">${esc(st.t)}</span></div>`;
 }
 function histBlock(o){
@@ -2120,7 +2191,7 @@ function opRow(o){
   const seen = sg && sg.st === o.status;
   return `<button type="button" class="crow${bk ? (bk.c === 'r' ? ' rowred' : ' rowblue') : ''}" data-open="${esc(o.code)}">
     <span class="cst ${st.c}">${esc(st.sh || st.t)}${showLate ? '<small>⏰ تأخیر</small>' : ''}</span>
-    <span class="ct"><b>${esc(fd(o.code))}</b>
+    <span class="ct"><b><bdi dir="ltr">${esc(fd(o.code))}</bdi></b>
       <i>${esc(o.typeName)} — ${esc(o.address)}</i>
       <u>${o.unit ? esc(o.unit) + ' • ' : ''}${esc(o.region)}${o.assignee ? ' • ' + esc(o.assignee) : ''}${verOf(o) > 1 ? ' • نسخه ' + fd(verOf(o)) : ''}</u></span>
     ${seen ? (sg.ok ? '<span class="seenpill">✔ ملاحظه و تأیید</span>'
@@ -2317,10 +2388,114 @@ function render(){
   paintFlashSoon();
 }
 
+/* ---------- سازمان‌ها، منو و راهنما ---------- */
+const HELP_HTML = `<ol>
+<li><b>سازمان‌ها جدا هستند.</b> هر سازمان داده، واحد، افراد و نقش‌های خودش را دارد و سازمان‌های دیگر را نمی‌بیند.</li>
+<li><b>ورود به سازمان:</b> اول فهرست سازمان‌ها باز می‌شود. یکی را بزن تا وارد شوی.</li>
+<li><b>تغییر سازمان:</b> ☰ بالا ← نام سازمان دیگر. برنامه دوباره باز می‌شود.</li>
+<li><b>سازمان جدید:</b> ☰ ← ➕ افزودن سازمان جدید.</li>
+<li><b>واحدها و افراد:</b> ☰ ← 🏢 واحدها و افراد این سازمان (عمران، فضای سبز، سرپرستان، ناظران).</li>
+<li><b>نقش:</b> بعد از ورود به سازمان، نقش خودت را انتخاب کن. برای عوض کردن: ☰ ← 🔁 تغییر نقش.</li>
+</ol>
+<p class="muted">فعلاً داده‌ها روی همین مرورگر ذخیره می‌شوند. در نسخه سرور، ورود با حساب کاربری انجام می‌شود.</p>`;
+function orgName(id){ const o = ORGS.find(x => x.id === id); return o ? o.n : ''; }
+function saveOrgs(){ try { localStorage.setItem(ORGS_KEY, JSON.stringify(ORGS)); } catch(e){} }
+function purgeOrg(id){
+  const s = orgSfx(id);
+  LEGACY_KEYS.forEach(k => { try { localStorage.removeItem(k + s); } catch(e){} });
+}
+function switchOrg(id){
+  if (id !== ACTIVE_ORG && !$('#wizard').classList.contains('hidden') &&
+      !confirm('دستور نیمه‌کاره‌ای باز است و ذخیره نشده از بین می‌رود. ادامه می‌دهی؟')) return;
+  try { if (id) localStorage.setItem(ACTIVE_KEY, id); else localStorage.removeItem(ACTIVE_KEY); } catch(e){}
+  location.reload();
+}
+function addOrg(name){
+  const n = String(name || '').trim();
+  if (n.length < 2) return '⛔ نام سازمان را کامل بنویس.';
+  if (ORGS.some(o => norm(o.n) === norm(n))) return '⛔ سازمانی با این نام وجود دارد.';
+  const id = 'o' + Date.now().toString(36);
+  ORGS.push({ id, n }); saveOrgs();
+  try { localStorage.setItem(ACTIVE_KEY, id); } catch(e){}
+  location.reload();
+  return '';
+}
+function paintOrgHead(){
+  const on = !!ACTIVE_ORG;
+  $('#menuBtn').classList.toggle('hidden', !on);
+  $('#homeBtn').classList.toggle('hidden', !on);
+  $('#orgTitle').classList.toggle('hidden', !on);
+  $('#orgTitle').textContent = on ? '🏛 ' + orgName(ACTIVE_ORG) : '';
+}
+function paintOrgPick(){
+  $('#orgCards').innerHTML = ORGS.length
+    ? ORGS.map(o => `<button type="button" class="role" data-org="${esc(o.id)}"><span class="ic">🏛</span><span class="tx"><b>${esc(o.n)}</b><i>ورود به این سازمان</i></span></button>`).join('')
+    : '<p class="muted" style="margin:0">هنوز سازمانی ساخته نشده است. از کادر پایین اولین سازمان را بساز.</p>';
+  $('#orgNewErr').classList.remove('show');
+}
+$('#orgCards').addEventListener('click', e => {
+  const b = e.target.closest('[data-org]'); if (b) switchOrg(b.dataset.org);
+});
+$('#orgNewGo').addEventListener('click', () => {
+  const msg = addOrg($('#orgNewName').value);
+  if (msg){ const e = $('#orgNewErr'); e.textContent = msg; e.classList.add('show'); }
+});
+$('#orgNewName').addEventListener('keydown', e => { if (e.key === 'Enter') $('#orgNewGo').click(); });
+
+function paintMenu(){
+  $('#menuOrgs').innerHTML = ORGS.map(o => {
+    const on = o.id === ACTIVE_ORG;
+    return `<button type="button" class="dmi${on ? ' on' : ''}" data-org="${esc(o.id)}">🏛 ${esc(o.n)}${on ? '<small>✓ سازمان فعال</small>' : '<small>ورود به این سازمان</small>'}</button>`;
+  }).join('');
+}
+function openMenu(){ paintMenu(); $('#menuOvl').classList.remove('hidden'); }
+function closeMenu(){ $('#menuOvl').classList.add('hidden'); }
+function openInfo(t, html){ $('#infoTitle').textContent = t; $('#infoBody').innerHTML = html; $('#infoOvl').classList.remove('hidden'); }
+$('#menuBtn').addEventListener('click', openMenu);
+$('#menuClose').addEventListener('click', closeMenu);
+$('#menuOvl').addEventListener('click', e => { if (e.target.id === 'menuOvl') closeMenu(); });
+$('#menuOrgs').addEventListener('click', e => {
+  const b = e.target.closest('[data-org]'); if (!b) return;
+  closeMenu();
+  if (b.dataset.org !== ACTIVE_ORG) switchOrg(b.dataset.org);
+});
+$('#mAddOrg').addEventListener('click', () => { closeMenu(); switchOrg(''); });
+$('#mRenameOrg').addEventListener('click', () => {
+  closeMenu();
+  const v = prompt('نام جدید سازمان:', orgName(ACTIVE_ORG)); if (v == null) return;
+  const n = v.trim();
+  if (n.length < 2) return toast('نام را کامل بنویس');
+  if (ORGS.some(o => o.id !== ACTIVE_ORG && norm(o.n) === norm(n))) return toast('این نام قبلاً هست');
+  const o = ORGS.find(x => x.id === ACTIVE_ORG); if (o) o.n = n;
+  saveOrgs(); paintOrgHead(); toast('نام سازمان عوض شد');
+});
+$('#mUnits').addEventListener('click', () => { closeMenu(); $('#orgBtn').click(); });
+$('#mDelOrg').addEventListener('click', () => {
+  const o = ORGS.find(x => x.id === ACTIVE_ORG); if (!o) return;
+  if (!confirm('سازمان «' + o.n + '» با همه عملیات، واحدها و افرادش از این مرورگر حذف شود؟ برگشتی ندارد.')) return;
+  purgeOrg(ACTIVE_ORG);
+  ORGS = ORGS.filter(x => x.id !== ACTIVE_ORG); saveOrgs();
+  try { localStorage.removeItem(ACTIVE_KEY); } catch(e){}
+  location.reload();
+});
+$('#mRole').addEventListener('click', () => { closeMenu(); $('#roleChip').click(); });
+$('#mTools').addEventListener('click', () => { closeMenu(); $('#toolsOvl').classList.remove('hidden'); });
+$('#toolsClose').addEventListener('click', () => $('#toolsOvl').classList.add('hidden'));
+$('#toolsOvl').addEventListener('click', e => { if (e.target.id === 'toolsOvl') $('#toolsOvl').classList.add('hidden'); });
+$('#mHelp').addEventListener('click', () => { closeMenu(); openInfo('❓ راهنما', HELP_HTML); });
+$('#mAbout').addEventListener('click', () => {
+  closeMenu();
+  openInfo('ℹ️ درباره برنامه', `<b>${APP_VERSION}</b><br>سازمان فعال: ${esc(orgName(ACTIVE_ORG) || '—')}<br>تعداد سازمان‌های این مرورگر: ${fd(ORGS.length)}`);
+});
+$('#infoClose').addEventListener('click', () => $('#infoOvl').classList.add('hidden'));
+$('#infoOvl').addEventListener('click', e => { if (e.target.id === 'infoOvl') $('#infoOvl').classList.add('hidden'); });
+
 try { const sv = localStorage.getItem(ROLE_KEY); if (sv && ROLES[sv]) role = sv; } catch(e){}
 buildRegions(); paintDateBtn(); paintStart(); paintDue(); paintUnitPick(); buildRoleCards();
-if (role){ render(); show('home'); } else { show('roleGate'); }
+paintOrgHead();
+if (!ACTIVE_ORG){ paintOrgPick(); show('orgPick'); }
+else if (role){ render(); show('home'); } else { show('roleGate'); }
 console.log('Bazdid Ops ' + APP_VERSION);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a47ace993abb66f8',t:'MTc5MTUyMTg3Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a47ace993abb66f8',t:'MTc5MTUyMTg3Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a47f4a05ef7e299d',t:'MTc5MTU2ODg3MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
