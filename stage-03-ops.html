@@ -389,6 +389,14 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 .ob-row.on .ob-st{color:#1d4ed8;font-weight:700}
 .rc-who{display:block;font-style:normal;font-size:11.5px;color:#1d4ed8;font-weight:700;margin-top:3px}
 .rc-who.off{color:var(--muted);font-weight:400}
+.ed-card{border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:10px;margin-bottom:9px}
+.ed-card.on{border-color:#1d4ed8;background:#eff6ff}
+.ed-top{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:15px}
+.ed-top b{flex:1}
+.ed-top small{color:#1d4ed8;font-weight:700;font-size:11px}
+.ed-btns{display:flex;gap:6px}
+.ed-btns button{flex:1;border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 4px;font:700 12px Tahoma;color:#0f172a}
+.ed-btns .ed-del{border-color:#fecaca;background:#fff5f5;color:#991b1b}
 .dmi small{display:block;font-weight:400;font-size:11px;opacity:.85;margin-top:2px}
 .sheet{background:#fff;border-radius:20px;width:min(94vw,460px);max-height:88vh;overflow:auto;padding:14px}
 .sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-size:15px}
@@ -700,24 +708,23 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 <div class="drawer-ovl hidden" id="menuOvl">
   <aside class="drawer">
     <div class="drawer-head"><span>☰ منو</span><button type="button" id="menuClose">✕</button></div>
-    <div class="drawer-sec">🏛 سازمان فعال — همه کارها داخل این سازمان است</div>
-    <div class="orgbox active">
-      <div class="ob-name" id="mActName">—</div>
-      <div class="ob-tools">
-        <button type="button" id="mRenameOrg">✏️ تغییر نام</button>
-        <button type="button" id="mUnits">🏢 واحدها و افراد</button>
-      </div>
-      <button type="button" class="ob-del" id="mDelOrg">🗑 حذف این سازمان از این مرورگر</button>
-    </div>
-    <div class="drawer-sec">📋 سازمان‌های من (شماره‌وار) — با زدن هر کدام، همان سازمان فعال می‌شود</div>
+    <div class="drawer-sec">🏛 سازمان‌های من — با زدن هر کدام، همان سازمان فعال می‌شود</div>
     <div class="orgbox" id="menuOrgs"></div>
     <button type="button" class="dmi" id="mAddOrg">➕ افزودن سازمان جدید<small>صفحه انتخاب سازمان باز می‌شود</small></button>
+    <button type="button" class="dmi" id="mEditOrgs">✏️ ویرایش سازمان‌ها<small>تغییر نام، واحدها و حذف هر سازمان</small></button>
     <div class="drawer-sec">کاربری</div>
     <button type="button" class="dmi" id="mRole">🔁 تغییر نقش</button>
     <button type="button" class="dmi" id="mTools">⚙️ ابزار آزمایش</button>
     <button type="button" class="dmi" id="mHelp">❓ راهنما</button>
     <button type="button" class="dmi" id="mAbout">ℹ️ درباره برنامه</button>
   </aside>
+</div>
+<div class="ovl hidden" id="orgEdOvl">
+  <div class="sheet">
+    <div class="sheet-head"><b>✏️ ویرایش سازمان‌ها</b><button type="button" id="orgEdClose">✕</button></div>
+    <p class="muted">هر سازمان جداست. تغییر نام، واحدها و حذف فقط روی همان سازمان اثر دارد. حذف دو مرحله دارد.</p>
+    <div id="orgEdList"></div>
+  </div>
 </div>
 <div class="ovl hidden" id="toolsOvl">
   <div class="sheet">
@@ -738,7 +745,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 <div class="msg" id="msg"></div>
 
 <script>
-const APP_VERSION = 'v3.7.2-MENU';
+const APP_VERSION = 'v3.7.3-MENU';
 /* ---------- سازمان‌ها: هر سازمان کلیدهای ذخیره‌سازی جدا دارد ---------- */
 const ORGS_KEY = 'ops37_orgs', ACTIVE_KEY = 'ops37_active';
 let ORGS = [];
@@ -2468,7 +2475,6 @@ $('#orgNewGo').addEventListener('click', () => {
 $('#orgNewName').addEventListener('keydown', e => { if (e.key === 'Enter') $('#orgNewGo').click(); });
 
 function paintMenu(){
-  $('#mActName').textContent = '🏛 ' + (orgName(ACTIVE_ORG) || '—');
   $('#menuOrgs').innerHTML = ORGS.length ? ORGS.map((o, i) => {
     const on = o.id === ACTIVE_ORG;
     return `<button type="button" class="ob-row${on ? ' on' : ''}" data-org="${esc(o.id)}"><span class="ob-num">${fd(i + 1)}</span><span class="ob-nm">${esc(o.n)}</span><span class="ob-st">${on ? '✓ فعال' : 'ورود ›'}</span></button>`;
@@ -2486,23 +2492,54 @@ $('#menuOrgs').addEventListener('click', e => {
   if (b.dataset.org !== ACTIVE_ORG) switchOrg(b.dataset.org);
 });
 $('#mAddOrg').addEventListener('click', () => { closeMenu(); switchOrg(''); });
-$('#mRenameOrg').addEventListener('click', () => {
-  closeMenu();
-  const v = prompt('نام جدید سازمان:', orgName(ACTIVE_ORG)); if (v == null) return;
-  const n = v.trim();
-  if (n.length < 2) return toast('نام را کامل بنویس');
-  if (ORGS.some(o => o.id !== ACTIVE_ORG && norm(o.n) === norm(n))) return toast('این نام قبلاً هست');
-  const o = ORGS.find(x => x.id === ACTIVE_ORG); if (o) o.n = n;
-  saveOrgs(); paintOrgHead(); toast('نام سازمان عوض شد');
-});
-$('#mUnits').addEventListener('click', () => { closeMenu(); $('#orgBtn').click(); });
-$('#mDelOrg').addEventListener('click', () => {
-  const o = ORGS.find(x => x.id === ACTIVE_ORG); if (!o) return;
-  if (!confirm('سازمان «' + o.n + '» با همه عملیات، واحدها و افرادش از این مرورگر حذف شود؟ برگشتی ندارد.')) return;
-  purgeOrg(ACTIVE_ORG);
-  ORGS = ORGS.filter(x => x.id !== ACTIVE_ORG); saveOrgs();
-  try { localStorage.removeItem(ACTIVE_KEY); } catch(e){}
-  location.reload();
+function paintOrgEd(){
+  $('#orgEdList').innerHTML = ORGS.length ? ORGS.map((o, i) => {
+    const on = o.id === ACTIVE_ORG;
+    return `<div class="ed-card${on ? ' on' : ''}">
+      <div class="ed-top"><span class="ob-num">${fd(i + 1)}</span><b>${esc(o.n)}</b>${on ? '<small>✓ فعال</small>' : ''}</div>
+      <div class="ed-btns">
+        <button type="button" data-ed="rename" data-id="${esc(o.id)}">✏️ تغییر نام</button>
+        <button type="button" data-ed="units" data-id="${esc(o.id)}">🏢 واحدها</button>
+        <button type="button" class="ed-del" data-ed="del" data-id="${esc(o.id)}">🗑 حذف</button>
+      </div></div>`;
+  }).join('') : '<p class="muted">سازمانی نیست.</p>';
+}
+function openOrgEd(){ paintOrgEd(); $('#orgEdOvl').classList.remove('hidden'); }
+function closeOrgEd(){ $('#orgEdOvl').classList.add('hidden'); }
+$('#mEditOrgs').addEventListener('click', () => { closeMenu(); openOrgEd(); });
+$('#orgEdClose').addEventListener('click', closeOrgEd);
+$('#orgEdOvl').addEventListener('click', e => { if (e.target.id === 'orgEdOvl') closeOrgEd(); });
+$('#orgEdList').addEventListener('click', e => {
+  const b = e.target.closest('[data-ed]'); if (!b) return;
+  const o = ORGS.find(x => x.id === b.dataset.id); if (!o) return;
+  const act = b.dataset.ed;
+  if (act === 'rename'){
+    const v = prompt('نام جدید سازمان:', o.n); if (v == null) return;
+    const n = v.trim();
+    if (n.length < 2) return toast('نام را کامل بنویس');
+    if (ORGS.some(x => x.id !== o.id && norm(x.n) === norm(n))) return toast('این نام قبلاً هست');
+    o.n = n; saveOrgs(); paintOrgHead(); paintMenu(); paintOrgEd(); toast('نام سازمان عوض شد');
+    return;
+  }
+  if (act === 'units'){
+    closeOrgEd();
+    if (o.id === ACTIVE_ORG){ $('#orgBtn').click(); return; }
+    try { sessionStorage.setItem('ops37_next', 'units'); } catch(err){}
+    switchOrg(o.id); return;
+  }
+  if (act === 'del'){
+    if (!confirm('مرحله ۱ از ۲\nحذف دائمی سازمان «' + o.n + '» با همه عملیات، واحدها و افرادش از این مرورگر.\nبرگشتی ندارد. ادامه می‌دهی؟')) return;
+    const v = prompt('مرحله ۲ از ۲\nبرای تأیید، نام دقیق سازمان را تایپ کن:\n' + o.n);
+    if (v == null) return;
+    if (norm(v) !== norm(o.n)) return toast('نام اشتباه بود؛ چیزی حذف نشد');
+    purgeOrg(o.id);
+    ORGS = ORGS.filter(x => x.id !== o.id); saveOrgs();
+    if (o.id === ACTIVE_ORG){
+      try { localStorage.removeItem(ACTIVE_KEY); } catch(err){}
+      location.reload(); return;
+    }
+    paintOrgEd(); paintMenu(); toast('سازمان حذف شد');
+  }
 });
 $('#mRole').addEventListener('click', () => { closeMenu(); $('#roleChip').click(); });
 $('#mTools').addEventListener('click', () => { closeMenu(); $('#toolsOvl').classList.remove('hidden'); });
@@ -2522,6 +2559,8 @@ buildRegions(); paintDateBtn(); paintStart(); paintDue(); paintUnitPick(); build
 paintOrgHead();
 if (!ACTIVE_ORG){ paintOrgPick(); show('orgPick'); }
 else if (role){ render(); show('home'); } else { show('roleGate'); }
+try { const nx = sessionStorage.getItem('ops37_next'); sessionStorage.removeItem('ops37_next');
+  if (nx === 'units' && ACTIVE_ORG) setTimeout(() => $('#orgBtn').click(), 0); } catch(e){}
 console.log('Bazdid Ops ' + APP_VERSION);
 </script>
 <script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a47ace993abb66f8',t:'MTc5MTUyMTg3Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
