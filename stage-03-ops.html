@@ -191,6 +191,54 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 .nm button{border:1.5px solid var(--line);background:#fff;border-radius:18px;padding:6px 11px;font:700 12px Tahoma;color:#334155}
 .nm button:active{background:#eff6ff}
 
+/* ---------- فشرده‌سازی عمودی (v3.5.3) ---------- */
+.app{padding:0 10px}
+.head{margin:0 -10px 10px;padding:12px 14px;border-radius:0 0 18px 18px}
+.head h1{font-size:16px}
+.card{padding:12px;margin-bottom:9px;border-radius:15px}
+.note{padding:8px 11px;font-size:11.5px;line-height:1.8;margin-bottom:9px;border-radius:12px}
+.tnote summary{cursor:pointer;font-weight:700;font-size:11.5px}
+.op{padding:11px;margin-bottom:7px;border-radius:14px}
+.op p{margin:6px 0 0;font-size:12.5px;line-height:1.8}
+.op .meta{font-size:10.5px;margin-top:5px}
+.field{margin:9px 0}
+.field input,.field textarea,.field select{padding:10px}
+.field textarea{min-height:74px}
+.btn{padding:11px 13px}
+.btn.block{margin-top:7px}
+.stats{gap:7px}
+.statbtn{padding:8px 3px}
+.statbtn b{font-size:19px}
+.assignbox,.pbox,.abox,.rbox,.nabox,.dbox,.fixbanner,.waitline,.okline,.seenline{padding:8px 10px;line-height:1.85;margin-top:7px}
+.sigbox{padding:8px 10px;margin-top:7px}
+.sigrow{padding:5px 0}
+.sigrow img{height:40px}
+.geostamp{padding:6px 9px;line-height:1.8;margin-top:5px}
+.actions{gap:6px;margin-top:7px}
+.actions .btn{padding:9px 7px;font-size:12.5px}
+.phrow{padding:8px 10px}
+.phpics{padding:0 10px 8px;gap:5px}
+.phpics img{width:54px;height:54px}
+.photos{gap:6px;margin-top:7px}
+.ph img{width:70px;height:70px}
+.minip img{width:78px;height:78px}
+.flow{margin:7px 0 0}
+.flow i{font-size:9px;padding:3px 2px}
+.badges{gap:5px;margin-top:5px}
+.chips{gap:6px}
+.chip{padding:6px 10px}
+.crow{padding:9px 10px;margin-bottom:6px}
+.inbox{padding:11px;margin-bottom:9px}
+.searchbar{margin-bottom:8px}
+.searchbar input{padding:10px 12px}
+.srcsel{padding:9px 11px;margin-bottom:8px}
+.vtoggle{margin-bottom:8px}
+.vtoggle button{padding:8px 6px}
+.wiz-top{margin-bottom:8px}
+.typegrid{gap:7px}
+.type{padding:9px 8px}
+.datebtn{padding:12px}
+
 /* ---- نشانه‌های توجه: نوار بالا + نوار کناری کارت نفس می‌کشند، متن کارت آرام می‌ماند ---- */
 .bkcard{transition:background-color .5s ease-in-out, border-right-color 1s ease-in-out}
 .bkcard.red {border-right:10px solid #fca5a5;background:#fffafa}
@@ -253,6 +301,18 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 .crow.rowblue{border-color:#93c5fd;background:#f7fbff}
 .dtop{display:flex;gap:8px;align-items:center;margin-bottom:10px}
 .dtop span{font-size:12.5px;color:var(--muted)}
+.orgunit{background:#fff;border:1px solid var(--line);border-radius:15px;padding:11px;margin-bottom:9px}
+.orgunit h4{margin:0 0 8px;font-size:14px;color:var(--p);display:flex;align-items:center;gap:7px}
+.orgunit h4 button{margin-right:auto;border:0;background:#fee2e2;color:#991b1b;border-radius:9px;padding:4px 9px;font:700 11px Tahoma}
+.orggrp{border-top:1px dashed #eef2f7;padding-top:7px;margin-top:7px}
+.orggrp .ttl{font-size:11.5px;font-weight:800;color:var(--muted);margin-bottom:5px}
+.orgchip{display:inline-flex;align-items:center;gap:5px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;
+  border-radius:999px;padding:4px 9px;font-size:11.5px;font-weight:700;margin:0 0 5px 5px}
+.orgchip button{border:0;background:transparent;color:#b91c1c;font:800 13px Tahoma;padding:0 2px}
+.orgadd{display:flex;gap:5px;margin-top:4px}
+.orgadd input{flex:1;padding:7px 9px;border:1.5px solid var(--line);border-radius:10px;font:inherit;font-size:12px}
+.orgadd button{border:0;background:#e2e8f0;border-radius:10px;padding:0 11px;font:700 12px Tahoma}
+.lockbox{background:#f1f5f9;border:1.5px dashed #94a3b8;border-radius:12px;padding:9px 11px;font-size:12px;line-height:1.95;color:#334155;margin:12px 0 4px}
 .waitline{background:#f8fafc;border:1px dashed #cbd5e1;color:#64748b;border-radius:11px;padding:8px 10px;font-size:11.5px;font-weight:700;margin-top:8px}
 .crewhint{background:#fffbeb;border:1px dashed #fde68a;color:#92400e;border-radius:12px;padding:9px 11px;font-size:11.5px;line-height:1.95;margin:0 0 10px}
 .crewhint b{color:#7c2d12}
@@ -310,16 +370,16 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
   <header class="head">
     <div>
       <h1>🏗️ ثبت عملیات</h1>
-      <small>نسخه آزمایشی • v3.5.2-ORDER</small>
+      <small>نسخه آزمایشی • v3.6.0-ORG</small>
       <button type="button" id="roleChip" class="rolechip hidden"></button>
     </div>
     <button class="btn ghost" id="homeBtn">خانه</button>
   </header>
 
-  <div class="note">
-    <b>فایل آزمایشی مرحله ۳.۵</b><br>
-    چرخه چهارنقشی با شواهد قفل‌دار: مدیر اصلی دستور می‌دهد ← مدیر اجرایی برنامه‌ریزی می‌کند یا پیشنهاد اصلاح می‌دهد ← اکیپ با عکس و موقعیت اجرا را ثبت و امضا می‌کند ← ناظر بازدید و امضا می‌کند. هر اصلاح پس از امضا، نسخه جدید می‌سازد و امضای دوباره می‌خواهد. داده‌ها فقط در حافظه همین مرورگر ذخیره می‌شود و هیچ ارتباطی با سامانه اصلی، سرور و داده‌های واقعی ندارد.
-  </div>
+  <details class="note tnote">
+    <summary>ℹ️ فایل آزمایشی مرحله ۳.۶ — برای دیدن توضیح بزن</summary>
+    <div style="margin-top:8px">چرخه چهارنقشی با شواهد قفل‌دار: مدیر اصلی دستور می‌دهد ← مدیر اجرایی برنامه‌ریزی می‌کند یا پیشنهاد اصلاح می‌دهد ← اکیپ با عکس و موقعیت ثبت و امضا می‌کند ← ناظر بازدید و امضا می‌کند. داده‌ها فقط در حافظه همین مرورگر ذخیره می‌شود و هیچ ارتباطی با سامانه اصلی ندارد.<br><b>این کادر در نسخه نهایی حذف می‌شود.</b></div>
+  </details>
 
   <section id="roleGate" class="hidden">
     <div class="card">
@@ -327,6 +387,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
       <p class="muted" style="margin:0 0 12px">هر نقش فقط گزینه‌های مربوط به خودش را می‌بیند. برای آزمایش هر وقت خواستی می‌توانی نقش را عوض کنی.</p>
       <div class="rolecards" id="roleCards"></div>
       <button class="btn ghost block hidden" id="editName" style="margin-top:12px">✏️ تغییر نام من در این نقش</button>
+      <button class="btn ghost block" id="orgBtn" style="margin-top:8px">🏢 واحدها و افراد سازمان</button>
     </div>
     <div class="note">
       گردش کار: <b>مدیر اصلی</b> دستور عملیات صادر می‌کند ← <b>مدیر اجرایی</b> آن را برنامه‌ریزی و به مجری ارجاع می‌دهد ← <b>ناظر/مجری</b> اجرا را شروع می‌کند.
@@ -370,6 +431,15 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 
       <!-- گام ۱ -->
       <div class="step" data-step="1">
+        <div id="unitStep">
+          <span class="lb">واحد مقصد دستور <span class="req">*</span></span>
+          <div class="chips" id="unitPick"></div>
+          <div id="toExecWrap" class="hidden" style="margin-top:8px">
+            <span class="lb">گیرنده در آن واحد (اختیاری)</span>
+            <div class="chips" id="toExecPick"></div>
+          </div>
+          <p class="muted" id="unitNote" style="margin:7px 0 12px"></p>
+        </div>
         <span class="lb">نوع عملیات را انتخاب کن <span class="req">*</span></span>
         <div class="typegrid" id="typeGrid"></div>
         <div class="pend" id="p1">هنوز انتخابی انجام نشده است.</div>
@@ -434,6 +504,12 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
         </div>
         <div class="pend" id="p6">اولویت هنوز انتخاب نشده است.</div>
 
+        <span class="lb" style="display:block;margin:16px 0 5px">تاریخ شروع کار <span class="req">*</span></span>
+        <button type="button" class="datebtn empty" id="startBtn">
+          <span><b id="startTxt">تاریخی انتخاب نشده</b><small id="startSub">این تاریخ برای مدیر اجرایی و اکیپ الزامی می‌شود</small></span>
+          <span class="ico">🚀</span>
+        </button>
+
         <span class="lb" style="display:block;margin:16px 0 5px">مهلت انجام (اختیاری)</span>
         <button type="button" class="datebtn empty" id="dueBtn">
           <span><b id="dueTxt">مهلتی تعیین نشده</b><small id="dueSub">برای تعیین مهلت، تقویم شمسی را باز کن</small></span>
@@ -467,6 +543,20 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
       </div>
       <button class="btn block ghost" id="cancel" style="margin-top:8px">انصراف</button>
     </div>
+  </section>
+
+  <section id="orgPage" class="hidden">
+    <div class="dtop"><button class="btn ghost" id="oBack">◀ بازگشت</button><span>واحدها و افراد سازمان</span></div>
+    <div class="card">
+      <h3 style="margin:0 0 6px;font-size:15px">🏢 واحدهای سازمان</h3>
+      <p class="muted" style="margin:0 0 10px">هر واحد (عمران، فضای سبز، پسماند، موتوری، اجراییات …) افراد خودش را دارد. یک‌بار تعریف کن، همیشه می‌ماند.</p>
+      <div class="row">
+        <input id="newUnit" placeholder="نام واحد جدید" style="padding:10px;border:1.5px solid var(--line);border-radius:12px;font:inherit">
+        <button class="btn primary" id="addUnit" style="flex:0 0 auto">➕ افزودن</button>
+      </div>
+      <p class="err" id="orgErr"></p>
+    </div>
+    <div id="orgList"></div>
   </section>
 
   <section id="detail" class="hidden">
@@ -536,7 +626,11 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
         <span class="lb">نام و نام خانوادگی <span class="req">*</span></span>
         <input id="myName" placeholder="مثلاً حسن شه‌پناه">
       </label>
-      <p class="muted">نام تو پای هر اقدامی که ثبت می‌کنی می‌نشیند تا مشخص باشد چه کسی چه کاری کرده است. فقط یک بار پرسیده می‌شود.</p>
+      <div id="unitWrap" class="hidden">
+        <span class="lb" style="display:block;margin:4px 0 5px">واحد تو <span class="req">*</span></span>
+        <div class="chips" id="unitSel"></div>
+      </div>
+      <p class="muted">نام تو پای هر اقدامی که ثبت می‌کنی می‌نشیند. فقط یک بار پرسیده می‌شود.</p>
       <p class="err" id="nameErr"></p>
       <button class="btn primary block" id="nameGo">✅ ورود</button>
     </div>
@@ -566,7 +660,7 @@ details.more summary{cursor:pointer;font-size:12px;color:var(--p);font-weight:70
 <div class="msg" id="msg"></div>
 
 <script>
-const APP_VERSION = 'v3.5.2-ORDER';
+const APP_VERSION = 'v3.6.0-ORG';
 const KEY = 'ops31_local_v1';
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
@@ -595,7 +689,7 @@ const REGIONS = ['منطقه ۱','منطقه ۲','منطقه ۳','منطقه ۴'
 const ROLES = {
   manager: {ic:'👔', t:'مدیر اصلی',   d:'صدور دستور عملیات و تصمیم درباره پیشنهادهای مدیر اجرایی'},
   exec:    {ic:'🧭', t:'مدیر اجرایی', d:'برنامه‌ریزی و ارجاع به اکیپ، یا پیشنهاد اصلاح به مدیر'},
-  crew:    {ic:'👷', t:'اکیپ اجرا',   d:'شروع کار، ثبت پیشرفت، پایان کار و ثبت مقدار واقعی'},
+  crew:    {ic:'👷', t:'سرپرست اکیپ', d:'ثبت مراحل کار، عکس و موقعیت، و ثبت مقدار واقعی'},
   sup:     {ic:'🦺', t:'ناظر',        d:'بازدید نهایی و تأیید یا برگشت کار'}
 };
 const ST = {
@@ -620,6 +714,9 @@ const PRIO = {
 const ROLE_KEY = 'ops32_role';
 const NAME_KEY = 'ops32_names';
 const VIEW_KEY = 'ops34_views';
+const ORG_KEY = 'ops36_org';
+const UNIT_KEY = 'ops36_units';
+const GRP = [['ex','مدیر اجرایی'], ['cr','سرپرست اکیپ'], ['su','ناظر']];
 const VIEW_DEF = { manager:'compact', exec:'compact', sup:'compact', crew:'full' };
 const FILT = [{k:'active',t:'در جریان'},{k:'late',t:'تأخیردار'},{k:'done',t:'تأییدشده'},{k:'all',t:'همه'}];
 const FILT_MGR = [{k:'active',t:'در جریان'},{k:'late',t:'تأخیردار'},{k:'done',t:'تأییدشده'},{k:'mynotok',t:'عدم تأیید من'},{k:'all',t:'همه'}];
@@ -673,10 +770,10 @@ function makeCode(jy,jm,jd){
 /* ---------- وضعیت ویزارد ---------- */
 let step = 1, draft = {}, photos = [];
 const LAST = 7;
-const TITLES = {1:'نوع عملیات',2:'تاریخ دستور',3:'منطقه و موقعیت',4:'آدرس دقیق',5:'شرح عملیات',6:'اولویت و مهلت',7:'بازبینی و صدور'};
+const TITLES = {1:'واحد و نوع عملیات',2:'تاریخ دستور',3:'منطقه و موقعیت',4:'آدرس دقیق',5:'شرح عملیات',6:'اولویت، شروع و مهلت',7:'بازبینی و صدور'};
 
 function show(sec){
-  ['roleGate','home','wizard','detail','act','done'].forEach(x => $('#'+x).classList.toggle('hidden', x !== sec));
+  ['roleGate','orgPage','home','wizard','detail','act','done'].forEach(x => $('#'+x).classList.toggle('hidden', x !== sec));
   window.scrollTo(0,0);
 }
 function err(t){
@@ -702,10 +799,10 @@ function paintStep(){
 /* نشانگر «هنوز انتخاب نشده» */
 function pending(){
   const set = (id, bad) => { const el = $(id); if (el) el.classList.toggle('hidden', !bad); };
-  set('#p1', !draft.typeId);
+  set('#p1', !draft.typeId || (org.units.length > 0 && !draft.unit));
   set('#p2', !draft.date);
   set('#p3', !$('#region').value || !draft.place || (draft.place === 'onsite' && !draft.gps));
-  set('#p6', !draft.prio);
+  set('#p6', !draft.prio || !draft.start);
   $('#dateBtn').classList.toggle('empty', !draft.date);
   $('#region').classList.toggle('empty', !$('#region').value);
 }
@@ -716,6 +813,30 @@ function paintTypes(){
     `<button type="button" class="type${draft.typeId===t.id?' sel':''}" data-id="${t.id}"><b>${esc(t.name)}</b><small>واحد: ${esc(t.u1)}${t.u2?' + '+esc(t.u2):''}</small></button>`
   ).join('');
 }
+function paintUnitPick(){
+  const has = org.units.length > 0;
+  $('#unitStep').classList.toggle('hidden', !has);
+  if (!has){ draft.unit = ''; return; }
+  $('#unitPick').innerHTML = org.units.map(u =>
+    `<button type="button" class="chip${norm(u.n)===norm(draft.unit||'')?' sel':''}" data-pu="${esc(u.n)}">${esc(u.n)}</button>`).join('');
+  const u = draft.unit ? unitBy(draft.unit) : null;
+  const ex = u ? (u.ex || []) : [];
+  $('#toExecWrap').classList.toggle('hidden', !ex.length);
+  if (ex.length) $('#toExecPick').innerHTML = ex.map(pp =>
+    `<button type="button" class="chip${norm(pp)===norm(draft.toExec||'')?' sel':''}" data-te="${esc(pp)}">${esc(pp)}</button>`).join('');
+  $('#unitNote').textContent = draft.unit
+    ? ('این دستور فقط در کارتابل واحد «' + draft.unit + '» دیده می‌شود.')
+    : 'واحدی که باید این دستور را انجام دهد انتخاب کن.';
+}
+$('#unitPick').addEventListener('click', e => {
+  const b = e.target.closest('[data-pu]'); if (!b) return;
+  draft.unit = b.dataset.pu; draft.toExec = ''; paintUnitPick(); pending(); err('');
+});
+$('#toExecPick').addEventListener('click', e => {
+  const b = e.target.closest('[data-te]'); if (!b) return;
+  draft.toExec = (norm(draft.toExec||'') === norm(b.dataset.te)) ? '' : b.dataset.te;
+  paintUnitPick(); err('');
+});
 $('#typeGrid').addEventListener('click', e => {
   const b = e.target.closest('.type'); if (!b) return;
   draft.typeId = b.dataset.id; paintTypes(); err(''); pending();
@@ -725,7 +846,7 @@ $('#typeGrid').addEventListener('click', e => {
 /* ---------- گام ۲: تقویم شمسی ---------- */
 let calY = 0, calM = 0;
 let calCtx = 'wizard';
-const calDate = () => calCtx === 'act' ? actDraft.date : (calCtx === 'due' ? draft.due : draft.date);
+const calDate = () => calCtx === 'act' ? actDraft.date : (calCtx === 'due' ? draft.due : (calCtx === 'start' ? draft.start : draft.date));
 function fillDate(b, t, u, d){
   $(b).classList.toggle('empty', !d);
   if (d){
@@ -740,7 +861,7 @@ function fillDate(b, t, u, d){
 }
 function paintDateBtn(){ fillDate('#dateBtn','#dateTxt','#dateSub', draft.date); }
 function openCal(ctx){
-  calCtx = (ctx === 'act' || ctx === 'due') ? ctx : 'wizard';
+  calCtx = (ctx === 'act' || ctx === 'due' || ctx === 'start') ? ctx : 'wizard';
   const t = jToday(), d = calDate();
   calY = d ? d.y : t.y; calM = d ? d.m : t.m;
   $('#calPick').classList.add('hidden');
@@ -769,6 +890,9 @@ function pickDate(y,m,d){
   } else if (calCtx === 'due'){
     draft.due = {y,m,d};
     paintDue(); err(''); closeCal();
+  } else if (calCtx === 'start'){
+    draft.start = {y,m,d};
+    paintStart(); pending(); err(''); closeCal();
   } else {
     draft.date = {y,m,d};
     paintDateBtn(); pending(); err(''); closeCal();
@@ -872,6 +996,10 @@ function curType(){ return TYPES.find(t => t.id === draft.typeId) || null; }
 function paintPrio(){
   $$('#prioBox .type').forEach(x => x.classList.toggle('sel', x.dataset.p === draft.prio));
 }
+function paintStart(){
+  fillDate('#startBtn','#startTxt','#startSub', draft.start);
+  if (!draft.start){ $('#startTxt').textContent = 'تاریخی انتخاب نشده'; $('#startSub').textContent = 'این تاریخ برای مدیر اجرایی و اکیپ الزامی می‌شود'; }
+}
 function paintDue(){
   fillDate('#dueBtn','#dueTxt','#dueSub', draft.due);
   if (!draft.due){ $('#dueTxt').textContent = 'مهلتی تعیین نشده'; $('#dueSub').textContent = 'برای تعیین مهلت، تقویم شمسی را باز کن'; }
@@ -881,6 +1009,7 @@ $('#prioBox').addEventListener('click', e => {
   const b = e.target.closest('.type'); if (!b) return;
   draft.prio = b.dataset.p; paintPrio(); pending(); err('');
 });
+$('#startBtn').addEventListener('click', () => openCal('start'));
 $('#dueBtn').addEventListener('click', () => openCal('due'));
 $('#dueClear').addEventListener('click', () => { draft.due = null; paintDue(); toast('مهلت حذف شد'); });
 
@@ -1026,7 +1155,8 @@ function collect(){
     jy: draft.date ? draft.date.y : 0, jm: draft.date ? draft.date.m : 0, jd: draft.date ? draft.date.d : 0,
     region, address: $('#address').value.trim(), descr: $('#descr').value.trim(),
     u1: t ? t.u1 : '', u2: t ? t.u2 : '',
-    prio: draft.prio, due: draft.due || null,
+    unit: draft.unit || '', toExec: draft.toExec || '',
+    prio: draft.prio, start: draft.start || null, due: draft.due || null,
     photoSrc: draft.photoSrc || '', photoGeo: !!draft.photoGeo,
     place: draft.place, gps: draft.gps || null, photos: photos.slice()
   };
@@ -1034,12 +1164,14 @@ function collect(){
 function paintReview(){
   const o = collect();
   const rows = [
+    ['واحد مقصد', o.unit || '—'],
     ['نوع عملیات', o.typeName],
     ['تاریخ عملیات', jFmt(o.jy,o.jm,o.jd)],
     ['منطقه', o.region],
     ['آدرس دقیق', o.address],
     ['شرح', o.descr],
     ['اولویت', PRIO[o.prio] ? PRIO[o.prio].t : '—'],
+    ['تاریخ شروع', o.start ? jFmt(o.start.y,o.start.m,o.start.d) : '—'],
     ['مهلت انجام', o.due ? jFmt(o.due.y,o.due.m,o.due.d) : 'تعیین نشده'],
     ['محل ثبت', o.place === 'onsite' ? 'در محل عملیات' : 'از دفتر'],
     ['موقعیت', o.gps ? o.gps.lat.toFixed(5) + ', ' + o.gps.lng.toFixed(5) + ' (±' + fd(o.gps.acc) + ' متر)' : 'ثبت نشده']
@@ -1049,7 +1181,10 @@ function paintReview(){
 
 /* ---------- اعتبارسنجی ---------- */
 function validate(){
-  if (step === 1 && !draft.typeId) return 'نوع عملیات اجباری است. یکی از کارت‌ها را انتخاب کن.';
+  if (step === 1){
+    if (org.units.length && !draft.unit) return 'واحد مقصد دستور را انتخاب کن.';
+    if (!draft.typeId) return 'نوع عملیات اجباری است. یکی از کارت‌ها را انتخاب کن.';
+  }
   if (step === 2 && !draft.date) return 'تاریخ عملیات انتخاب نشده است. روی کادر تاریخ بزن و از تقویم یک روز را انتخاب کن.';
   if (step === 3){
     if (!$('#region').value) return 'منطقه اجباری است و هیچ پیش‌فرضی ندارد.';
@@ -1059,7 +1194,10 @@ function validate(){
   }
   if (step === 4 && $('#address').value.trim().length < 3) return 'آدرس دقیق اجباری است.';
   if (step === 5 && $('#descr').value.trim().length < 3) return 'شرح عملیات اجباری است.';
-  if (step === 6 && !draft.prio) return 'اولویت کار اجباری است و پیش‌فرضی ندارد. یکی از سه گزینه را انتخاب کن.';
+  if (step === 6){
+    if (!draft.prio) return 'اولویت کار اجباری است و پیش‌فرضی ندارد. یکی از سه گزینه را انتخاب کن.';
+    if (!draft.start) return 'تاریخ شروع کار اجباری است. روی کادر «تاریخ شروع» بزن.';
+  }
   return '';
 }
 
@@ -1106,10 +1244,11 @@ $('#newOp').addEventListener('click', () => {
   if (role !== 'manager' && role !== 'exec') return toast('فقط مدیر اصلی یا مدیر اجرایی می‌تواند کار ثبت کند');
   if (role === 'manager') wizOrigin = 'manager';
   draft = {}; photos = []; step = 1;
-  draft.date = null; paintTypes(); paintDateBtn(); buildRegions();
+  draft.date = null; draft.unit = (role === 'exec' ? myUnit() : ''); draft.toExec = '';
+  paintUnitPick(); paintTypes(); paintDateBtn(); buildRegions();
   $('#regionOtherWrap').classList.add('hidden'); $('#regionOther').value = '';
   $('#address').value = ''; $('#descr').value = '';
-  draft.prio = null; draft.due = null; draft.photoSrc = ''; draft.photoGeo = false; paintPrio(); paintDue();
+  draft.prio = null; draft.start = null; draft.due = null; draft.photoSrc = ''; draft.photoGeo = false; paintPrio(); paintStart(); paintDue();
   $$('#placeMode .type').forEach(x => x.classList.remove('sel'));
   $('#gpsWrap').classList.add('hidden'); draft.gps = null; draft.place = null;
   $('#gpsBtn').disabled = false; $('#gpsBtn').textContent = '📍 ثبت موقعیت فعلی';
@@ -1163,6 +1302,55 @@ function passFilt(o){
 }
 let names = {}; try { names = JSON.parse(localStorage.getItem(NAME_KEY) || '{}'); } catch(e){ names = {}; }
 let views = {}; try { views = JSON.parse(localStorage.getItem(VIEW_KEY) || '{}'); } catch(e){ views = {}; }
+let org = { units: [] }; try { org = JSON.parse(localStorage.getItem(ORG_KEY) || '{"units":[]}'); } catch(e){ org = {units:[]}; }
+if (!org.units) org.units = [];
+let myUnits = {}; try { myUnits = JSON.parse(localStorage.getItem(UNIT_KEY) || '{}'); } catch(e){ myUnits = {}; }
+const myUnit = () => myUnits[role] || '';
+function saveOrg(){ try { localStorage.setItem(ORG_KEY, JSON.stringify(org)); } catch(e){} }
+function saveUnits(){ try { localStorage.setItem(UNIT_KEY, JSON.stringify(myUnits)); } catch(e){} }
+const unitBy = n => org.units.find(u => norm(u.n) === norm(n)) || null;
+function unitOK(o){
+  if (role === 'manager') return true;
+  if (!o.unit || !myUnit()) return true;
+  return norm(o.unit) === norm(myUnit());
+}
+function renderOrg(){
+  $('#orgList').innerHTML = org.units.length ? org.units.map((u, i) => `
+    <div class="orgunit">
+      <h4>🏢 ${esc(u.n)}<button type="button" data-delu="${i}">حذف واحد</button></h4>
+      ${GRP.map(g => `<div class="orggrp"><div class="ttl">${esc(g[1])}</div>
+        ${(u[g[0]] || []).map((p, j) => `<span class="orgchip">${esc(p)}<button type="button" data-delp="${i}:${g[0]}:${j}">✕</button></span>`).join('') || '<span class="muted">—</span>'}
+        <div class="orgadd"><input id="add_${i}_${g[0]}" placeholder="نام جدید…"><button type="button" data-addp="${i}:${g[0]}">افزودن</button></div>
+      </div>`).join('')}
+    </div>`).join('')
+    : '<div class="card empty">هنوز واحدی تعریف نشده است.<br>با کادر بالا اولین واحد را بساز (مثلاً «عمران»).</div>';
+}
+$('#orgBtn').addEventListener('click', () => { renderOrg(); $('#orgErr').classList.remove('show'); show('orgPage'); });
+$('#oBack').addEventListener('click', () => { buildRoleCards(); show('roleGate'); });
+$('#addUnit').addEventListener('click', () => {
+  const n = $('#newUnit').value.trim(), e = $('#orgErr');
+  if (n.length < 2){ e.textContent = '⛔ نام واحد را بنویس.'; e.classList.add('show'); return; }
+  if (unitBy(n)){ e.textContent = '⛔ این واحد قبلاً تعریف شده است.'; e.classList.add('show'); return; }
+  org.units.push({ n, ex: [], cr: [], su: [] }); saveOrg();
+  $('#newUnit').value = ''; e.classList.remove('show'); renderOrg(); toast('واحد «' + n + '» اضافه شد');
+});
+$('#orgList').addEventListener('click', e => {
+  const du = e.target.closest('[data-delu]');
+  if (du){ const i = +du.dataset.delu;
+    if (!confirm('واحد «' + org.units[i].n + '» و افرادش حذف شود؟')) return;
+    org.units.splice(i,1); saveOrg(); renderOrg(); return toast('حذف شد'); }
+  const dp = e.target.closest('[data-delp]');
+  if (dp){ const a = dp.dataset.delp.split(':');
+    org.units[+a[0]][a[1]].splice(+a[2],1); saveOrg(); renderOrg(); return; }
+  const ap = e.target.closest('[data-addp]');
+  if (ap){ const a = ap.dataset.addp.split(':');
+    const inp = $('#add_' + a[0] + '_' + a[1]), v = inp ? inp.value.trim() : '';
+    if (v.length < 2) return toast('نام را کامل بنویس');
+    const arr = org.units[+a[0]][a[1]] = org.units[+a[0]][a[1]] || [];
+    if (arr.some(x => norm(x) === norm(v))) return toast('این نام قبلاً هست');
+    arr.push(v); saveOrg(); renderOrg(); toast('اضافه شد');
+  }
+});
 const me = () => (names[role] || (ROLES[role] ? ROLES[role].t : '—'));
 const norm = x => String(x == null ? '' : x).replace(/\u200c/g,' ').replace(/\s+/g,' ').trim().toLowerCase();
 function sameName(a, b){
@@ -1170,12 +1358,14 @@ function sameName(a, b){
   return !!a && !!b && (a === b || a.indexOf(b) > -1 || b.indexOf(a) > -1);
 }
 function knownNames(){
-  const set = [];
+  const u = unitBy(myUnit());
+  const set = u ? (u.cr || []).slice() : [];
   load().forEach(o => { if (o.assignee && !set.some(x => norm(x) === norm(o.assignee))) set.push(o.assignee); });
-  return set.slice(0, 8);
+  return set.slice(0, 10);
 }
 function knownSups(){
-  const set = [];
+  const u = unitBy(myUnit());
+  const set = u ? (u.su || []).slice() : [];
   load().forEach(o => { [o.supervisor, o.reviewBy].forEach(n => {
     if (n && !set.some(x => norm(x) === norm(n))) set.push(n); }); });
   if (names.sup && !set.some(x => norm(x) === norm(names.sup))) set.push(names.sup);
@@ -1347,10 +1537,26 @@ function setRole(k){
   toast(ROLES[k].t + ' • ' + me());
 }
 let pendingRole = null;
+let pendUnit = '';
+function paintUnitSel(k){
+  const need = (k !== 'manager') && org.units.length > 0;
+  $('#unitWrap').classList.toggle('hidden', !need);
+  if (!need){ pendUnit = ''; return; }
+  pendUnit = myUnits[k] || '';
+  $('#unitSel').innerHTML = org.units.map(u =>
+    `<button type="button" class="chip${norm(u.n)===norm(pendUnit)?' sel':''}" data-u="${esc(u.n)}">${esc(u.n)}</button>`).join('');
+}
+$('#unitSel').addEventListener('click', e => {
+  const b = e.target.closest('[data-u]'); if (!b) return;
+  pendUnit = b.dataset.u;
+  $$('#unitSel .chip').forEach(x => x.classList.toggle('sel', x.dataset.u === pendUnit));
+  $('#nameErr').classList.remove('show');
+});
 function openName(k){
   pendingRole = k;
   $('#nameTitle').textContent = ROLES[k].ic + ' ' + ROLES[k].t;
   $('#myName').value = names[k] || '';
+  paintUnitSel(k);
   $('#nameErr').classList.remove('show');
   $('#nameOvl').classList.remove('hidden');
 }
@@ -1360,7 +1566,8 @@ $('#roleCards').addEventListener('click', e => {
   const k = b.dataset.role;
   pendingRole = k;
   $$('#roleCards .role').forEach(x => x.classList.toggle('on', x.dataset.role === k));
-  if (names[k]) setRole(k); else openName(k);
+  const needUnit = (k !== 'manager') && org.units.length > 0 && !myUnits[k];
+  if (names[k] && !needUnit) setRole(k); else openName(k);
 });
 $('#editName').addEventListener('click', () => { if (role) openName(role); });
 $('#nameCancel').addEventListener('click', closeName);
@@ -1369,6 +1576,10 @@ $('#nameGo').addEventListener('click', () => {
   const n = $('#myName').value.trim();
   if (n.length < 3){ const e = $('#nameErr'); e.textContent = '⛔ نام و نام خانوادگی را کامل بنویس.'; e.classList.add('show'); return; }
   if (!pendingRole) return;
+  if (pendingRole !== 'manager' && org.units.length && !pendUnit){
+    const e = $('#nameErr'); e.textContent = '⛔ واحد خودت را انتخاب کن.'; e.classList.add('show'); return;
+  }
+  if (pendingRole !== 'manager'){ myUnits[pendingRole] = pendUnit; saveUnits(); }
   names[pendingRole] = n;
   try { localStorage.setItem(NAME_KEY, JSON.stringify(names)); } catch(e){}
   closeName();
@@ -1409,7 +1620,7 @@ function matches(o, qq){
   if (!qq) return true;
   const g = (role === 'manager' || role === 'exec') ? seenRec(o, role) : null;
   const seenTxt = (g && g.st === o.status) ? (g.ok ? 'ملاحظه و تأیید شد' : 'ملاحظه شد تأیید نشد ' + (g.note || '')) : '';
-  const hay = lat([o.code, o.typeName, o.region, o.address, o.descr, o.assignee, seenTxt,
+  const hay = lat([o.code, o.typeName, o.region, o.address, o.descr, o.assignee, o.unit, seenTxt,
     PRIO[o.prio] ? PRIO[o.prio].t : '', ST[o.status] ? ST[o.status].t : ''].join(' ')).toLowerCase();
   return lat(qq).toLowerCase().split(/\s+/).filter(Boolean).every(w => hay.includes(w));
 }
@@ -1435,14 +1646,24 @@ const ACTS = {
       ${IN('aName','نام اکیپ یا پیمانکار','مثلاً اکیپ ۳ یا شرکت آریا',1)}
       ${knownNames().length ? `<div class="nm" id="aNames">${knownNames().map(n => `<button type="button" data-nm="${esc(n)}">${esc(n)}</button>`).join('')}</div>
         <p class="muted">برای اینکه کار در کارتابل اکیپ دیده شود، نام باید دقیقاً همان نامی باشد که اکیپ با آن وارد می‌شود.</p>` : ''}
-      ${DATEBTN('تاریخ شروع برنامه‌ریزی‌شده',1)}
+      ${(o.origin === 'manager' && o.start)
+        ? `<div class="lockbox">📅 تاریخ شروع: <b>${esc(jFmt(o.start.y,o.start.m,o.start.d))}</b><br>
+           این تاریخ را <b>مدیر اصلی</b> تعیین کرده و قابل تغییر نیست. اگر تاریخ دیگری لازم است، انصراف بده و از «💡 پیشنهاد به مدیر» استفاده کن.</div>`
+        : DATEBTN('تاریخ شروع برنامه‌ریزی‌شده',1)}
       ${IN('aSup','ناظر این عملیات (اختیاری)','اگر خالی بماند، همه ناظران آن را می‌بینند',0)}
       ${knownSups().length ? `<div class="nm" id="aSups">${knownSups().map(n => `<button type="button" data-sp="${esc(n)}">${esc(n)}</button>`).join('')}</div>` : ''}
       ${TA('aNote','یادداشت برای اکیپ (اختیاری)','هماهنگی با ترافیک، ساعت شروع، تجهیزات لازم')}`,
-    fill: o => { actDraft.mode = o.mode || null; actDraft.date = o.planDate || null; $('#aName').value = o.assignee || ''; if ($('#aSup')) $('#aSup').value = o.supervisor || ''; $('#aNote').value = o.planNote || ''; },
+    fill: o => {
+      actDraft.mode = o.mode || null;
+      actDraft.dateLocked = !!(o.origin === 'manager' && o.start);
+      actDraft.date = actDraft.dateLocked ? o.start : (o.planDate || null);
+      $('#aName').value = o.assignee || '';
+      if ($('#aSup')) $('#aSup').value = o.supervisor || '';
+      $('#aNote').value = o.planNote || '';
+    },
     check: () => !actDraft.mode ? 'نحوه اجرا را انتخاب کن: اکیپ امانی یا پیمانکار.'
       : !$('#aName').value.trim() ? 'aName|نام اکیپ یا پیمانکار اجباری است و پیش‌فرضی ندارد.'
-      : !actDraft.date ? 'تاریخ شروع انتخاب نشده است. روی کادر تاریخ بزن.' : '',
+      : (!actDraft.dateLocked && !actDraft.date) ? 'تاریخ شروع انتخاب نشده است. روی کادر تاریخ بزن.' : '',
     apply: o => {
       const again = o.status === 'planned';
       o.mode = actDraft.mode; o.assignee = $('#aName').value.trim();
@@ -1469,12 +1690,18 @@ const ACTS = {
   accept: {
     t: '✅ موافقت با پیشنهاد', btn: '✅ تأیید می‌کنم',
     body: o => `<div class="pbox"><b>پیشنهاد مدیر اجرایی:</b><br>${esc(o.proposal ? o.proposal.text : '—')}</div>
-      ${TA('aNote','توضیح مدیر (اختیاری)','مثلاً: موافقم، فقط ایمنی معبر رعایت شود.')}`,
-    fill: () => {},
+      ${TA('aNote','توضیح مدیر (اختیاری)','مثلاً: موافقم، فقط ایمنی معبر رعایت شود.')}
+      ${DATEBTN('تاریخ شروع جدید (اختیاری)',0)}
+      <p class="muted">اگر پیشنهاد درباره زمان بود، تاریخ شروع تازه را اینجا تعیین کن. خالی بگذاری، تاریخ قبلی می‌ماند.</p>`,
+    fill: o => { actDraft.date = o.start || null; },
     check: () => '',
     apply: o => {
       const n = $('#aNote').value.trim();
       o.decision = { ok:true, prop: o.proposal ? o.proposal.text : '', note:n, fa: nowFa() };
+      if (actDraft.date && (!o.start || num(actDraft.date) !== num(o.start))){
+        o.start = actDraft.date;
+        addLog(o,'manager','تاریخ شروع به ' + jFmt(o.start.y,o.start.m,o.start.d) + ' تغییر کرد','talk');
+      }
       o.proposal = null; o.status = 'ordered';
       addLog(o,'manager','با پیشنهاد مدیر اجرایی موافقت شد' + (n ? ' — ' + n : ''),'talk');
       return 'موافقت ثبت شد؛ کار به مدیر اجرایی برگشت';
@@ -1822,6 +2049,7 @@ function badges(o){
   return `<div class="badges">${bk ? `<span class="bkbadge ${bk.c}"><i></i>${esc(bk.t)}</span>` : ''}<span class="prio ${pr.c}">${esc(pr.t)}</span>
     ${o.due ? `<span class="prio prio-normal">مهلت ${esc(jFmt(o.due.y,o.due.m,o.due.d))}</span>` : ''}
     ${(isLate(o) && !(blinkOf(o) && blinkOf(o).c === 'r')) ? '<span class="late">⏰ تأخیر</span>' : ''}
+    ${o.unit ? `<span class="srcbadge">🏢 ${esc(o.unit)}</span>` : ''}
     ${o.origin === 'exec' ? '<span class="srcbadge">کار مستقل مدیر اجرایی</span>' : ''}
     ${verOf(o) > 1 ? '<span class="verbadge">نسخه ' + fd(verOf(o)) + '</span>' : ''}
     ${needsMe(o) ? '<span class="late" style="background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe">منتظر اقدام تو</span>' : ''}</div>`;
@@ -1894,7 +2122,7 @@ function opRow(o){
     <span class="cst ${st.c}">${esc(st.sh || st.t)}${showLate ? '<small>⏰ تأخیر</small>' : ''}</span>
     <span class="ct"><b>${esc(fd(o.code))}</b>
       <i>${esc(o.typeName)} — ${esc(o.address)}</i>
-      <u>${esc(o.region)}${o.assignee ? ' • ' + esc(o.assignee) : ''}${verOf(o) > 1 ? ' • نسخه ' + fd(verOf(o)) : ''}</u></span>
+      <u>${o.unit ? esc(o.unit) + ' • ' : ''}${esc(o.region)}${o.assignee ? ' • ' + esc(o.assignee) : ''}${verOf(o) > 1 ? ' • نسخه ' + fd(verOf(o)) : ''}</u></span>
     ${seen ? (sg.ok ? '<span class="seenpill">✔ ملاحظه و تأیید</span>'
                     : '<span class="seenpill no">✖ تأیید نشد</span>')
            : (nx ? `<span class="rowgo">${esc(nx)}</span>` : '')}
@@ -1930,6 +2158,8 @@ function opCard(o){
   const asg  = o.assignee ? `<div class="assignbox">${o.mode === 'contractor' ? '🏢 پیمانکار' : '👷 اکیپ'}: <b>${esc(o.assignee)}</b>` +
     (o.planDate ? ` • شروع: <b>${esc(jFmt(o.planDate.y,o.planDate.m,o.planDate.d))}</b>` : '') +
     ((role !== 'crew') ? `<br>🦺 ناظر: <b>${esc(o.supervisor || 'تعیین‌نشده — همه ناظران')}</b>` : '') +
+    (o.origin === 'manager' && o.start ? `<br>📅 شروع تعیین‌شده توسط مدیر: <b>${esc(jFmt(o.start.y,o.start.m,o.start.d))}</b>` : '') +
+    (o.toExec ? `<br>📨 گیرنده دستور: <b>${esc(o.toExec)}</b>` : '') +
     (o.planNote ? `<br>📝 ${esc(o.planNote)}` : '') + '</div>' : '';
   const nabx = (o.status === 'notapproved' && role !== 'crew')
     ? `<div class="nabox"><b>⛔ ناظر${o.reviewBy ? ' (' + esc(o.reviewBy) + ')' : ''} این کار را تأیید نکرد:</b><br>${esc(o.naReason || '—')}` +
@@ -1995,7 +2225,7 @@ function render(){
   const all = migrate(load());
   const r = ROLES[role];
   $('#roleChip').classList.remove('hidden');
-  $('#roleChip').textContent = r.ic + ' ' + r.t + ' • تغییر نقش';
+  $('#roleChip').textContent = r.ic + ' ' + r.t + (myUnit() ? ' • ' + myUnit() : '') + ' • تغییر نقش';
 
   const qq = $('#q').value.trim();
   $('#qClear').classList.toggle('hidden', !qq);
@@ -2006,7 +2236,7 @@ function render(){
     sw.value = src;
   } else sw.classList.add('hidden');
 
-  const base = all.filter(o => VIS[role].includes(o.status) && srcPass(o)
+  const base = all.filter(o => VIS[role].includes(o.status) && srcPass(o) && unitOK(o)
     && (role !== 'crew' || sameName(o.assignee, me()))
     && (role !== 'sup'  || !o.supervisor || sameName(o.supervisor, me())));
   const mine = base.filter(needsMe);
@@ -2088,9 +2318,9 @@ function render(){
 }
 
 try { const sv = localStorage.getItem(ROLE_KEY); if (sv && ROLES[sv]) role = sv; } catch(e){}
-buildRegions(); paintDateBtn(); paintDue(); buildRoleCards();
+buildRegions(); paintDateBtn(); paintStart(); paintDue(); paintUnitPick(); buildRoleCards();
 if (role){ render(); show('home'); } else { show('roleGate'); }
 console.log('Bazdid Ops ' + APP_VERSION);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a479b37eaa5c0b3e',t:'MTc5MTUxMDI3Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a47ace993abb66f8',t:'MTc5MTUyMTg3Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
