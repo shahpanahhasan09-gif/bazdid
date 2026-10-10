@@ -22,7 +22,8 @@
 
 پروژه یک برنامه تحت وب فارسی و راست‌چین برای مدیریت بازدید و عملیات شهرداری است که روی GitHub Pages منتشر می‌شود.
 
-لطفاً اول این دو آدرس را کامل بخوان، بعد شروع کن:
+لطفاً اول این سه آدرس را کامل بخوان، بعد شروع کن:
+https://raw.githubusercontent.com/shahpanahhasan09-gif/bazdid/main/00-GUIDE-CHAT.md
 https://raw.githubusercontent.com/shahpanahhasan09-gif/bazdid/main/BAZDID-HANDOVER.md
 https://raw.githubusercontent.com/shahpanahhasan09-gif/bazdid/main/BAZDID-PROJECT-STATUS.md
 
@@ -42,7 +43,8 @@ https://raw.githubusercontent.com/shahpanahhasan09-gif/bazdid/main/BAZDID-PROJEC
 
 | فایل | آدرس |
 |---|---|
-| بسته انتقال (اول این) | <https://raw.githubusercontent.com/shahpanahhasan09-gif/bazdid/main/BAZDID-HANDOVER.md> |
+| راهنمای چت (اول این) | <https://raw.githubusercontent.com/shahpanahhasan09-gif/bazdid/main/00-GUIDE-CHAT.md> |
+| بسته انتقال | <https://raw.githubusercontent.com/shahpanahhasan09-gif/bazdid/main/BAZDID-HANDOVER.md> |
 | دفترچه رسمی وضعیت | <https://raw.githubusercontent.com/shahpanahhasan09-gif/bazdid/main/BAZDID-PROJECT-STATUS.md> |
 | بایگانی کامل گزارش‌ها | <https://raw.githubusercontent.com/shahpanahhasan09-gif/bazdid/main/BAZDID-ARCHIVE.md> |
 
@@ -76,8 +78,8 @@ https://raw.githubusercontent.com/shahpanahhasan09-gif/bazdid/main/BAZDID-PROJEC
 
 | مورد | وضعیت |
 |---|---|
-| مرحله تمام‌شده | **۳.۳ — چرخه چهارنقشی با شواهد قفل‌دار** (`v3.3.8-CALM2`) ✅ |
-| مرحله بعدی | **۳.۴ — امضای دیجیتال و نسخه‌بندی** |
+| مرحله تمام‌شده | **۳ — ثبت عملیات با منوی سازمان‌ها** (`v3.7.4-MENU`) ✅ پایان رسمی تأیید شد |
+| مرحله بعدی | **۴ — سینک:** شهر، سازمان‌های جدا، نقش‌های سفارشی، ارجاع و همکاری، Supabase با RLS. منتظر دستور «شروع کن» |
 | نسخه تولید پایدار | `index.html` نسخه v10 — **بدون تغییر بماند** |
 
 جزئیات کامل در `BAZDID-PROJECT-STATUS.md` بخش «اقدام بعدی».
@@ -91,9 +93,8 @@ https://raw.githubusercontent.com/shahpanahhasan09-gif/bazdid/main/BAZDID-PROJEC
 |---|---|
 | `index.html` | نسخه تولید v10 |
 | `stage-02-core.html` | هسته بازدید، `v2.11.1-WORD-FONT` |
-| `stage-03-ops.html` | چرخه عملیات، `v3.3.8-CALM2` |
+| `stage-03-ops.html` | ثبت عملیات با منوی سازمان‌ها، `v3.7.4-MENU` |
 | `demo-stage-01.html` | محیط نمایشی ایزوله |
-| `online-release-candidate.html` | مبنای توسعه ۲.۱ |
 | `report.html` | صفحه گزارش مستقل |
 | `sos.html` | کارت نجات پروژه |
 | `sw.js` · `manifest.webmanifest` · `icon.svg` · `splash-logo.jpg` | زیرساخت PWA |
@@ -102,11 +103,17 @@ https://raw.githubusercontent.com/shahpanahhasan09-gif/bazdid/main/BAZDID-PROJEC
 **حافظه پروژه**
 | فایل | توضیح |
 |---|---|
+| `00-GUIDE-CHAT.md` | راهنمای ادامه کار و گردش دانلود و آپلود؛ اول این را بخوان |
 | `BAZDID-HANDOVER.md` | بسته انتقال؛ هر دستیار جدید اول این را می‌خواند |
 | `BAZDID-PROJECT-STATUS.md` | دفترچه رسمی وضعیت و «اقدام بعدی» |
 | `BAZDID-ARCHIVE.md` | بایگانی کامل همه گزارش‌های مرحله‌ای |
+| `STATUS-03-CLOSE.md` | بستن رسمی مرحله ۳ |
+| `01-TOR-NAJAT-03.md` | کارت تور نجات مرحله ۳ |
+| `02-DAFTARCHE.md` | دفترچه کامل پروژه |
+| `03-VAZEIAT.md` | خلاصه وضعیت |
+| `04-PLAN-CITY-REFERRAL.md` | طرح مرحله ۴ (شهر، ارجاع، سینک) |
 
-> **قاعده ثابت:** پایان هر مرحله، این سه فایل به‌روز و دوباره در مخزن بارگذاری می‌شوند.
+> **قاعده ثابت:** پایان هر مرحله، همه فایل‌های حافظه به‌روز و دوباره در مخزن بارگذاری می‌شوند.
 
 ---
 
