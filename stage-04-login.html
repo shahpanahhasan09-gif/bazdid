@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مرحله ۴.۲ — ورود آزمایشی</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#eef2f7;color:#15202b;font-family:Vazirmatn,"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.8;padding:14px}
+.wrap{max-width:560px;margin:0 auto}
+h1{font-size:19px;margin:6px 0 2px;color:#0d47a1}
+.sub{font-size:12.5px;color:#607d8b;margin:0 0 10px}
+.card{background:#fff;border-radius:14px;padding:14px;margin:12px 0;box-shadow:0 2px 10px rgba(16,42,80,.08)}
+.card h2{font-size:15px;margin:0 0 8px;color:#0d47a1}
+input{width:100%;padding:12px;border:1.5px solid #cfd8dc;border-radius:12px;font:inherit;font-size:15px;direction:ltr;text-align:left}
+button{width:100%;border:0;border-radius:12px;padding:13px;font:inherit;font-size:15.5px;font-weight:800;color:#fff;background:#1565c0;margin-top:10px}
+button.alt{background:#2e7d32}
+button.gray{background:#607d8b}
+button:disabled{background:#90a4ae}
+.msg{margin-top:10px;padding:10px 12px;border-radius:10px;font-size:13.5px;display:none;white-space:pre-wrap;word-break:break-word}
+.msg.show{display:block}
+.good{background:#e8f5e9;color:#1b5e20;border:1px solid #a5d6a7}
+.bad{background:#ffebee;color:#b71c1c;border:1px solid #ef9a9a}
+.info{background:#e3f2fd;color:#0d47a1;border:1px solid #90caf9}
+.kv{font-size:13.5px;margin:4px 0}
+code{direction:ltr;display:inline-block;background:#f1f5f9;padding:1px 6px;border-radius:6px;font-size:12.5px}
+.note{font-size:12.5px;color:#607d8b}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🔐 مرحله ۴.۲ — ورود آزمایشی</h1>
+  <p class="sub">فقط برای آزمایش. داده واقعی وارد نکن.</p>
+
+  <div class="card" id="cfgCard">
+    <h2>۱. وضعیت تنظیمات</h2>
+    <div id="cfgMsg" class="msg"></div>
+  </div>
+
+  <div class="card" id="loginCard">
+    <h2>۲. ورود با لینک ایمیل</h2>
+    <input id="email" type="email" placeholder="ایمیل خودت" autocomplete="email">
+    <button id="sendBtn" onclick="sendLink()">📨 فرستادن لینک ورود</button>
+    <div id="loginMsg" class="msg"></div>
+    <p class="note">لینک را روی همین گوشی باز کن. بعد از باز شدن، برگشت به همین صفحه انجام می‌شود.</p>
+  </div>
+
+  <div class="card" id="sessCard" style="display:none">
+    <h2>۳. وضعیت ورود</h2>
+    <div class="kv">ایمیل: <code id="sEmail"></code></div>
+    <div class="kv">شناسه کاربر: <code id="sId"></code></div>
+    <button id="chkBtn" class="alt" onclick="checkAccess()">🔎 بررسی دسترسی‌ها</button>
+    <button class="gray" onclick="signOut()">خروج از این صفحه</button>
+    <div id="accMsg" class="msg"></div>
+  </div>
+</div>
+
+<script src="stage4-config.js"></script>
+<script>
+var CFG = window.BAZDID_CFG || {};
+var SESSION = null;
+
+function el(id){ return document.getElementById(id); }
+function say(id, cls, text){
+  var m = el(id);
+  m.className = 'msg show ' + cls;
+  m.textContent = text;
+}
+
+function configOk(){
+  return !!(CFG.url && CFG.anon &&
+    CFG.url.indexOf('CHANGE_ME') < 0 && CFG.anon.indexOf('CHANGE_ME') < 0);
+}
+
+function hdrs(){
+  var h = { 'apikey': CFG.anon, 'Content-Type': 'application/json' };
+  if (SESSION) h['Authorization'] = 'Bearer ' + SESSION.access_token;
+  return h;
+}
+
+function readJson(r){
+  return r.text().then(function(t){
+    var j = {};
+    try { j = t ? JSON.parse(t) : {}; } catch(e) { j = { raw: t }; }
+    return { ok: r.ok, status: r.status, j: j };
+  });
+}
+
+function errText(x){
+  var j = x.j || {};
+  return j.msg || j.error_description || j.message || j.error || j.raw || ('کد ' + x.status);
+}
+
+function sendLink(){
+  if (!configOk()) return say('loginMsg', 'bad', 'تنظیمات هنوز کامل نیست. فایل stage4-config.js را پر کن.');
+  var email = el('email').value.trim().toLowerCase();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return say('loginMsg', 'bad', 'ایمیل معتبر نیست.');
+  el('sendBtn').disabled = true;
+  var back = location.origin + location.pathname;
+  fetch(CFG.url + '/auth/v1/otp?redirect_to=' + encodeURIComponent(back), {
+    method: 'POST',
+    headers: hdrs(),
+    body: JSON.stringify({ email: email, create_user: true })
+  })
+  .then(readJson)
+  .then(function(x){
+    el('sendBtn').disabled = false;
+    if (x.ok) say('loginMsg', 'good', 'لینک ورود به ' + email + ' فرستاده شد. ایمیل را باز کن (گاهی در هرزنامه است) و روی لینک بزن.');
+    else say('loginMsg', 'bad', 'خطا در ارسال: ' + errText(x));
+  })
+  .catch(function(){
+    el('sendBtn').disabled = false;
+    say('loginMsg', 'bad', 'اتصال به سرور برقرار نشد. ممکن است اینترنت یا فیلترینگ مانع شده باشد.');
+  });
+}
+
+function takeTokenFromUrl(){
+  var h = location.hash.replace(/^#/, '');
+  if (!h) return null;
+  var p = new URLSearchParams(h);
+  var at = p.get('access_token');
+  if (!at) return null;
+  history.replaceState(null, '', location.pathname);
+  return at;
+}
+
+function loadUser(token){
+  SESSION = { access_token: token };
+  return fetch(CFG.url + '/auth/v1/user', { headers: hdrs() })
+    .then(readJson)
+    .then(function(x){
+      if (!x.ok) { SESSION = null; say('loginMsg', 'bad', 'ورود کامل نشد: ' + errText(x)); return; }
+      SESSION.user_id = x.j.id;
+      SESSION.email = x.j.email;
+      paintSession();
+    });
+}
+
+function paintSession(){
+  if (!SESSION) { el('sessCard').style.display = 'none'; el('loginCard').style.display = ''; return; }
+  el('sEmail').textContent = SESSION.email || '-';
+  el('sId').textContent = SESSION.user_id || '-';
+  el('sessCard').style.display = '';
+  el('loginCard').style.display = 'none';
+}
+
+function checkAccess(){
+  if (!SESSION) return;
+  el('chkBtn').disabled = true;
+  var get = function(path){
+    return fetch(CFG.url + '/rest/v1/' + path, { headers: hdrs() }).then(readJson);
+  };
+  Promise.all([
+    get('orgs?select=name'),
+    get('members?select=email,active'),
+    get('platform_admins?select=user_id')
+  ]).then(function(r){
+    el('chkBtn').disabled = false;
+    var lines = [];
+    var fail = r.filter(function(x){ return !x.ok; });
+    if (fail.length) { say('accMsg', 'bad', 'خطا: ' + errText(fail[0])); return; }
+    var orgs = r[0].j, mem = r[1].j, adm = r[2].j;
+    var isAdmin = Array.isArray(adm) && adm.some(function(a){ return a.user_id === SESSION.user_id; });
+    lines.push('مدیر سیستم: ' + (isAdmin ? 'بله' : 'خیر'));
+    lines.push('سازمان‌هایی که می‌بینی (' + orgs.length + '):');
+    orgs.forEach(function(o){ lines.push('  • ' + o.name); });
+    lines.push('عضویت‌هایی که می‌بینی (' + mem.length + '):');
+    mem.forEach(function(m){ lines.push('  • ' + m.email + (m.active ? '' : ' (غیرفعال)')); });
+    say('accMsg', 'info', lines.join('\n'));
+  }).catch(function(){
+    el('chkBtn').disabled = false;
+    say('accMsg', 'bad', 'اتصال برقرار نشد.');
+  });
+}
+
+function signOut(){
+  SESSION = null;
+  paintSession();
+}
+
+function init(){
+  if (!configOk()) {
+    say('cfgMsg', 'bad', 'فایل stage4-config.js هنوز پر نشده است. آدرس و کلید عمومی پروژه را خودت در آن فایل بگذار.');
+    el('loginCard').style.opacity = '0.5';
+    return;
+  }
+  say('cfgMsg', 'good', 'تنظیمات کامل است.');
+  var tok = takeTokenFromUrl();
+  if (tok) {
+    say('loginMsg', 'info', 'در حال ورود...');
+    loadUser(tok).then(function(){ el('loginMsg').className = 'msg'; });
+  }
+}
+init();
+</script>
+</body>
+</html>
