@@ -1,0 +1,20 @@
+name: remove-fix-sos
+on:
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  rm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: check and remove
+        run: |
+          H=$(git hash-object .github/workflows/fix-sos.yml | cut -c1-8)
+          echo "$H"
+          [ "$H" = "fcba2183" ] || exit 1
+          git config user.name fix-bot
+          git config user.email fix-bot@users.noreply.github.com
+          git rm -q -- .github/workflows/fix-sos.yml .github/workflows/remove-fix-sos.yml
+          git commit -m "cleanup: remove one-time sos workflows"
+          git push
