@@ -216,15 +216,21 @@ function checkAccess(){
   var get = function(path){
     return fetch(CFG.url + '/rest/v1/' + path, { headers: hdrs() }).then(readJson);
   };
+  var rpc = fetch(CFG.url + '/rest/v1/rpc/my_orgs', { method: 'POST', headers: hdrs(), body: '{}' })
+    .then(readJson).catch(function(){ return { ok: false, status: 0, j: {} }; });
   Promise.all([
     get('orgs?select=name'),
     get('members?select=email,active'),
-    get('platform_admins?select=user_id')
+    get('platform_admins?select=user_id'),
+    rpc
   ]).then(function(r){
     el('chkBtn').disabled = false;
-    var lines = [];
-    var fail = r.filter(function(x){ return !x.ok; });
-    if (fail.length) { say('accMsg', 'bad', 'خطا: ' + errText(fail[0]) + '\nکد وضعیت: ' + fail[0].status + '\nتوکن: ' + tokenInfo()); return; }
+    var rp = r[3];
+    var rpcLine = 'تابع امن my_orgs: ' + (rp.ok ? 'جواب داد (' + (Array.isArray(rp.j) ? rp.j.length : '?') + ' سازمان)' : 'خطا ' + rp.status + ': ' + errText(rp));
+    var lines = [rpcLine];
+    if (rp.ok && Array.isArray(rp.j)) rp.j.forEach(function(o){ lines.push('  • ' + o.name); });
+    var fail = r.slice(0, 3).filter(function(x){ return !x.ok; });
+    if (fail.length) { say('accMsg', 'bad', rpcLine + '\nخطا: ' + errText(fail[0]) + '\nکد وضعیت: ' + fail[0].status + '\nتوکن: ' + tokenInfo()); return; }
     var orgs = r[0].j, mem = r[1].j, adm = r[2].j;
     var isAdmin = Array.isArray(adm) && adm.some(function(a){ return a.user_id === SESSION.user_id; });
     lines.push('مدیر سیستم: ' + (isAdmin ? 'بله' : 'خیر'));
@@ -261,5 +267,5 @@ function init(){
 }
 init();
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a48c99053abd66cc',t:'MTc5MTcwODQyMQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
