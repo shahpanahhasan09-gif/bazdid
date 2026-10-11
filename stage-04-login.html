@@ -187,6 +187,7 @@ function loadUser(token){
       SESSION.user_id = x.j.id;
       SESSION.email = x.j.email;
       paintSession();
+      say('loginMsg', 'info', 'ورود انجام شد. ' + tokenInfo());
     });
 }
 
@@ -196,6 +197,17 @@ function paintSession(){
   el('sId').textContent = SESSION.user_id || '-';
   el('sessCard').style.display = '';
   el('loginCard').style.display = 'none';
+}
+
+
+function tokenInfo(){
+  if (!SESSION || !SESSION.access_token) return 'بدون توکن';
+  try {
+    var part = SESSION.access_token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+    while (part.length % 4) part += '=';
+    var p = JSON.parse(decodeURIComponent(escape(atob(part))));
+    return 'role=' + (p.role || '-') + ' | aud=' + (p.aud || '-') + ' | iss=' + (p.iss ? 'ok' : '-');
+  } catch(e) { return 'توکن قابل خواندن نیست'; }
 }
 
 function checkAccess(){
@@ -212,7 +224,7 @@ function checkAccess(){
     el('chkBtn').disabled = false;
     var lines = [];
     var fail = r.filter(function(x){ return !x.ok; });
-    if (fail.length) { say('accMsg', 'bad', 'خطا: ' + errText(fail[0])); return; }
+    if (fail.length) { say('accMsg', 'bad', 'خطا: ' + errText(fail[0]) + '\nکد وضعیت: ' + fail[0].status + '\nتوکن: ' + tokenInfo()); return; }
     var orgs = r[0].j, mem = r[1].j, adm = r[2].j;
     var isAdmin = Array.isArray(adm) && adm.some(function(a){ return a.user_id === SESSION.user_id; });
     lines.push('مدیر سیستم: ' + (isAdmin ? 'بله' : 'خیر'));
@@ -249,5 +261,5 @@ function init(){
 }
 init();
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a48c0cc7bc657638',t:'MTc5MTcwMjY3Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
