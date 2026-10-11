@@ -46,8 +46,8 @@ code{direction:ltr;display:inline-block;background:#f1f5f9;padding:1px 6px;borde
       <p class="note">کد ۶ رقمی به ایمیلت فرستاده می‌شود. اگر ایمیل نیامد، پوشه هرزنامه (Spam) را ببین.</p>
     </div>
     <div id="step2" style="display:none">
-      <p class="note" style="margin:0 0 6px">کد ۶ رقمی را که به <code id="codeEmail"></code> فرستاده شد اینجا بنویس:</p>
-      <input id="code" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="------" maxlength="10">
+      <p class="note" style="margin:0 0 6px">کد را که به <code id="codeEmail"></code> فرستاده شد اینجا بنویس:</p>
+      <input id="code" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="--------" maxlength="10">
       <button id="verifyBtn" class="alt" onclick="verifyCode()">✅ تأیید کد</button>
       <button class="gray" onclick="backToEmail()">تغییر ایمیل یا فرستادن دوباره</button>
       <div id="codeMsg" class="msg"></div>
@@ -199,7 +199,6 @@ function paintSession(){
   el('loginCard').style.display = 'none';
 }
 
-
 function tokenInfo(){
   if (!SESSION || !SESSION.access_token) return 'بدون توکن';
   try {
@@ -229,16 +228,12 @@ function checkAccess(){
     var rpcLine = 'تابع امن my_orgs: ' + (rp.ok ? 'جواب داد (' + (Array.isArray(rp.j) ? rp.j.length : '?') + ' سازمان)' : 'خطا ' + rp.status + ': ' + errText(rp));
     var lines = [rpcLine];
     if (rp.ok && Array.isArray(rp.j)) rp.j.forEach(function(o){ lines.push('  • ' + o.name); });
-    var fail = r.slice(0, 3).filter(function(x){ return !x.ok; });
-    if (fail.length) { say('accMsg', 'bad', rpcLine + '\nخطا: ' + errText(fail[0]) + '\nکد وضعیت: ' + fail[0].status + '\nتوکن: ' + tokenInfo()); return; }
-    var orgs = r[0].j, mem = r[1].j, adm = r[2].j;
-    var isAdmin = Array.isArray(adm) && adm.some(function(a){ return a.user_id === SESSION.user_id; });
-    lines.push('مدیر سیستم: ' + (isAdmin ? 'بله' : 'خیر'));
-    lines.push('سازمان‌هایی که می‌بینی (' + orgs.length + '):');
-    orgs.forEach(function(o){ lines.push('  • ' + o.name); });
-    lines.push('عضویت‌هایی که می‌بینی (' + mem.length + '):');
-    mem.forEach(function(m){ lines.push('  • ' + m.email + (m.active ? '' : ' (غیرفعال)')); });
-    say('accMsg', 'info', lines.join('\n'));
+    if (!rp.ok) { say('accMsg', 'bad', rpcLine + '\nتوکن: ' + tokenInfo()); return; }
+    var names = [];
+    r.slice(0, 3).forEach(function(x){ if (!x.ok) names.push('(' + errText(x) + ')'); });
+    lines.push('یادداشت: خواندن مستقیم جدول‌ها ' + (names.length ? 'بسته است (' + names.length + ' مورد، منتظر پشتیبانی)' : 'باز است'));
+    lines.push('توکن: ' + tokenInfo());
+    say('accMsg', 'good', lines.join('\n'));
   }).catch(function(){
     el('chkBtn').disabled = false;
     say('accMsg', 'bad', 'اتصال برقرار نشد.');
