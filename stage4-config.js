@@ -3,5 +3,5 @@
 // هیچ کلید مخفی (service_role) را اینجا نگذار.
 window.BAZDID_CFG = {
   url: 'https://pqebteassyocmzoobntj.supabase.co',
-  anon: 'sb_publishable_REffQMswFWw2RFnn6XdSZg_UY3AnDmt'
+  anon: https://github.com/shahpanahhasan09-gif/bazdid/edit/main/stage4-config.js'
 };
