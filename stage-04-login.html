@@ -26,6 +26,11 @@ button:disabled{background:#90a4ae}
 .kv{font-size:13.5px;margin:4px 0}
 code{direction:ltr;display:inline-block;background:#f1f5f9;padding:1px 6px;border-radius:6px;font-size:12.5px}
 .note{font-size:12.5px;color:#607d8b}
+select,textarea{width:100%;padding:10px;border:1.5px solid #cfd8dc;border-radius:12px;font:inherit;font-size:14px;margin-top:6px;background:#fff}
+textarea{min-height:70px;direction:rtl}
+.ref{border:1px solid #cfd8dc;border-radius:12px;padding:10px;margin-top:10px;font-size:13px}
+.ref b{color:#0d47a1}
+.ref button{margin-top:6px;padding:9px;font-size:13.5px}
 </style>
 </head>
 <body>
@@ -81,6 +86,30 @@ code{direction:ltr;display:inline-block;background:#f1f5f9;padding:1px 6px;borde
     <button id="chkBtn" class="alt" onclick="checkAccess()">🔎 بررسی دسترسی‌ها</button>
     <button class="red" onclick="logout()">🚪 خروج از برنامه</button>
     <div id="accMsg" class="msg"></div>
+  </div>
+
+  <div class="card" id="refCard" style="display:none">
+    <h2>۵. ارجاع به سازمان دیگر</h2>
+    <div id="refSend" style="display:none">
+      <div class="kv">از سازمان:</div>
+      <select id="refFrom"></select>
+      <div class="kv">به سازمان:</div>
+      <select id="refTo"></select>
+      <div class="kv">نوع:</div>
+      <select id="refKind">
+        <option value="referral">ارجاع (دستور انجام کار)</option>
+        <option value="cooperation">درخواست همکاری</option>
+      </select>
+      <div class="kv">خلاصه‌ی کار:</div>
+      <textarea id="refNote" maxlength="500" placeholder="عنوان، نشانی کلی، توضیح کوتاه. عکس و اطلاعات شخصی شهروند ننویس."></textarea>
+      <button class="alt" onclick="sendReferral()">📤 ارسال ارجاع</button>
+      <div id="refSendMsg" class="msg"></div>
+    </div>
+    <div id="refNoRight" class="note" style="display:none">این حساب در هیچ سازمانی نقش «ارجاع» ندارد. فقط می‌تواند ارجاع‌های ورودی را ببیند و پاسخ دهد اگر نقشش اجازه داشته باشد.</div>
+    <h2 style="margin-top:14px">فهرست ارجاع‌ها</h2>
+    <button class="gray" onclick="loadReferrals()">🔄 به‌روزرسانی فهرست</button>
+    <div id="refList"></div>
+    <div id="refListMsg" class="msg"></div>
   </div>
 </div>
 
@@ -362,6 +391,7 @@ function enterApp(){
   el('sExp').textContent = new Date(a.exp).toLocaleString('fa-IR');
   showCard('sess');
   el('accMsg').className = 'msg';
+  refreshReferrals();
 }
 
 function logout(){
@@ -411,6 +441,163 @@ function checkAccess(){
     el('chkBtn').disabled = false;
     say('accMsg', 'bad', 'اتصال برقرار نشد.');
   });
+}
+
+/* ---------- ارجاع بین سازمان‌ها (۴.۴) ---------- */
+var MEMBERSHIPS = [];
+var ORG_NAMES = {};
+
+function txt(tag, text, cls){
+  var n = document.createElement(tag);
+  if (cls) n.className = cls;
+  n.textContent = text;
+  return n;
+}
+function orgName(id){ return ORG_NAMES[id] || id || '-'; }
+function canSendFrom(orgId){
+  return MEMBERSHIPS.some(function(m){ return m.org_id === orgId && m.can_refer; });
+}
+function anyCanRefer(){
+  return MEMBERSHIPS.some(function(m){ return m.can_refer; });
+}
+
+function loadMemberships(){
+  var q = 'members?select=org_id,roles(can_refer),orgs(name)&active=eq.true&user_id=eq.' + SESSION.user_id;
+  return fetch(CFG.url + '/rest/v1/' + q, { headers: hdrs() }).then(readJson).then(function(x){
+    if (!x.ok || !Array.isArray(x.j)) return [];
+    return x.j.map(function(m){
+      var ro = m.roles || {};
+      var og = m.orgs || {};
+      if (og.name) ORG_NAMES[m.org_id] = og.name;
+      return { org_id: m.org_id, org_name: og.name || '-', can_refer: !!ro.can_refer };
+    });
+  }).catch(function(){ return []; });
+}
+
+function loadPartnerOrgs(){
+  return fetch(CFG.url + '/rest/v1/rpc/partner_orgs', { method: 'POST', headers: hdrs(), body: '{}' })
+    .then(readJson).then(function(x){
+      if (!x.ok || !Array.isArray(x.j)) return [];
+      x.j.forEach(function(o){ ORG_NAMES[o.id] = o.name; });
+      return x.j;
+    }).catch(function(){ return []; });
+}
+
+function fillSelect(id, items){
+  var s = el(id);
+  s.innerHTML = '';
+  items.forEach(function(it){
+    var o = document.createElement('option');
+    o.value = it.value;
+    o.textContent = it.label;
+    s.appendChild(o);
+  });
+}
+
+function refreshReferrals(){
+  el('refCard').style.display = '';
+  Promise.all([loadMemberships(), loadPartnerOrgs()]).then(function(r){
+    MEMBERSHIPS = r[0];
+    var partners = r[1];
+    var senders = MEMBERSHIPS.filter(function(m){ return m.can_refer; });
+    el('refSend').style.display = senders.length ? '' : 'none';
+    el('refNoRight').style.display = senders.length ? 'none' : '';
+    if (senders.length) {
+      fillSelect('refFrom', senders.map(function(m){ return { value: m.org_id, label: m.org_name }; }));
+      fillSelect('refTo', partners.filter(function(p){
+        return !senders.some(function(m){ return m.org_id === p.id; });
+      }).map(function(p){ return { value: p.id, label: p.name }; }));
+    }
+    loadReferrals();
+  });
+}
+
+function sendReferral(){
+  var from = el('refFrom').value;
+  var to = el('refTo').value;
+  var note = el('refNote').value.trim();
+  if (!from || !to) return say('refSendMsg', 'bad', 'سازمان مبدأ و مقصد را انتخاب کن.');
+  if (from === to) return say('refSendMsg', 'bad', 'مبدأ و مقصد نباید یکی باشند.');
+  if (!note) return say('refSendMsg', 'bad', 'خلاصه‌ی کار را بنویس.');
+  ensureFresh().then(function(ok){
+    if (!ok) return say('refSendMsg', 'bad', 'نشست معتبر نیست. دوباره وارد شو.');
+    var h = hdrs(); h['Prefer'] = 'return=representation';
+    return fetch(CFG.url + '/rest/v1/referrals', {
+      method: 'POST', headers: h,
+      body: JSON.stringify({ from_org_id: from, to_org_id: to, kind: el('refKind').value, note: note })
+    }).then(readJson).then(function(x){
+      if (x.ok) {
+        el('refNote').value = '';
+        say('refSendMsg', 'good', 'ارجاع ثبت و ارسال شد.');
+        loadReferrals();
+      } else {
+        say('refSendMsg', 'bad', 'ثبت نشد: ' + errText(x));
+      }
+    });
+  });
+}
+
+function patchReferral(id, body){
+  ensureFresh().then(function(){
+    var h = hdrs(); h['Prefer'] = 'return=representation';
+    return fetch(CFG.url + '/rest/v1/referrals?id=eq.' + id, {
+      method: 'PATCH', headers: h, body: JSON.stringify(body)
+    }).then(readJson).then(function(x){
+      if (x.ok) loadReferrals();
+      else say('refListMsg', 'bad', 'تغییر انجام نشد: ' + errText(x));
+    });
+  });
+}
+
+var STATUS_FA = { sent: 'ارسال‌شده', accepted: 'پذیرفته‌شده', rejected: 'ردشده', in_progress: 'در حال انجام', done: 'انجام‌شده', cancelled: 'لغوشده' };
+var KIND_FA = { referral: 'ارجاع', cooperation: 'درخواست همکاری' };
+
+function loadReferrals(){
+  ensureFresh().then(function(){
+    return fetch(CFG.url + '/rest/v1/referrals?select=*&order=created_at.desc', { headers: hdrs() }).then(readJson);
+  }).then(function(x){
+    var box = el('refList');
+    box.innerHTML = '';
+    if (!x.ok) return say('refListMsg', 'bad', 'خواندن فهرست ممکن نشد: ' + errText(x));
+    el('refListMsg').className = 'msg';
+    if (!Array.isArray(x.j) || !x.j.length) { box.appendChild(txt('p', 'ارجاعی نیست.', 'note')); return; }
+    x.j.forEach(function(r){
+      var card = document.createElement('div');
+      card.className = 'ref';
+      var incoming = MEMBERSHIPS.some(function(m){ return m.org_id === r.to_org_id; });
+      var outgoing = MEMBERSHIPS.some(function(m){ return m.org_id === r.from_org_id; });
+      card.appendChild(txt('div', (incoming ? 'ورودی' : 'خروجی') + ' · ' + (KIND_FA[r.kind] || r.kind)));
+      card.appendChild(txt('div', 'از: ' + orgName(r.from_org_id) + '  ←  به: ' + orgName(r.to_org_id)));
+      card.appendChild(txt('div', 'وضعیت: ' + (STATUS_FA[r.status] || r.status)));
+      card.appendChild(txt('div', r.note || '', 'note'));
+      if (r.reply_note) card.appendChild(txt('div', 'پاسخ: ' + r.reply_note, 'note'));
+      var toMe = canSendFrom(r.to_org_id);
+      var fromMe = canSendFrom(r.from_org_id);
+      function btn(label, cls, fn){
+        var b = document.createElement('button');
+        b.className = cls; b.textContent = label;
+        b.onclick = fn;
+        card.appendChild(b);
+      }
+      if (r.status === 'sent' && toMe) {
+        btn('✅ پذیرش', 'alt', function(){ patchReferral(r.id, { status: 'accepted' }); });
+        btn('❌ رد', 'red', function(){
+          var why = window.prompt('دلیل رد (اختیاری):', '') || '';
+          patchReferral(r.id, { status: 'rejected', reply_note: why });
+        });
+      }
+      if (r.status === 'sent' && fromMe) {
+        btn('↩️ لغو ارجاع', 'gray', function(){ patchReferral(r.id, { status: 'cancelled' }); });
+      }
+      if (r.status === 'accepted' && toMe) {
+        btn('🔧 شروع کار', 'alt', function(){ patchReferral(r.id, { status: 'in_progress' }); });
+      }
+      if (r.status === 'in_progress' && toMe) {
+        btn('🏁 انجام شد', 'alt', function(){ patchReferral(r.id, { status: 'done' }); });
+      }
+      box.appendChild(card);
+    });
+  }).catch(function(){ say('refListMsg', 'bad', 'اتصال برقرار نشد.'); });
 }
 
 /* ---------- شروع ---------- */
