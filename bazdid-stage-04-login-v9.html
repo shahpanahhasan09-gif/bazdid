@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مرحله ۴.۲ — ورود آزمایشی</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#eef2f7;color:#15202b;font-family:Vazirmatn,"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.8;padding:14px}
+.wrap{max-width:560px;margin:0 auto}
+h1{font-size:19px;margin:6px 0 2px;color:#0d47a1}
+.sub{font-size:12.5px;color:#607d8b;margin:0 0 10px}
+.card{background:#fff;border-radius:14px;padding:14px;margin:12px 0;box-shadow:0 2px 10px rgba(16,42,80,.08)}
+.card h2{font-size:15px;margin:0 0 8px;color:#0d47a1}
+input{width:100%;padding:12px;border:1.5px solid #cfd8dc;border-radius:12px;font:inherit;font-size:15px;direction:ltr;text-align:left;margin-top:6px}
+button{width:100%;border:0;border-radius:12px;padding:13px;font:inherit;font-size:15.5px;font-weight:800;color:#fff;background:#1565c0;margin-top:10px}
+button.alt{background:#2e7d32}
+button.gray{background:#607d8b}
+button.red{background:#c62828}
+button:disabled{background:#90a4ae}
+.msg{margin-top:10px;padding:10px 12px;border-radius:10px;font-size:13.5px;display:none;white-space:pre-wrap;word-break:break-word}
+.msg.show{display:block}
+.good{background:#e8f5e9;color:#1b5e20;border:1px solid #a5d6a7}
+.bad{background:#ffebee;color:#b71c1c;border:1px solid #ef9a9a}
+.info{background:#e3f2fd;color:#0d47a1;border:1px solid #90caf9}
+.kv{font-size:13.5px;margin:4px 0}
+code{direction:ltr;display:inline-block;background:#f1f5f9;padding:1px 6px;border-radius:6px;font-size:12.5px}
+.note{font-size:12.5px;color:#607d8b}
+select,textarea{width:100%;padding:10px;border:1.5px solid #cfd8dc;border-radius:12px;font:inherit;font-size:14px;margin-top:6px;background:#fff}
+textarea{min-height:70px;direction:rtl}
+.ref{border:1px solid #cfd8dc;border-radius:12px;padding:10px;margin-top:10px;font-size:13px}
+.ref b{color:#0d47a1}
+.ref button{margin-top:6px;padding:9px;font-size:13.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🔐 مرحله ۴.۲ — ورود آزمایشی</h1>
+  <p class="sub">فقط برای آزمایش. داده واقعی وارد نکن.</p>
+
+  <div class="card" id="cfgCard">
+    <h2>۱. وضعیت تنظیمات</h2>
+    <div id="cfgMsg" class="msg"></div>
+  </div>
+
+  <div class="card" id="loginCard" style="display:none">
+    <h2>۲. ورود با کد</h2>
+    <div id="step1">
+      <input id="email" type="email" placeholder="ایمیل خودت" autocomplete="email">
+      <button id="sendBtn" onclick="sendCode()">📨 فرستادن کد ورود</button>
+      <div id="loginMsg" class="msg"></div>
+      <p class="note">کد ۶ رقمی به ایمیلت فرستاده می‌شود. اگر ایمیل نیامد، پوشه هرزنامه (Spam) را ببین.</p>
+    </div>
+    <div id="step2" style="display:none">
+      <p class="note" style="margin:0 0 6px">کد ۶ رقمی را که به <code id="codeEmail"></code> فرستاده شد اینجا بنویس:</p>
+      <input id="code" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="------" maxlength="10">
+      <button id="verifyBtn" class="alt" onclick="verifyCode()">✅ تأیید کد</button>
+      <button class="gray" onclick="backToEmail()">تغییر ایمیل یا فرستادن دوباره</button>
+      <div id="codeMsg" class="msg"></div>
+    </div>
+  </div>
+
+  <div class="card" id="pinSetCard" style="display:none">
+    <h2>۳. یک PIN ۴ رقمی بساز</h2>
+    <p class="note" style="margin:0 0 6px">این PIN را برای باز کردن برنامه بعد از خروج استفاده می‌کنی. آن را یادت باشد.</p>
+    <input id="pin1" type="password" inputmode="numeric" maxlength="4" placeholder="PIN ۴ رقمی">
+    <input id="pin2" type="password" inputmode="numeric" maxlength="4" placeholder="دوباره همان PIN">
+    <button class="alt" onclick="setPin()">💾 ذخیره PIN</button>
+    <div id="pinSetMsg" class="msg"></div>
+  </div>
+
+  <div class="card" id="lockCard" style="display:none">
+    <h2>🔒 برنامه قفل است</h2>
+    <p class="note" style="margin:0 0 6px">PIN ۴ رقمی خودت را وارد کن.</p>
+    <input id="pinIn" type="password" inputmode="numeric" maxlength="4" placeholder="PIN">
+    <button class="alt" onclick="unlock()">🔓 باز کردن</button>
+    <button class="gray" onclick="forgotPin()">PIN را فراموش کردم (ورود با کد ایمیل)</button>
+    <div id="lockMsg" class="msg"></div>
+  </div>
+
+  <div class="card" id="sessCard" style="display:none">
+    <h2>۴. وضعیت ورود</h2>
+    <div class="kv">ایمیل: <code id="sEmail"></code></div>
+    <div class="kv">شناسه کاربر: <code id="sId"></code></div>
+    <div class="kv">ورود تا: <code id="sExp"></code></div>
+    <button id="chkBtn" class="alt" onclick="checkAccess()">🔎 بررسی دسترسی‌ها</button>
+    <button class="red" onclick="logout()">🚪 خروج از برنامه</button>
+    <div id="accMsg" class="msg"></div>
+  </div>
+
+  <div class="card" id="refCard" style="display:none">
+    <h2>۵. ارجاع به سازمان دیگر</h2>
+    <div id="refSend" style="display:none">
+      <div class="kv">از سازمان:</div>
+      <select id="refFrom"></select>
+      <div class="kv">به سازمان:</div>
+      <select id="refTo"></select>
+      <div class="kv">نوع:</div>
+      <select id="refKind">
+        <option value="referral">ارجاع (دستور انجام کار)</option>
+        <option value="cooperation">درخواست همکاری</option>
+      </select>
+      <div class="kv">خلاصه‌ی کار:</div>
+      <textarea id="refNote" maxlength="500" placeholder="عنوان، نشانی کلی، توضیح کوتاه. عکس و اطلاعات شخصی شهروند ننویس."></textarea>
+      <button class="alt" onclick="sendReferral()">📤 ارسال ارجاع</button>
+      <div id="refSendMsg" class="msg"></div>
+    </div>
+    <div id="refNoRight" class="note" style="display:none">این حساب در هیچ سازمانی نقش «ارجاع» ندارد. فقط می‌تواند ارجاع‌های ورودی را ببیند و پاسخ دهد اگر نقشش اجازه داشته باشد.</div>
+    <h2 style="margin-top:14px">فهرست ارجاع‌ها</h2>
+    <button class="gray" onclick="loadReferrals()">🔄 به‌روزرسانی فهرست</button>
+    <div id="refList"></div>
+    <div id="refListMsg" class="msg"></div>
+  </div>
+</div>
+
+<script src="stage4-config.js"></script>
+<script>
+var CFG = window.BAZDID_CFG || {};
+var SESSION = null;
+var PENDING_EMAIL = '';
+var AUTH_KEY = 'bazdid_auth_v1';
+var DAYS = 15;
+var MAX_FAILS = 5;
+
+function el(id){ return document.getElementById(id); }
+function say(id, cls, text){
+  var m = el(id);
+  m.className = 'msg show ' + cls;
+  m.textContent = text;
+}
+
+function configOk(){
+  return !!(CFG.url && CFG.anon &&
+    CFG.url.indexOf('CHANGE_ME') < 0 && CFG.anon.indexOf('CHANGE_ME') < 0);
+}
+
+function hdrs(){
+  var h = { 'apikey': CFG.anon, 'Content-Type': 'application/json' };
+  if (SESSION) h['Authorization'] = 'Bearer ' + SESSION.access_token;
+  return h;
+}
+
+function readJson(r){
+  return r.text().then(function(t){
+    var j = {};
+    try { j = t ? JSON.parse(t) : {}; } catch(e) { j = { raw: t }; }
+    return { ok: r.ok, status: r.status, j: j };
+  });
+}
+
+function errText(x){
+  var j = x.j || {};
+  return j.msg || j.error_description || j.message || j.error || j.raw || ('کد ' + x.status);
+}
+
+/* ---------- ذخیره‌ی نشست روی گوشی ---------- */
+function loadAuth(){
+  try { return JSON.parse(localStorage.getItem(AUTH_KEY) || 'null'); } catch(e) { return null; }
+}
+function saveAuth(a){ localStorage.setItem(AUTH_KEY, JSON.stringify(a)); }
+function clearAuth(){ localStorage.removeItem(AUTH_KEY); SESSION = null; }
+
+function jwtPayload(at){
+  try {
+    var part = at.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+    while (part.length % 4) part += '=';
+    return JSON.parse(decodeURIComponent(escape(atob(part))));
+  } catch(e) { return {}; }
+}
+
+function hex(buf){
+  return Array.prototype.map.call(new Uint8Array(buf), function(b){
+    return ('0' + b.toString(16)).slice(-2);
+  }).join('');
+}
+function randSalt(){
+  var a = new Uint8Array(16);
+  crypto.getRandomValues(a);
+  return hex(a);
+}
+function pinHash(salt, pin){
+  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(salt + ':' + pin))
+    .then(hex);
+}
+
+/* ---------- نمایش کارت‌ها ---------- */
+function showCard(name){
+  ['login','pinSet','lock','sess'].forEach(function(n){
+    el(n + 'Card').style.display = (n === name) ? '' : 'none';
+  });
+}
+
+/* ---------- ورود با کد ایمیل ---------- */
+function backToEmail(){
+  el('step1').style.display = '';
+  el('step2').style.display = 'none';
+  el('codeMsg').className = 'msg';
+}
+
+function sendCode(){
+  if (!configOk()) return say('loginMsg', 'bad', 'تنظیمات هنوز کامل نیست.');
+  var email = el('email').value.trim().toLowerCase();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return say('loginMsg', 'bad', 'ایمیل معتبر نیست.');
+  el('sendBtn').disabled = true;
+  fetch(CFG.url + '/auth/v1/otp', {
+    method: 'POST',
+    headers: hdrs(),
+    body: JSON.stringify({ email: email, create_user: true })
+  })
+  .then(readJson)
+  .then(function(x){
+    el('sendBtn').disabled = false;
+    if (x.ok) {
+      PENDING_EMAIL = email;
+      el('codeEmail').textContent = email;
+      el('code').value = '';
+      el('step1').style.display = 'none';
+      el('step2').style.display = '';
+      say('codeMsg', 'info', 'اگر کد نیامد، چند دقیقه صبر کن یا پوشه هرزنامه را ببین.');
+    } else {
+      say('loginMsg', 'bad', 'خطا در ارسال: ' + errText(x));
+    }
+  })
+  .catch(function(){
+    el('sendBtn').disabled = false;
+    say('loginMsg', 'bad', 'اتصال به سرور برقرار نشد. اینترنت را بررسی کن.');
+  });
+}
+
+function verifyCode(){
+  var code = el('code').value.trim();
+  if (!/^[0-9]{4,10}$/.test(code)) return say('codeMsg', 'bad', 'کد را فقط با عدد انگلیسی و بدون فاصله وارد کن.');
+  if (!PENDING_EMAIL) return backToEmail();
+  el('verifyBtn').disabled = true;
+  fetch(CFG.url + '/auth/v1/verify', {
+    method: 'POST',
+    headers: hdrs(),
+    body: JSON.stringify({ type: 'email', email: PENDING_EMAIL, token: code })
+  })
+  .then(readJson)
+  .then(function(x){
+    el('verifyBtn').disabled = false;
+    if (x.ok && x.j && x.j.access_token) {
+      onNewLogin(x.j.access_token, x.j.refresh_token, x.j.user);
+    } else {
+      say('codeMsg', 'bad', 'کد درست نیست یا منقضی شده. دوباره کد بفرست و کد تازه را وارد کن.\n(' + errText(x) + ')');
+    }
+  })
+  .catch(function(){
+    el('verifyBtn').disabled = false;
+    say('codeMsg', 'bad', 'اتصال برقرار نشد.');
+  });
+}
+
+/* بعد از ورود تازه با کد: مدت ۱۵ روز از همین لحظه شروع می‌شود */
+function onNewLogin(accessToken, refreshToken, user){
+  var old = loadAuth() || {};
+  var samePin = (old.uid && user && old.uid === user.id) ? old.pin : null;
+  var a = {
+    rt: refreshToken,
+    uid: user.id,
+    email: user.email,
+    exp: Date.now() + DAYS * 24 * 60 * 60 * 1000,
+    pin: samePin || null,
+    fails: 0,
+    locked: false
+  };
+  saveAuth(a);
+  SESSION = { access_token: accessToken, user_id: user.id, email: user.email };
+  if (!a.pin) {
+    el('pin1').value = ''; el('pin2').value = '';
+    showCard('pinSet');
+    say('pinSetMsg', 'info', 'حالا یک PIN ۴ رقمی بساز.');
+  } else {
+    enterApp();
+  }
+}
+
+/* ---------- PIN ---------- */
+function setPin(){
+  var p1 = el('pin1').value.trim();
+  var p2 = el('pin2').value.trim();
+  if (!/^[0-9]{4}$/.test(p1)) return say('pinSetMsg', 'bad', 'PIN باید دقیقاً ۴ رقم عددی باشد.');
+  if (p1 !== p2) return say('pinSetMsg', 'bad', 'دو PIN یکی نیستند.');
+  var a = loadAuth();
+  if (!a) return showCard('login');
+  var salt = randSalt();
+  pinHash(salt, p1).then(function(h){
+    a.pin = { salt: salt, hash: h };
+    a.fails = 0;
+    a.locked = false;
+    saveAuth(a);
+    enterApp();
+  });
+}
+
+function unlock(){
+  var pin = el('pinIn').value.trim();
+  var a = loadAuth();
+  if (!a || !a.pin) return showCard('login');
+  if (!/^[0-9]{4}$/.test(pin)) return say('lockMsg', 'bad', 'PIN ۴ رقمی را وارد کن.');
+  pinHash(a.pin.salt, pin).then(function(h){
+    if (h === a.pin.hash) {
+      a.fails = 0;
+      a.locked = false;
+      saveAuth(a);
+      el('pinIn').value = '';
+      refreshAndEnter();
+    } else {
+      a.fails = (a.fails || 0) + 1;
+      if (a.fails >= MAX_FAILS) {
+        clearAuth();
+        el('pinIn').value = '';
+        showCard('login');
+        say('loginMsg', 'bad', 'PIN ' + MAX_FAILS + ' بار اشتباه شد. برای امنیت، با کد ایمیل دوباره وارد شو.');
+      } else {
+        saveAuth(a);
+        say('lockMsg', 'bad', 'PIN درست نیست. ' + (MAX_FAILS - a.fails) + ' بار دیگر فرصت داری.');
+      }
+    }
+  });
+}
+
+function forgotPin(){
+  clearAuth();
+  el('pinIn').value = '';
+  showCard('login');
+  el('step1').style.display = '';
+  el('step2').style.display = 'none';
+  say('loginMsg', 'info', 'PIN پاک شد. با کد ایمیل وارد شو و یک PIN تازه بساز.');
+}
+
+/* ---------- نشست و تمدید توکن ---------- */
+function refreshTokens(a){
+  return fetch(CFG.url + '/auth/v1/token?grant_type=refresh_token', {
+    method: 'POST',
+    headers: { 'apikey': CFG.anon, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refresh_token: a.rt })
+  })
+  .then(readJson)
+  .then(function(x){
+    if (x.ok && x.j && x.j.access_token) {
+      a.rt = x.j.refresh_token;
+      saveAuth(a);
+      SESSION = { access_token: x.j.access_token, user_id: a.uid, email: a.email };
+      return { ok: true };
+    }
+    return { ok: false, net: false, text: errText(x) };
+  })
+  .catch(function(){ return { ok: false, net: true, text: 'اتصال برقرار نشد.' }; });
+}
+
+function refreshAndEnter(){
+  var a = loadAuth();
+  if (!a || !a.rt) return showCard('login');
+  if (Date.now() > a.exp) {
+    clearAuth();
+    showCard('login');
+    return say('loginMsg', 'bad', 'مدت ' + DAYS + ' روز تمام شد. دوباره با کد ایمیل وارد شو.');
+  }
+  refreshTokens(a).then(function(r){
+    if (r.ok) return enterApp();
+    if (r.net) {
+      showCard('login');
+      return say('loginMsg', 'bad', 'اتصال به سرور برقرار نشد. اینترنت را بررسی کن و صفحه را دوباره باز کن.');
+    }
+    clearAuth();
+    showCard('login');
+    say('loginMsg', 'bad', 'نشست دیگر معتبر نیست (شاید از سمت مدیر قطع شده). با کد ایمیل وارد شو.\n(' + r.text + ')');
+  });
+}
+
+/* قبل از درخواست‌ها: اگر توکن کوتاه‌مدت نزدیک انقضاست، تمدید کن */
+function ensureFresh(){
+  if (!SESSION) return Promise.resolve(false);
+  var exp = jwtPayload(SESSION.access_token).exp || 0;
+  if (exp * 1000 - Date.now() > 5 * 60 * 1000) return Promise.resolve(true);
+  var a = loadAuth();
+  if (!a || !a.rt) return Promise.resolve(false);
+  return refreshTokens(a).then(function(r){ return r.ok; });
+}
+
+function enterApp(){
+  var a = loadAuth();
+  if (!a) return showCard('login');
+  if (!SESSION) {
+    return refreshAndEnter();
+  }
+  el('sEmail').textContent = SESSION.email || a.email || '-';
+  el('sId').textContent = SESSION.user_id || a.uid || '-';
+  el('sExp').textContent = new Date(a.exp).toLocaleString('fa-IR');
+  showCard('sess');
+  el('accMsg').className = 'msg';
+  refreshReferrals();
+}
+
+function logout(){
+  var a = loadAuth();
+  if (a) { a.locked = true; saveAuth(a); }
+  SESSION = null;
+  el('pinIn').value = '';
+  showCard('lock');
+  say('lockMsg', 'info', 'از برنامه خارج شدی. برای ورود دوباره PIN را بزن.');
+}
+
+/* ---------- بررسی دسترسی (آزمایشی) ---------- */
+function tokenInfo(){
+  if (!SESSION || !SESSION.access_token) return 'بدون توکن';
+  var p = jwtPayload(SESSION.access_token);
+  return 'role=' + (p.role || '-') + ' | aud=' + (p.aud || '-') + ' | iss=' + (p.iss ? 'ok' : '-');
+}
+
+function checkAccess(){
+  if (!SESSION) return;
+  el('chkBtn').disabled = true;
+  ensureFresh().then(function(){
+    var get = function(path){
+      return fetch(CFG.url + '/rest/v1/' + path, { headers: hdrs() }).then(readJson);
+    };
+    var rpc = fetch(CFG.url + '/rest/v1/rpc/my_orgs', { method: 'POST', headers: hdrs(), body: '{}' })
+      .then(readJson).catch(function(){ return { ok: false, status: 0, j: {} }; });
+    return Promise.all([
+      get('orgs?select=name'),
+      get('members?select=email,active'),
+      get('platform_admins?select=user_id'),
+      rpc
+    ]);
+  }).then(function(r){
+    el('chkBtn').disabled = false;
+    var rp = r[3];
+    var rpcLine = 'تابع امن my_orgs: ' + (rp.ok ? 'جواب داد (' + (Array.isArray(rp.j) ? rp.j.length : '?') + ' سازمان)' : 'خطا ' + rp.status + ': ' + errText(rp));
+    var lines = [rpcLine];
+    if (rp.ok && Array.isArray(rp.j)) rp.j.forEach(function(o){ lines.push('  • ' + o.name); });
+    if (!rp.ok) { say('accMsg', 'bad', rpcLine + '\nتوکن: ' + tokenInfo()); return; }
+    var names = [];
+    r.slice(0, 3).forEach(function(x){ if (!x.ok) names.push('(' + errText(x) + ')'); });
+    lines.push('یادداشت: خواندن مستقیم جدول‌ها ' + (names.length ? 'بسته است (' + names.length + ' مورد، منتظر پشتیبانی)' : 'باز است'));
+    lines.push('توکن: ' + tokenInfo());
+    say('accMsg', 'good', lines.join('\n'));
+  }).catch(function(){
+    el('chkBtn').disabled = false;
+    say('accMsg', 'bad', 'اتصال برقرار نشد.');
+  });
+}
+
+/* ---------- ارجاع بین سازمان‌ها (۴.۴) ---------- */
+var MEMBERSHIPS = [];
+var ORG_NAMES = {};
+
+function txt(tag, text, cls){
+  var n = document.createElement(tag);
+  if (cls) n.className = cls;
+  n.textContent = text;
+  return n;
+}
+function orgName(id){ return ORG_NAMES[id] || id || '-'; }
+function canSendFrom(orgId){
+  return MEMBERSHIPS.some(function(m){ return m.org_id === orgId && m.can_refer; });
+}
+function anyCanRefer(){
+  return MEMBERSHIPS.some(function(m){ return m.can_refer; });
+}
+
+function loadMemberships(){
+  var q = 'members?select=org_id,roles(can_refer),orgs(name)&active=eq.true&user_id=eq.' + SESSION.user_id;
+  return fetch(CFG.url + '/rest/v1/' + q, { headers: hdrs() }).then(readJson).then(function(x){
+    if (!x.ok || !Array.isArray(x.j)) return [];
+    return x.j.map(function(m){
+      var ro = m.roles || {};
+      var og = m.orgs || {};
+      if (og.name) ORG_NAMES[m.org_id] = og.name;
+      return { org_id: m.org_id, org_name: og.name || '-', can_refer: !!ro.can_refer };
+    });
+  }).catch(function(){ return []; });
+}
+
+function loadPartnerOrgs(){
+  return fetch(CFG.url + '/rest/v1/rpc/partner_orgs', { method: 'POST', headers: hdrs(), body: '{}' })
+    .then(readJson).then(function(x){
+      if (!x.ok || !Array.isArray(x.j)) return [];
+      x.j.forEach(function(o){ ORG_NAMES[o.id] = o.name; });
+      return x.j;
+    }).catch(function(){ return []; });
+}
+
+function fillSelect(id, items){
+  var s = el(id);
+  s.innerHTML = '';
+  items.forEach(function(it){
+    var o = document.createElement('option');
+    o.value = it.value;
+    o.textContent = it.label;
+    s.appendChild(o);
+  });
+}
+
+function refreshReferrals(){
+  el('refCard').style.display = '';
+  Promise.all([loadMemberships(), loadPartnerOrgs()]).then(function(r){
+    MEMBERSHIPS = r[0];
+    var partners = r[1];
+    var senders = MEMBERSHIPS.filter(function(m){ return m.can_refer; });
+    el('refSend').style.display = senders.length ? '' : 'none';
+    el('refNoRight').style.display = senders.length ? 'none' : '';
+    if (senders.length) {
+      fillSelect('refFrom', senders.map(function(m){ return { value: m.org_id, label: m.org_name }; }));
+      fillSelect('refTo', partners.filter(function(p){
+        return !senders.some(function(m){ return m.org_id === p.id; });
+      }).map(function(p){ return { value: p.id, label: p.name }; }));
+    }
+    loadReferrals();
+  });
+}
+
+function sendReferral(){
+  var from = el('refFrom').value;
+  var to = el('refTo').value;
+  var note = el('refNote').value.trim();
+  if (!from || !to) return say('refSendMsg', 'bad', 'سازمان مبدأ و مقصد را انتخاب کن.');
+  if (from === to) return say('refSendMsg', 'bad', 'مبدأ و مقصد نباید یکی باشند.');
+  if (!note) return say('refSendMsg', 'bad', 'خلاصه‌ی کار را بنویس.');
+  ensureFresh().then(function(ok){
+    if (!ok) return say('refSendMsg', 'bad', 'نشست معتبر نیست. دوباره وارد شو.');
+    return fetch(CFG.url + '/rest/v1/rpc/send_referral', {
+      method: 'POST', headers: hdrs(),
+      body: JSON.stringify({ p_from: from, p_to: to, p_kind: el('refKind').value, p_note: note })
+    }).then(readJson).then(function(x){
+      if (x.ok) {
+        el('refNote').value = '';
+        say('refSendMsg', 'good', 'ارجاع ثبت و ارسال شد.');
+        loadReferrals();
+      } else {
+        say('refSendMsg', 'bad', 'ثبت نشد: ' + errText(x));
+      }
+    });
+  });
+}
+
+function patchReferral(id, body){
+  ensureFresh().then(function(){
+    return fetch(CFG.url + '/rest/v1/rpc/update_referral', {
+      method: 'POST', headers: hdrs(),
+      body: JSON.stringify({ p_id: id, p_status: body.status, p_reply: body.reply_note || null })
+    }).then(readJson).then(function(x){
+      if (x.ok) loadReferrals();
+      else say('refListMsg', 'bad', 'تغییر انجام نشد: ' + errText(x));
+    });
+  });
+}
+
+var STATUS_FA = { sent: 'ارسال‌شده', accepted: 'پذیرفته‌شده', rejected: 'ردشده', in_progress: 'در حال انجام', done: 'انجام‌شده', cancelled: 'لغوشده' };
+var KIND_FA = { referral: 'ارجاع', cooperation: 'درخواست همکاری' };
+
+function loadReferrals(){
+  say('refListMsg', 'info', 'در حال خواندن فهرست...');
+  var timer = setTimeout(function(){
+    say('refListMsg', 'bad', 'پاسخی از سرور نرسید (بیش از ۱۰ ثانیه). اینترنت را بررسی کن و دوباره روی دکمه بزن.');
+  }, 10000);
+  ensureFresh().then(function(){
+    return fetch(CFG.url + '/rest/v1/rpc/list_referrals', { method: 'POST', headers: hdrs(), body: '{}' }).then(readJson);
+  }).then(function(x){
+    clearTimeout(timer);
+    var box = el('refList');
+    box.innerHTML = '';
+    if (!x.ok) {
+      var roleTxt = SESSION ? (jwtPayload(SESSION.access_token).role || '?') : 'بدون نشست';
+      return say('refListMsg', 'bad', 'خواندن فهرست ممکن نشد: ' + errText(x) + ' | HTTP ' + x.status + ' | نقش توکن: ' + roleTxt + ' | نسخه: v9');
+    }
+    el('refListMsg').className = 'msg';
+    if (!Array.isArray(x.j) || !x.j.length) { box.appendChild(txt('p', 'ارجاعی نیست.', 'note')); return; }
+    x.j.forEach(function(r){
+      var card = document.createElement('div');
+      card.className = 'ref';
+      var incoming = MEMBERSHIPS.some(function(m){ return m.org_id === r.to_org_id; });
+      var outgoing = MEMBERSHIPS.some(function(m){ return m.org_id === r.from_org_id; });
+      card.appendChild(txt('div', (incoming ? 'ورودی' : 'خروجی') + ' · ' + (KIND_FA[r.kind] || r.kind)));
+      card.appendChild(txt('div', 'از: ' + orgName(r.from_org_id) + '  ←  به: ' + orgName(r.to_org_id)));
+      card.appendChild(txt('div', 'وضعیت: ' + (STATUS_FA[r.status] || r.status)));
+      card.appendChild(txt('div', r.note || '', 'note'));
+      if (r.reply_note) card.appendChild(txt('div', 'پاسخ: ' + r.reply_note, 'note'));
+      var toMe = canSendFrom(r.to_org_id);
+      var fromMe = canSendFrom(r.from_org_id);
+      function btn(label, cls, fn){
+        var b = document.createElement('button');
+        b.className = cls; b.textContent = label;
+        b.onclick = fn;
+        card.appendChild(b);
+      }
+      if (r.status === 'sent' && toMe) {
+        btn('✅ پذیرش', 'alt', function(){ patchReferral(r.id, { status: 'accepted' }); });
+        btn('❌ رد', 'red', function(){
+          var why = window.prompt('دلیل رد (اختیاری):', '') || '';
+          patchReferral(r.id, { status: 'rejected', reply_note: why });
+        });
+      }
+      if (r.status === 'sent' && fromMe) {
+        btn('↩️ لغو ارجاع', 'gray', function(){ patchReferral(r.id, { status: 'cancelled' }); });
+      }
+      if (r.status === 'accepted' && toMe) {
+        btn('🔧 شروع کار', 'alt', function(){ patchReferral(r.id, { status: 'in_progress' }); });
+      }
+      if (r.status === 'in_progress' && toMe) {
+        btn('🏁 انجام شد', 'alt', function(){ patchReferral(r.id, { status: 'done' }); });
+      }
+      box.appendChild(card);
+    });
+  }).catch(function(){ clearTimeout(timer); say('refListMsg', 'bad', 'اتصال برقرار نشد.'); });
+}
+
+/* ---------- شروع ---------- */
+function takeTokenFromUrl(){
+  var h = location.hash.replace(/^#/, '');
+  if (!h) return null;
+  var p = new URLSearchParams(h);
+  var at = p.get('access_token');
+  if (!at) return null;
+  var rt = p.get('refresh_token');
+  history.replaceState(null, '', location.pathname);
+  return { access: at, refresh: rt };
+}
+
+function init(){
+  if (!configOk()) {
+    say('cfgMsg', 'bad', 'فایل stage4-config.js هنوز پر نشده است.');
+    return;
+  }
+  say('cfgMsg', 'good', 'تنظیمات کامل است.');
+  var tok = takeTokenFromUrl();
+  if (tok) {
+    fetch(CFG.url + '/auth/v1/user', { headers: { 'apikey': CFG.anon, 'Authorization': 'Bearer ' + tok.access } })
+      .then(readJson)
+      .then(function(x){
+        if (x.ok && x.j && x.j.id) onNewLogin(tok.access, tok.refresh, x.j);
+        else { showCard('login'); say('loginMsg', 'bad', 'ورود کامل نشد: ' + errText(x)); }
+      });
+    return;
+  }
+  var a = loadAuth();
+  if (!a) return showCard('login');
+  if (a.locked) { showCard('lock'); return; }
+  refreshAndEnter();
+}
+init();
+</script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4949dbede559f94',t:'MTc5MTc5MjUwMQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
