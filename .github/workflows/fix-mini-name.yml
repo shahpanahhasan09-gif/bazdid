@@ -1,0 +1,25 @@
+name: fix-mini-name
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  rename:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rename mini rescue file safely
+        run: |
+          set -eu
+          SRC='12-MINI-TOR-NAJAT-STAGE07-TEST11 (1).md'
+          DST='12-MINI-TOR-NAJAT-STAGE07-TEST11.md'
+          test -f "$SRC"
+          test ! -e "$DST"
+          printf '%s  %s\n' 'c3c4ba7bff1b3f424aa62e1c666ae3f0' "$SRC" | md5sum -c -
+          test -f index.html
+          git config user.name 'rename-bot'
+          git config user.email 'rename-bot@users.noreply.github.com'
+          git mv -- "$SRC" "$DST"
+          git rm -q -- '.github/workflows/fix-mini-name.yml'
+          git commit -m 'Fix mini rescue filename'
+          git push
