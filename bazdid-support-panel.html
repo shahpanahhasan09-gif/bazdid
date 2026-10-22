@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>صندوق پشتیبانی بازدید</title>
+<style>
+  :root{
+    --bg:#f1f5f9; --card:#ffffff; --ink:#0f172a; --muted:#64748b; --line:#e2e8f0;
+    --brand:#0f766e; --brand2:#115e59; --red:#b91c1c; --amber:#b45309; --green:#15803d; --blue:#1d4ed8;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;font-size:15px;line-height:1.7}
+  button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+  .hidden{display:none !important}
+  .wrap{max-width:820px;margin:0 auto;padding:0 12px 90px}
+  header.top{position:sticky;top:0;z-index:20;background:var(--brand);color:#fff;
+    padding:10px 12px;display:flex;align-items:center;gap:8px;box-shadow:0 2px 10px rgba(15,23,42,.18)}
+  header.top h1{font-size:16px;margin:0;flex:1;font-weight:700}
+  header.top .sub{font-size:11px;opacity:.85;font-weight:400;display:block}
+  .ibtn{background:rgba(255,255,255,.16);border:0;color:#fff;border-radius:10px;padding:7px 10px;font-size:13px}
+  .ibtn:active{background:rgba(255,255,255,.3)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0}
+  .card h2{font-size:15px;margin:0 0 8px}
+  .muted{color:var(--muted);font-size:12.5px}
+  label.f{display:block;margin:10px 0 4px;font-size:13px;color:#334155;font-weight:600}
+  input.f,select.f,textarea.f{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:11px;background:#fff;outline:none}
+  input.f:focus,select.f:focus,textarea.f:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(15,118,110,.12)}
+  textarea.f{min-height:110px;resize:vertical}
+  .btn{display:block;width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:#fff;font-weight:700}
+  .btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .btn.ghost{background:transparent}
+  .btn:active{transform:translateY(1px)}
+  .row{display:flex;gap:8px}
+  .row>*{flex:1}
+  .chips{display:flex;gap:6px;overflow-x:auto;padding:8px 0;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{white-space:nowrap;border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 12px;font-size:13px;font-weight:600;color:#475569}
+  .chip.on{background:var(--brand);border-color:var(--brand);color:#fff}
+  .item{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;margin:8px 0;position:relative}
+  .item.s-new{border-right:5px solid var(--blue)}
+  .item.s-seen{border-right:5px solid var(--amber)}
+  .item.s-resolved{border-right:5px solid var(--green);opacity:.75}
+  .item.s-wontfix{border-right:5px solid #94a3b8;opacity:.7}
+  .item .t{font-weight:700;font-size:14px;margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .tag{font-size:11px;padding:2px 8px;border-radius:999px;background:#f1f5f9;color:#475569;border:1px solid var(--line)}
+  .tag.red{background:#fef2f2;color:#b91c1c;border-color:#fecaca}
+  .tag.amber{background:#fffbeb;color:#b45309;border-color:#fde68a}
+  .tag.green{background:#f0fdf4;color:#15803d;border-color:#bbf7d0}
+  .tag.blue{background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe}
+  .sheet{position:fixed;inset:0;z-index:60;background:var(--bg);overflow:auto;padding-bottom:90px}
+  .sheet header{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);padding:10px 12px;display:flex;gap:8px;align-items:center;z-index:5}
+  .sheet header b{flex:1;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  pre.diag{background:#0f172a;color:#cbd5e1;border-radius:12px;padding:12px;font-size:11.5px;direction:ltr;text-align:left;overflow:auto;max-height:340px;line-height:1.55}
+  .rule{border:1px solid var(--line);border-radius:12px;padding:11px;margin:8px 0;background:#fff}
+  .rule.r-crash{border-color:#fca5a5;background:#fef2f2}
+  .rule.r-blocker{border-color:#fdba74;background:#fff7ed}
+  .rule.r-warn{border-color:#fde68a;background:#fffdf5}
+  .rule.r-info{border-color:#bfdbfe;background:#f8fbff}
+  .rule .rt{font-weight:800;font-size:13.5px;margin-bottom:4px}
+  .rule .rc{font-size:12.5px;color:#334155}
+  .rule .ra{margin-top:6px;font-size:12.5px;background:#fff;border:1px dashed var(--line);border-radius:9px;padding:7px 9px}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:12.5px;margin:6px 0}
+  .kv b{color:#475569;font-weight:600}
+  .empty{text-align:center;color:var(--muted);padding:36px 10px}
+  .fab{position:fixed;left:16px;bottom:20px;z-index:30;background:var(--brand);color:#fff;border:0;border-radius:999px;padding:13px 18px;font-weight:700;box-shadow:0 8px 22px rgba(15,118,110,.35)}
+  .banner{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;border-radius:12px;padding:10px 12px;font-size:12.5px;margin:10px 0}
+  .banner.warn{background:#fffbeb;border-color:#fde68a;color:#92400e}
+  .err{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:10px;padding:9px 11px;font-size:12.5px;margin-top:8px;display:none}
+  .stat{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0 2px}
+  .stat div{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 6px;text-align:center}
+  .stat b{display:block;font-size:17px}
+  .stat span{font-size:10.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<!-- ---------- تنظیمات ---------- -->
+<section id="scSetup" class="hidden">
+  <header class="top"><h1>صندوق پشتیبانی بازدید<span class="sub">تنظیم یک‌باره</span></h1></header>
+  <div class="wrap">
+    <div class="card">
+      <h2>اتصال به صندوق پشتیبانی</h2>
+      <p class="muted">این دو مقدار را از پنل Supabase پروژه پشتیبانی بردار: Settings → API. فقط یک‌بار لازم است و روی همین گوشی می‌ماند.</p>
+      <label class="f">آدرس پروژه (Project URL)</label>
+      <input class="f" id="cfUrl" dir="ltr" placeholder="https://xxxxx.supabase.co">
+      <label class="f">کلید عمومی (anon / publishable)</label>
+      <input class="f" id="cfKey" dir="ltr" placeholder="sb_publishable_...">
+      <div class="err" id="cfErr"></div>
+      <div style="height:12px"></div>
+      <button class="btn primary" id="cfSave">ذخیره و ادامه</button>
+      <div style="height:8px"></div>
+      <button class="btn ghost" id="cfDemo">فقط نمایش نمونه (بدون اتصال)</button>
+    </div>
+  </div>
+</section>
+
+<!-- ---------- ورود ---------- -->
+<section id="scLogin" class="hidden">
+  <header class="top"><h1>صندوق پشتیبانی بازدید<span class="sub">ورود سازنده</span></h1>
+    <button class="ibtn" id="lnSetup">تنظیمات</button>
+  </header>
+  <div class="wrap">
+    <div class="card">
+      <h2>ورود صاحب صندوق</h2>
+      <p class="muted">فقط حسابی که در جدول <code dir="ltr">support_owners</code> ثبت شده می‌تواند گزارش‌ها را ببیند.</p>
+      <label class="f">ایمیل</label>
+      <input class="f" id="lnEmail" dir="ltr" autocomplete="username">
+      <label class="f">رمز</label>
+      <input class="f" id="lnPass" type="password" dir="ltr" autocomplete="current-password">
+      <div class="err" id="lnErr"></div>
+      <div style="height:12px"></div>
+      <button class="btn primary" id="lnGo">ورود</button>
+      <div style="height:8px"></div>
+      <button class="btn ghost" id="lnDemo">نمایش با داده نمونه</button>
+    </div>
+  </div>
+</section>
+
+<!-- ---------- صندوق ---------- -->
+<section id="scInbox" class="hidden">
+  <header class="top">
+    <h1>صندوق پشتیبانی<span class="sub" id="inSub">—</span></h1>
+    <button class="ibtn" id="inRefresh">↻</button>
+    <button class="ibtn" id="inOut">خروج</button>
+  </header>
+  <div class="wrap">
+    <div class="stat">
+      <div><b id="cAll">۰</b><span>کل</span></div>
+      <div><b id="cNew">۰</b><span>جدید</span></div>
+      <div><b id="cSeen">۰</b><span>دیده‌شده</span></div>
+      <div><b id="cRes">۰</b><span>حل‌شده</span></div>
+    </div>
+    <div class="chips" id="fStatus">
+      <button class="chip on" data-s="all">همه</button>
+      <button class="chip" data-s="new">جدید</button>
+      <button class="chip" data-s="seen">دیده‌شده</button>
+      <button class="chip" data-s="resolved">حل‌شده</button>
+      <button class="chip" data-s="wontfix">حل‌نمی‌شود</button>
+    </div>
+    <div class="row" style="margin-bottom:8px">
+      <select class="f" id="fSev">
+        <option value="">همه شدت‌ها</option>
+        <option value="crash">متوقف‌کننده</option>
+        <option value="blocker">مانع کار</option>
+        <option value="normal">عادی</option>
+        <option value="minor">جزئی</option>
+      </select>
+      <select class="f" id="fClient"><option value="">همه نصب‌ها</option></select>
+    </div>
+    <input class="f" id="fSearch" placeholder="جست‌وجو در متن، نسخه، کاربر…">
+    <div id="list"></div>
+  </div>
+  <button class="fab hidden" id="fabDemo">داده نمونه</button>
+</section>
+
+<!-- ---------- جزئیات ---------- -->
+<section id="scDetail" class="sheet hidden">
+  <header>
+    <button class="ibtn" id="dtBack" style="background:#f1f5f9;color:#0f172a">‹ بازگشت</button>
+    <b id="dtTitle">گزارش</b>
+  </header>
+  <div class="wrap" id="dtBody"></div>
+</section>
+
+<script>
+/* ============================================================
+   موتور عیب‌یابی — قواعد قطعی و قابل توضیح
+   هر قاعده: یک نشانه → یک علت محتمل → یک کار مشخص
+   ============================================================ */
+const RULES = [
+  { id:'quota', sev:'blocker',
+    when:d => d.storage && d.storage.quotaTotal > 0 && (d.storage.quotaUsage / d.storage.quotaTotal) > 0.8,
+    title:'حافظه مرورگر نزدیک پر شدن',
+    cause:d => 'مصرف ' + mb(d.storage.quotaUsage) + ' از ' + mb(d.storage.quotaTotal) + ' پر است. با پر شدن، ثبت عکس و صف آفلاین شکست می‌خورد.',
+    action:'از داده پشتیبان بگیر، عکس‌های ارسال‌شده را پاک کن، و درخواست حافظه پایدار (persist) را فعال کن.' },
+
+  { id:'quotaerr', sev:'crash',
+    when:d => errText(d).includes('quotaexceeded'),
+    title:'خطای پر شدن حافظه ثبت شده',
+    cause:() => 'مرورگر صریحاً QuotaExceededError داده؛ نوشتن در حافظه رد شده است.',
+    action:'همان اقدام قاعده «حافظه» با اولویت بالاتر؛ ضمناً اندازه فشرده‌سازی عکس را کم کن.' },
+
+  { id:'noidb', sev:'blocker',
+    when:d => d.storage && d.storage.hasIdb === false,
+    title:'IndexedDB در دسترس نیست',
+    cause:() => 'مرورگر در حالت ناشناس/خصوصی است یا ذخیره‌سازی سایت بسته شده. صف آفلاین بدون IndexedDB کار نمی‌کند.',
+    action:'به کاربر بگو از حالت عادی کروم استفاده کند و «ذخیره کوکی‌ها و داده سایت» را مجاز کند.' },
+
+  { id:'jwt', sev:'blocker',
+    when:d => /jwt|token.*expired|invalid.{0,10}token|refresh/i.test(errText(d)),
+    title:'نشست کاربر منقضی شده',
+    cause:() => 'توکن ورود باطل یا منقضی شده و درخواست‌ها ۴۰۱ می‌گیرند.',
+    action:'خروج و ورود مجدد. اگر تکرار شد، عمر نشست یا ساعت گوشی را بررسی کن.' },
+
+  { id:'rls', sev:'crash',
+    when:d => /permission denied|42501|row-level security|rls/i.test(errText(d)),
+    title:'دسترسی دیتابیس رد شده (RLS)',
+    cause:() => 'سیاست امنیتی جدول با نقش یا سازمان این کاربر نمی‌خواند.',
+    action:'سیاست‌های همان جدول را با یک کاربر هم‌نقش تست کن؛ پیام دقیق خطا در بخش تشخیص فنی هست.' },
+
+  { id:'offline', sev:'info',
+    when:d => d.env && d.env.online === false && d.queue && d.queue.pending > 0,
+    title:'کاربر آفلاین با صف ارسال‌نشده',
+    cause:d => 'در لحظه گزارش، اینترنت قطع بوده و ' + d.queue.pending + ' مورد در صف مانده.',
+    action:'اشکال واقعی نیست؛ به کاربر بگو با اتصال، ارسال خودکار انجام می‌شود. اگر چند روز ماند، دنبال کن.' },
+
+  { id:'conflict', sev:'blocker',
+    when:d => d.queue && d.queue.conflicts > 0,
+    title:'تعارض همگام‌سازی',
+    cause:d => d.queue.conflicts + ' مورد تعارض دارد؛ سرور جلوتر از گوشی است.',
+    action:'راهنمای کادر قرمز: لمس اول آماده‌سازی، لمس دوم حذف تغییر محلی و گرفتن نسخه سرور.' },
+
+  { id:'cdn', sev:'warn',
+    when:(d,ctx) => d.runtime && d.runtime.cdn && d.runtime.cdn.pptx === false && /پاورپوینت|pptx|powerpoint/i.test(ctx.message || ''),
+    title:'کتابخانه پاورپوینت بارگذاری نشده',
+    cause:() => 'خروجی پاورپوینت از CDN می‌آید و در حالت آفلاین یا شبکه محدود بارگذاری نمی‌شود.',
+    action:'کتابخانه را محلی کن (همین فایل در مخزن هست) یا فعلاً از Word/Excel استفاده کن.' },
+
+  { id:'insecure', sev:'warn',
+    when:d => d.env && d.env.protocol === 'http:',
+    title:'صفحه روی HTTP باز شده',
+    cause:() => 'کلیپ‌بورد، سرویس‌ورکر و نصب برنامه در HTTP کار نمی‌کنند.',
+    action:'همیشه از آدرس https استفاده کن.' },
+
+  { id:'oldbrowser', sev:'warn',
+    when:d => chromeVersion(d.env && d.env.ua) > 0 && chromeVersion(d.env.ua) < 100,
+    title:'مرورگر قدیمی',
+    cause:d => 'نسخه کروم ' + chromeVersion(d.env.ua) + ' است.',
+    action:'به‌روزرسانی کروم؛ زیر ۱۰۰ قابلیت‌های ذخیره‌سازی و صف کامل نیست.' },
+
+  { id:'nosw', sev:'info',
+    when:d => d.runtime && d.runtime.swSupported && d.runtime.swController === false,
+    title:'سرویس‌ورکر کنترل صفحه را ندارد',
+    cause:() => 'صفحه از کش آفلاین نمی‌آید؛ احتمالاً نصب/بارگذاری سرویس‌ورکر ناقص بوده.',
+    action:'یک بار بستن کامل و باز کردن برنامه؛ اگر تکرار شد، ثبت سرویس‌ورکر را بررسی کن.' },
+
+  { id:'nopersist', sev:'info',
+    when:d => d.storage && d.storage.persisted === false && /Android/i.test((d.env && d.env.ua) || ''),
+    title:'حافظه پایدار درخواست نشده',
+    cause:() => 'اندروید می‌تواند برای آزادکردن فضا داده سایت را پاک کند.',
+    action:'درخواست navigator.storage.persist() را در شروع برنامه اضافه کن.' },
+
+  { id:'noqueue', sev:'info',
+    when:(d,ctx) => /صف|آفلاین/.test(ctx.section || '') && !d.queue,
+    title:'گزارش وضعیت صف در دسترس نیست',
+    cause:() => 'برنامه در این نسخه وضعیت صف را به موتور عیب‌یابی نمی‌دهد.',
+    action:'تابع window.__baazdidQueueInfo را در نسخه بعدی وصل کن تا تشخیص دقیق شود.' },
+
+  { id:'loginfail', sev:'crash',
+    when:(d,ctx) => /invalid_grant|invalid login|نام کاربری یا رمز/.test(errText(d) + ' ' + (ctx.message||'')),
+    title:'ورود ناموفق (رمز یا حساب)',
+    cause:() => 'سرور ورود را رد کرده. معمولاً رمز اشتباه، حساب بدون رمز، یا نبودن پروفایل در جدول profiles.',
+    action:'در پنل Supabase کاربر را پیدا کن؛ رمز را بازنشانی کن و مطمئن شو ردیف profiles با همان شناسه وجود دارد و active است.' },
+
+  { id:'noprofile', sev:'crash',
+    when:d => /پروفایل کاربر تعریف نشده|profile.{0,10}not.{0,10}found/.test(errText(d)),
+    title:'پروفایل کاربر تعریف نشده',
+    cause:() => 'کاربر در Authentication هست ولی ردیف متناظر در جدول profiles ندارد (یا سیاست خواندن آن را پنهان کرده).',
+    action:'ردیف profiles با همان UUID بساز؛ اگر تازه بسته‌ای، سیاست profiles_select برای کاربر واردشده را بررسی کن.' },
+
+  { id:'photo', sev:'blocker',
+    when:d => /image|photo|base64|عکس/.test(errText(d)) && /too large|payload|413|بزرگ/.test(errText(d)),
+    title:'ارسال عکس رد شده',
+    cause:() => 'حجم عکس از حد مجاز بیشتر است و درخواست رد شده.',
+    action:'کیفیت فشرده‌سازی را کم کن یا سقف حجم در آپلود را بالا ببر؛ عکس قبل از دستور ارسال می‌شود، پس این خطا صف را هم متوقف می‌کند.' },
+
+  { id:'none', sev:'info',
+    when:d => !d.errors || d.errors.length === 0,
+    title:'هیچ خطای فنی ثبت نشده',
+    cause:() => 'کاربر 「گیر کردم» گفته ولی خطایی در حافظه نیست؛ اشکال احتمالاً منطقی یا رابط کاربری است.',
+    action:'بازتولید با همین نسخه و همان بخش؛ اگر شد ویدیو یا عکس مرحله‌به‌مرحله بگیر.' }
+];
+
+function errText(d){
+  return ((d.errors || []).map(e => (e.kind||'') + ' ' + (e.msg||'') + ' ' + (e.stack||'')).join(' ')).toLowerCase();
+}
+function chromeVersion(ua){
+  const m = /Chrome\/(\d+)/.exec(ua || '');
+  return m ? +m[1] : 0;
+}
+function mb(b){ return (Math.round(b/1048576*10)/10) + ' مگابایت'; }
+function diagnose(report){
+  const d = (report && report.diag) || {};
+  const ctx = { message: report && report.message, section: report && report.section };
+  const out = [];
+  for (const r of RULES){
+    let hit = false;
+    try { hit = !!r.when(d, ctx); } catch(e){ hit = false; }
+    if (!hit) continue;
+    if (r.id === 'none' && out.length) continue;
+    out.push({
+      id:r.id, sev:r.sev, title:r.title,
+      cause: typeof r.cause === 'function' ? safe(()=>r.cause(d)) : r.cause,
+      action: r.action
+    });
+  }
+  if (!out.length) out.push({id:'unknown', sev:'warn', title:'تشخیص قطعی نشد',
+    cause:'نشانه‌های موجود با قواعد شناخته‌شده جور نشد.', action:'بخش «تشخیص فنی» را بخوان و همین گزارش را با کاربر بازتولید کن.'});
+  const rank = {crash:0, blocker:1, warn:2, info:3};
+  return out.sort((a,b)=> rank[a.sev]-rank[b.sev]);
+}
+function safe(fn){ try{ return String(fn()); }catch(e){ return ''; } }
+
+/* ============================================================
+   وضعیت و اتصال
+   ============================================================ */
+const S = { cfg:null, sess:null, reports:[], demo:false, filter:{status:'all', sev:'', client:'', q:''}, open:null };
+const $ = s => document.querySelector(s);
+const fa = n => String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+
+function loadCfg(){
+  try { S.cfg = JSON.parse(localStorage.getItem('bp_cfg') || 'null'); } catch(e){ S.cfg = null; }
+  return S.cfg;
+}
+function loadSess(){
+  try { S.sess = JSON.parse(localStorage.getItem('bp_sess') || 'null'); } catch(e){ S.sess = null; }
+  if (S.sess && S.sess.exp && Date.now() > S.sess.exp - 60000) return refresh().then(()=>S.sess).catch(()=>{ S.sess=null; return null; });
+  return Promise.resolve(S.sess);
+}
+
+async function api(path, opts){
+  opts = opts || {};
+  const base = (S.cfg.url || '').replace(/\/$/,'');
+  const headers = Object.assign({
+    'apikey': S.cfg.key,
+    'Content-Type': 'application/json'
+  }, opts.headers || {});
+  if (S.sess && S.sess.access_token) headers['Authorization'] = 'Bearer ' + S.sess.access_token;
+  else headers['Authorization'] = 'Bearer ' + S.cfg.key;
+  const r = await fetch(base + path, Object.assign({}, opts, { headers }));
+  const txt = await r.text();
+  if (!r.ok) {
+    let msg = txt;
+    try { msg = (JSON.parse(txt).message) || txt; } catch(e){}
+    if (r.status === 401 && S.sess) { throw Object.assign(new Error(msg), {code:401}); }
+    throw Object.assign(new Error(msg || ('HTTP ' + r.status)), {code:r.status});
+  }
+  return txt ? JSON.parse(txt) : null;
+}
+
+async function login(email, password){
+  const base = (S.cfg.url || '').replace(/\/$/,'');
+  const r = await fetch(base + '/auth/v1/token?grant_type=password', {
+    method:'POST',
+    headers:{ 'apikey':S.cfg.key, 'Content-Type':'application/json' },
+    body: JSON.stringify({ email, password })
+  });
+  const txt = await r.text();
+  if (!r.ok) {
+    let m = 'ایمیل یا رمز درست نیست';
+    try { const j = JSON.parse(txt); m = j.error_description || j.msg || j.message || m; } catch(e){}
+    throw new Error(m);
+  }
+  const j = JSON.parse(txt);
+  S.sess = { access_token:j.access_token, refresh_token:j.refresh_token,
+             exp: Date.now() + (j.expires_in||3600)*1000, email };
+  localStorage.setItem('bp_sess', JSON.stringify(S.sess));
+}
+
+async function refresh(){
+  if (!S.sess || !S.sess.refresh_token) throw new Error('no refresh');
+  const base = (S.cfg.url || '').replace(/\/$/,'');
+  const r = await fetch(base + '/auth/v1/token?grant_type=refresh_token', {
+    method:'POST', headers:{ 'apikey':S.cfg.key, 'Content-Type':'application/json' },
+    body: JSON.stringify({ refresh_token: S.sess.refresh_token })
+  });
+  if (!r.ok) throw new Error('refresh failed');
+  const j = await r.json();
+  S.sess = Object.assign({}, S.sess, {
+    access_token:j.access_token,
+    refresh_token:j.refresh_token || S.sess.refresh_token,
+    exp: Date.now() + (j.expires_in||3600)*1000
+  });
+  localStorage.setItem('bp_sess', JSON.stringify(S.sess));
+}
+
+async function fetchReports(){
+  const rows = await api('/rest/v1/bug_reports?select=*&order=created_at.desc&limit=300');
+  S.reports = rows || [];
+}
+
+async function patchReport(id, patch){
+  await api('/rest/v1/bug_reports?id=eq.' + id, {
+    method:'PATCH',
+    headers:{ 'Prefer':'return=representation' },
+    body: JSON.stringify(patch)
+  });
+}
+
+/* ============================================================
+   نمایش
+   ============================================================ */
+function show(id){
+  ['scSetup','scLogin','scInbox','scDetail'].forEach(s => $('#'+s).classList.add('hidden'));
+  if (id) $('#'+id).classList.remove('hidden');
+}
+
+async function boot(){
+  loadCfg();
+  if (!S.cfg) { show('scSetup'); return; }
+  const sess = await loadSess();
+  if (!sess) { show('scLogin'); return; }
+  show('scInbox');
+  await reload();
+}
+
+async function reload(){
+  const box = $('#list');
+  box.innerHTML = '<div class="empty">در حال گرفتن گزارش‌ها…</div>';
+  if (S.demo) { S.reports = demoData(); }
+  else {
+    try { await fetchReports(); }
+    catch(e){
+      box.innerHTML = '<div class="err" style="display:block">دریافت گزارش‌ها نشد: ' + esc(e.message) + '</div>';
+      return;
+    }
+  }
+  $('#inSub').textContent = S.demo ? 'حالت نمونه — داده واقعی نیست' : ((S.cfg.url||'').replace('https://','').split('.')[0] + ' • ' + (S.sess && S.sess.email || ''));
+  renderAll();
+}
+
+function counts(){
+  const c = {all:S.reports.length, new:0, seen:0, resolved:0, wontfix:0};
+  S.reports.forEach(r => c[r.status] = (c[r.status]||0) + 1);
+  return c;
+}
+
+function renderAll(){
+  const c = counts();
+  $('#cAll').textContent = fa(c.all); $('#cNew').textContent = fa(c.new||0);
+  $('#cSeen').textContent = fa(c.seen||0); $('#cRes').textContent = fa(c.resolved||0);
+
+  const clients = Array.from(new Set(S.reports.map(r => r.client_id).filter(Boolean)));
+  const sel = $('#fClient');
+  sel.innerHTML = '<option value="">همه نصب‌ها</option>' + clients.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join('');
+  sel.value = S.filter.client || '';
+
+  const sigCount = {};
+  S.reports.forEach(r => { if (r.signature) sigCount[r.signature] = (sigCount[r.signature]||0) + 1; });
+
+  let rows = S.reports.slice();
+  if (S.filter.status !== 'all') rows = rows.filter(r => r.status === S.filter.status);
+  if (S.filter.sev) rows = rows.filter(r => r.severity === S.filter.sev);
+  if (S.filter.client) rows = rows.filter(r => r.client_id === S.filter.client);
+  if (S.filter.q) {
+    const q = S.filter.q.toLowerCase();
+    rows = rows.filter(r => [r.message, r.section, r.username, r.app_version, r.client_name, r.page_url]
+      .filter(Boolean).join(' ').toLowerCase().includes(q));
+  }
+
+  const box = $('#list');
+  if (!rows.length) { box.innerHTML = '<div class="empty">گزارشی با این فیلتر نیست.</div>'; return; }
+
+  box.innerHTML = rows.map(r => {
+    const rules = diagnose(r);
+    const top = rules[0];
+    const sigN = r.signature ? (sigCount[r.signature]||1) : 0;
+    return `<div class="item s-${esc(r.status)}" data-id="${r.id}">
+      <div class="t">${esc(r.message || '(بدون متن)')}</div>
+      <div class="meta">
+        ${sevTag(r.severity)}
+        <span class="tag">${esc(sectionFa(r.section))}</span>
+        <span class="tag">${esc(r.app_version || 'نسخه نامشخص')}</span>
+        <span class="tag">${esc(r.client_id || '')}</span>
+        ${r.username ? `<span class="tag">${esc(r.username)}</span>` : ''}
+        ${sigN > 1 ? `<span class="tag blue">${fa(sigN)} گزارش مشابه</span>` : ''}
+        ${top && top.sev !== 'info' ? `<span class="tag amber">${esc(top.title)}</span>` : ''}
+        <span class="tag">${esc(when(r.created_at))}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  box.querySelectorAll('.item').forEach(el => {
+    el.onclick = () => openDetail(el.dataset.id);
+  });
+}
+
+function openDetail(id){
+  const r = S.reports.find(x => String(x.id) === String(id));
+  if (!r) return;
+  S.open = r;
+  $('#dtTitle').textContent = 'گزارش #' + fa(r.id);
+  const rules = diagnose(r);
+  const d = r.diag || {};
+  const env = d.env || {}, st = d.storage || {}, q = d.queue;
+
+  $('#dtBody').innerHTML = `
+    <div class="card">
+      <h2>${esc(r.message || '(بدون متن)')}</h2>
+      <div class="meta">${sevTag(r.severity)}<span class="tag">${esc(sectionFa(r.section))}</span><span class="tag">${esc(r.app_version||'')}</span><span class="tag">${esc(when(r.created_at))}</span></div>
+      <div class="kv" style="margin-top:10px">
+        <b>کاربر</b><span>${esc(r.username || '—')} ${r.ops_role ? '(' + esc(r.ops_role) + ')' : ''}</span>
+        <b>نصب/مشتری</b><span>${esc(r.client_name || r.client_id || '—')}</span>
+        <b>صفحه</b><span dir="ltr" style="font-size:11px;word-break:break-all">${esc(r.page_url || '—')}</span>
+        <b>وضعیت</b><span>${esc(statusFa(r.status))}</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>تشخیص خودکار</h2>
+      <p class="muted">نتیجه موتور عیب‌یابی روی همین گزارش (قواعد قطعی، نه حدس آزاد).</p>
+      ${rules.map(x => `<div class="rule r-${esc(x.sev)}">
+          <div class="rt">${sevIcon(x.sev)} ${esc(x.title)}</div>
+          <div class="rc">${esc(x.cause || '')}</div>
+          <div class="ra"><b>کار پیشنهادی:</b> ${esc(x.action || '')}</div>
+        </div>`).join('')}
+    </div>
+
+    <div class="card">
+      <h2>محیط و حافظه</h2>
+      <div class="kv">
+        <b>آنلاین</b><span>${env.online ? 'بله' : 'خیر'} ${d.env && d.env.conn && d.env.conn.effectiveType ? '• ' + esc(d.env.conn.effectiveType) : ''}</span>
+        <b>مرورگر</b><span dir="ltr" style="font-size:11px;word-break:break-all">${esc(shortUA(env.ua))}</span>
+        <b>صفحه</b><span dir="ltr">${esc((env.screen && env.screen.w || '?') + '×' + (env.screen && env.screen.h || '?'))}</span>
+        <b>حافظه</b><span>${st.quotaTotal ? mb(st.quotaUsage) + ' از ' + mb(st.quotaTotal) : 'نامشخص'} • پایدار: ${st.persisted ? 'بله' : 'خیر'} • IndexedDB: ${st.hasIdb ? 'دارد' : 'ندارد'}</span>
+        <b>صف</b><span>${q ? ('در انتظار ' + fa(q.pending||0) + ' • تعارض ' + fa(q.conflicts||0)) : 'نامشخص'}</span>
+        <b>سرویس‌ورکر</b><span>${d.runtime && d.runtime.swController ? 'فعال' : 'غیرفعال'}</span>
+        <b>CDN</b><span>pptx ${d.runtime && d.runtime.cdn && d.runtime.cdn.pptx ? '✓' : '✗'} • xlsx ${d.runtime && d.runtime.cdn && d.runtime.cdn.xlsx ? '✓' : '✗'} • docx ${d.runtime && d.runtime.cdn && d.runtime.cdn.docx ? '✓' : '✗'}</span>
+      </div>
+    </div>
+
+    ${(d.errors && d.errors.length) ? `<div class="card">
+      <h2>خطاهای ثبت‌شده (${fa(d.errors.length)})</h2>
+      ${d.errors.slice().reverse().map(e => `<div class="rule r-warn"><div class="rt" dir="ltr" style="font-size:12px;text-align:left">${esc(e.kind)}</div><div class="rc" dir="ltr" style="text-align:left;font-size:11.5px">${esc((e.msg||'').slice(0,300))}</div>${e.stack ? `<pre class="diag" style="max-height:150px">${esc(e.stack)}</pre>` : ''}</div>`).join('')}
+    </div>` : ''}
+
+    ${(d.breadcrumbs && d.breadcrumbs.length) ? `<div class="card">
+      <h2>ردپای اقدام‌ها</h2>
+      <div class="kv">${d.breadcrumbs.slice(-12).reverse().map(b => `<b dir="ltr">${esc((b.t||'').slice(11,19))}</b><span>${esc(b.label)} ${b.detail ? '— ' + esc(b.detail) : ''}</span>`).join('')}</div>
+    </div>` : ''}
+
+    <div class="card">
+      <h2>تشخیص فنی خام</h2>
+      <pre class="diag">${esc(JSON.stringify(r.diag || {}, null, 1).slice(0, 12000))}</pre>
+      <div class="row" style="margin-top:10px">
+        <button class="btn ghost" id="dtCopy">کپی تشخیص</button>
+        <button class="btn ghost" id="dtExport">دانلود JSON</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>وضعیت و یادداشت</h2>
+      <div class="row">
+        <button class="btn" data-st="seen">دیده شد</button>
+        <button class="btn" data-st="resolved">حل شد</button>
+        <button class="btn" data-st="wontfix">حل نمی‌شود</button>
+      </div>
+      <label class="f">یادداشت سازنده</label>
+      <textarea class="f" id="dtNote" placeholder="علت واقعی چه بود؟">${esc(r.owner_note || '')}</textarea>
+      <button class="btn primary" id="dtSaveNote">ذخیره یادداشت</button>
+      <div id="dtMsg" class="banner" style="display:none"></div>
+    </div>
+  `;
+
+  show('scDetail');
+
+  $('#dtCopy').onclick = () => {
+    const txt = 'گزارش #' + r.id + '\n' + (r.message||'') + '\n\nتشخیص:\n' +
+      rules.map(x => '- ' + x.title + ': ' + (x.cause||'') + ' | کار: ' + (x.action||'')).join('\n') +
+      '\n\nمحیط: ' + shortUA(r.diag && r.diag.env && r.diag.env.ua) +
+      '\nتهیه‌شده در صندوق پشتیبانی بازدید';
+    navigator.clipboard ? navigator.clipboard.writeText(txt).then(()=>toast('کپی شد')) : toast('کپی در این مرورگر نیست');
+  };
+  $('#dtExport').onclick = () => {
+    const blob = new Blob([JSON.stringify(r, null, 2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'bug-' + r.id + '.json'; a.click();
+  };
+  $('#dtSaveNote').onclick = async () => {
+    const note = $('#dtNote').value;
+    try {
+      if (!S.demo) await patchReport(r.id, { owner_note: note });
+      r.owner_note = note; toast('ذخیره شد');
+    } catch(e){ toast('ذخیره نشد: ' + e.message); }
+  };
+  $('#dtBody').querySelectorAll('[data-st]').forEach(b => {
+    b.onclick = async () => {
+      const st2 = b.dataset.st;
+      try {
+        if (!S.demo) await patchReport(r.id, { status: st2 });
+        r.status = st2; toast('وضعیت: ' + statusFa(st2));
+        renderAll(); openDetail(r.id);
+      } catch(e){ toast('تغییر نداد: ' + e.message); }
+    };
+  });
+}
+
+function toast(m){
+  const el = document.createElement('div');
+  el.textContent = m;
+  el.style.cssText = 'position:fixed;bottom:80px;right:50%;transform:translateX(50%);background:#0f172a;color:#fff;padding:10px 16px;border-radius:12px;font-size:13px;z-index:99;box-shadow:0 8px 24px rgba(0,0,0,.3)';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2200);
+}
+
+/* ---------- کمکی‌ها ---------- */
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function shortUA(ua){ ua = ua || ''; const m = /Android[^;]*;\s*([^)]+)\)/.exec(ua); const c = /Chrome\/(\d+)/.exec(ua); return (m ? 'Android / ' : '') + (m ? m[1] : '') + (c ? ' • Chrome ' + c[1] : ''); }
+function sevTag(s){ const m = {crash:['red','متوقف‌کننده'], blocker:['amber','مانع کار'], normal:['blue','عادی'], minor:['','جزئی']}; const x = m[s] || m.normal; return `<span class="tag ${x[0]}">${x[1]}</span>`; }
+function sevIcon(s){ return {crash:'⛔', blocker:'⚠️', warn:'🔶', info:'ℹ️'}[s] || '•'; }
+function sectionFa(s){ return ({'login':'ورود','orders':'دستورها','queue':'صف آفلاین','photo':'عکس','report':'گزارش‌ها','other':'سایر'})[s] || (s || 'بخش نامشخص'); }
+function statusFa(s){ return ({new:'جدید', seen:'دیده‌شده', resolved:'حل‌شده', wontfix:'حل‌نمی‌شود'})[s] || s; }
+function when(t){ if (!t) return ''; try { return new Date(t).toLocaleString('fa-IR', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'}); } catch(e){ return t; } }
+
+/* ============================================================
+   رویدادها
+   ============================================================ */
+$('#cfSave').onclick = () => {
+  const url = $('#cfUrl').value.trim(), key = $('#cfKey').value.trim();
+  const err = $('#cfErr');
+  if (!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(url)) { err.textContent = 'آدرس باید شکل https://xxxx.supabase.co باشد'; err.style.display='block'; return; }
+  if (key.length < 20) { err.textContent = 'کلید عمومی خیلی کوتاه است'; err.style.display='block'; return; }
+  localStorage.setItem('bp_cfg', JSON.stringify({url, key}));
+  S.cfg = {url, key};
+  show('scLogin');
+};
+$('#cfDemo').onclick = () => { S.demo = true; S.cfg = {url:'https://demo.supabase.co', key:'demo'}; show('scInbox'); reload(); };
+$('#lnSetup').onclick = () => { show('scSetup'); $('#cfUrl').value = (S.cfg&&S.cfg.url)||''; $('#cfKey').value = (S.cfg&&S.cfg.key)||''; };
+$('#lnGo').onclick = async () => {
+  const err = $('#lnErr'); err.style.display='none';
+  try {
+    await login($('#lnEmail').value.trim(), $('#lnPass').value);
+    show('scInbox'); await reload();
+  } catch(e){ err.textContent = e.message; err.style.display='block'; }
+};
+$('#lnDemo').onclick = () => { S.demo = true; show('scInbox'); reload(); };
+$('#inRefresh').onclick = () => reload();
+$('#inOut').onclick = () => { localStorage.removeItem('bp_sess'); S.sess = null; show('scLogin'); };
+$('#dtBack').onclick = () => { show('scInbox'); renderAll(); };
+document.querySelectorAll('#fStatus .chip').forEach(ch => {
+  ch.onclick = () => {
+    document.querySelectorAll('#fStatus .chip').forEach(c => c.classList.remove('on'));
+    ch.classList.add('on'); S.filter.status = ch.dataset.s; renderAll();
+  };
+});
+$('#fSev').onchange = e => { S.filter.sev = e.target.value; renderAll(); };
+$('#fClient').onchange = e => { S.filter.client = e.target.value; renderAll(); };
+$('#fSearch').oninput = e => { S.filter.q = e.target.value.trim(); renderAll(); };
+
+/* ============================================================
+   داده نمونه (فقط برای نمایش و آموزش — هیچ ارتباطی با سرور ندارد)
+   ============================================================ */
+function demoData(){
+  const now = Date.now();
+  const t = m => new Date(now - m*60000).toISOString();
+  return [
+    { id:1007, client_id:'bazdid-test', client_name:'بازدید — آزمایشی', severity:'blocker', section:'queue',
+      message:'در حالت آفلاین عکس ثبت شد ولی بعد از اتصال ارسال نشد و کادر سبز نیامد.',
+      app_version:'v4.1.19-S3f', username:'crew1', ops_role:'crew', page_url:'https://x/bazdid/stage-07-ops-test-21.html',
+      signature:'a1_queue', status:'new', created_at:t(12),
+      diag:{ env:{online:true, ua:'Mozilla/5.0 (Linux; Android 14; SM-A546E) AppleWebKit/537.36 Chrome/128.0 Mobile', screen:{w:412,h:915}, protocol:'https:', conn:{effectiveType:'4g'}, tz:'Asia/Tehran'},
+        runtime:{swSupported:true, swController:false, cdn:{pptx:true,xlsx:true,docx:true}, clipboardSecure:true},
+        storage:{hasIdb:true, persisted:false, quotaUsage:184*1048576, quotaTotal:200*1048576, lsKeys:14},
+        queue:{pending:3, conflicts:0, lastFlushAt:t(15), lastFlushOk:false},
+        errors:[{t:t(13), kind:'error', msg:'QuotaExceededError: Failed to execute transaction on IDBObjectStore', stack:'at putPhoto (app.js:2211)\nat offFlush (app.js:2988)'}],
+        breadcrumbs:[{t:t(16),label:'ثبت دستور آفلاین'},{t:t(14),label:'افزودن عکس'},{t:t(13),label:'offFlush'}] } },
+
+    { id:1006, client_id:'bazdid-test', client_name:'بازدید — آزمایشی', severity:'crash', section:'login',
+      message:'نام کاربری درست است ولی می‌گوید نام کاربری یا رمز صحیح نیست.',
+      app_version:'v4.1.19-S3f', username:'exec1', ops_role:'exec', page_url:'https://x/bazdid/stage-07-ops-test-21.html',
+      signature:'b2_login', status:'seen', created_at:t(95), owner_note:'حساب exec1 رمز نداشت؛ بازنشانی شد.',
+      diag:{ env:{online:true, ua:'Mozilla/5.0 (Linux; Android 12; Redmi Note 10) Chrome/119.0 Mobile', screen:{w:393,h:851}, protocol:'https:'},
+        runtime:{swSupported:true, swController:true, cdn:{pptx:true,xlsx:true,docx:true}},
+        storage:{hasIdb:true, persisted:false, quotaUsage:12*1048576, quotaTotal:120*1048576, lsKeys:6},
+        errors:[{t:t(96), kind:'console', msg:'POST /auth/v1/token 400 invalid_grant'}], breadcrumbs:[{t:t(97),label:'تلاش ورود'}] } },
+
+    { id:1005, client_id:'bazdid-test', client_name:'بازدید — آزمایشی', severity:'normal', section:'report',
+      message:'دکمه پاورپوینت در حالت هواپیما هیچ فایلی نمی‌سازد.',
+      app_version:'v4.1.19-S3f', username:'sup1', ops_role:'sup', page_url:'https://x/bazdid/stage-07-ops-test-21.html',
+      signature:'c3_ppt', status:'new', created_at:t(180),
+      diag:{ env:{online:false, ua:'Mozilla/5.0 (Linux; Android 13; SM-G991B) Chrome/127.0 Mobile', screen:{w:360,h:800}, protocol:'https:'},
+        runtime:{swSupported:true, swController:true, cdn:{pptx:false,xlsx:true,docx:true}},
+        storage:{hasIdb:true, persisted:true, quotaUsage:40*1048576, quotaTotal:300*1048576},
+        errors:[], breadcrumbs:[{t:t(181),label:'لمس پاورپوینت'}] } },
+
+    { id:1004, client_id:'bazdid-test', client_name:'بازدید — آزمایشی', severity:'minor', section:'other',
+      message:'فونت بعضی جدول‌ها روی گوشی خیلی ریز است.',
+      app_version:'v4.1.19-S3f', username:'manager', ops_role:'manager', page_url:'https://x/bazdid/',
+      signature:'d4_ui', status:'resolved', created_at:t(400), owner_note:'در نسخه بعدی بزرگ شد.',
+      diag:{ env:{online:true, ua:'Mozilla/5.0 (Linux; Android 11; M2007J3SY) Chrome/104.0 Mobile', screen:{w:393,h:873}, protocol:'https:'},
+        runtime:{swSupported:true, swController:true, cdn:{pptx:true,xlsx:true,docx:true}},
+        storage:{hasIdb:true, persisted:false, quotaUsage:8*1048576, quotaTotal:120*1048576},
+        errors:[], breadcrumbs:[] } }
+  ];
+}
+
+boot();
+</script>
+</body>
+</html>
