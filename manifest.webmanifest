@@ -1,21 +1,27 @@
 {
-  "name": "سامانه بازدید مناطق",
-  "short_name": "بازدید",
-  "description": "ثبت، پیگیری و گزارش بازدیدهای میدانی",
+  "id": "./",
+  "name": "مدیریت عملکرد عملیات",
+  "short_name": "مدیریت عملیات",
+  "description": "مدیریت دستورهای عملیات، بازدیدهای میدانی و گزارش‌های یکپارچه",
   "lang": "fa",
   "dir": "rtl",
-  "start_url": "./?v=10",
+  "start_url": "./?app=ops",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f6f8fc",
-  "theme_color": "#1d4ed8",
+  "background_color": "#f1f5f9",
+  "theme_color": "#0f766e",
   "icons": [
     {
-      "src": "icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "./icon-ops-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-ops-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "any maskable"
     }
-  ],
-  "id": "./"
+  ]
 }
