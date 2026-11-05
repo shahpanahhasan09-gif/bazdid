@@ -1,9 +1,10 @@
-/* ops-v51-arak-icon-2026-11-05d: only same-origin app shell is cached; Supabase/API requests are never intercepted. */
-const BUILD_ID = 'ops-v51-arak-icon-2026-11-05d';
+/* ops-v52-support-cleanup-2026-11-06a: only same-origin app shell is cached; Supabase/API requests are never intercepted. */
+const BUILD_ID = 'ops-v52-support-cleanup-2026-11-06a';
 const CACHE = 'bazdid-' + BUILD_ID;
 const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './icon-arak-192.png?v=arak-v1', './icon-arak-512.png?v=arak-v1', './report.html'];
+const OFFICE_LIBS = ['./lib-xlsx-style-1.2.0.js', './lib-pptxgen-3.12.0.js', './lib-docx-8.5.0.js'];
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(APP_SHELL)));
+  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(APP_SHELL).then(() => Promise.all(OFFICE_LIBS.map(u => cache.add(u).catch(() => null))))));
 });
 self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
