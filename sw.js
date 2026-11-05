@@ -1,7 +1,7 @@
-/* ops-v50-2026-11-05a: only same-origin app shell is cached; Supabase/API requests are never intercepted. */
-const BUILD_ID = 'ops-v50-2026-11-05a';
+/* ops-v50-city-icon-2026-11-05b: only same-origin app shell is cached; Supabase/API requests are never intercepted. */
+const BUILD_ID = 'ops-v50-city-icon-2026-11-05b';
 const CACHE = 'bazdid-' + BUILD_ID;
-const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './icon-ops-192.png', './icon-ops-512.png', './report.html'];
+const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './icon-ops-192.png?v=city-ops-v1', './icon-ops-512.png?v=city-ops-v1', './report.html'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(APP_SHELL)));
 });
