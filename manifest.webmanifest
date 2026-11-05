@@ -8,20 +8,26 @@
   "start_url": "./?app=ops",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f1f5f9",
+  "background_color": "#0b2a4f",
   "theme_color": "#0f766e",
   "icons": [
     {
-      "src": "./icon-ops-192.png?v=city-ops-v1",
+      "src": "./icon-arak-192.png?v=arak-v1",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./icon-ops-512.png?v=city-ops-v1",
+      "src": "./icon-arak-512.png?v=arak-v1",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-arak-512.png?v=arak-v1",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
